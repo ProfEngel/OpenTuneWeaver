@@ -3,6 +3,9 @@
 
 Dieses Projekt ermöglicht ein vereinfachtes Finetuning eines OpenSource-LLMs. Dabei wird zunächst eine RAW-PDF hochgeladen, dann in Q&A überführt und in ein passendes Finetuning-Format überführt. Danach wird mittels ausgewählten Mitteln ein ausgewähltes OpenSource-LLM feinabgestimmt und zum Download (auch als gguf) bereitgestellt. Alles in einer anwenderfreundlichen UI.
 
+> [!IMPORTANT]
+> Dieses Projekt ist im Entstehen und hat noch keine Funktionalität. -Noch nicht...
+
 ## Projektstruktur
 
 - `data/`: Verzeichnis für Rohdaten wie PDFs und konvertierte TXT-Dateien.
@@ -69,7 +72,7 @@ Wir freuen uns über Beiträge von jedem! Wenn Sie einen Fehler finden, eine Fun
 ## Roadmap? 🛣️
 Was als nächstes implementiert wird, habe ich auf meiner Roadmap dargestellt. Das findet man in meiner [Documentation](https://github.com/ProfEngel/OpenTuneWeaver/wiki/Roadmap).
 
-# <iframe style="width:100%;height:auto;min-width:600px;min-height:400px;" src="https://star-history.com/embedsecret=Z2hwX0JRaFJPZXkxcUpibDJ6Q1dYS052YUVleEJtRG5YaDFMcjJlMw==#ProfEngel/OpenTuneWeaver&Timeline" frameBorder="0"></iframe>
+<!-- <iframe style="width:100%;height:auto;min-width:600px;min-height:400px;" src="https://star-history.com/embedsecret=Z2hwX0JRaFJPZXkxcUpibDJ6Q1dYS052YUVleEJtRG5YaDFMcjJlMw==#ProfEngel/OpenTuneWeaver&Timeline" frameBorder="0"></iframe> -->
 
 ## Star History
 
