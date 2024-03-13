@@ -9,11 +9,11 @@ Dieses Projekt ermöglicht ein vereinfachtes Finetuning eines OpenSource-LLMs. D
 ## Verlauf
 
 
-🔥 13 März: Was ist OpenTuneWeaver? 📰Blog; 📺Youtube.
+🔥 13 März: Was ist OpenTuneWeaver? 
 
 📚 11 März: [Plakat](papers/MoEundMultiAgentenChatbot.pdf) und Impulsvortrag auf dem Dialogtreffen des MWK Ba-Wü "KI in der Hochschullehre Baden-Württemberg".
 
-🎉 12. März. Neues Feature integriert.
+<!-- 🎉 12. März. Neues Feature integriert. 📰Blog; 📺Youtube. -->
 
 
 
