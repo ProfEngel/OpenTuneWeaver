@@ -6,6 +6,18 @@ Dieses Projekt ermöglicht ein vereinfachtes Finetuning eines OpenSource-LLMs. D
 > [!IMPORTANT]
 > Dieses Projekt ist im Entstehen und hat noch keine Funktionalität. -Noch nicht...
 
+## Verlauf
+
+
+🔥 13 März: Was ist OpenTuneWeaver? 📰Blog; 📺Youtube.
+
+📚 11 März: [Plakat](papers/MoEundMultiAgentenChatbot.pdf) und Impulsvortrag auf dem Dialogtreffen des MWK Ba-Wü "KI in der Hochschullehre Baden-Württemberg".
+
+🎉 12. März. Neues Feature integriert.
+
+
+
+
 ## Projektstruktur
 
 - `data/`: Verzeichnis für Rohdaten wie PDFs und konvertierte TXT-Dateien.
