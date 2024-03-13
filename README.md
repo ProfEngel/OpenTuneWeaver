@@ -1,5 +1,5 @@
 
-# FineTuneLLM
+# OpenTuneWeaver
 
 Dieses Projekt ermöglicht ein vereinfachtes Finetuning eines OpenSource-LLMs. Dabei wird zunächst eine RAW-PDF hochgeladen, dann in Q&A überführt und in ein passendes Finetuning-Format überführt. Danach wird mittels ausgewählten Mitteln ein ausgewähltes OpenSource-LLM feinabgestimmt und zum Download (auch als gguf) bereitgestellt. Alles in einer anwenderfreundlichen UI.
 
@@ -20,16 +20,16 @@ Um dieses Projekt zu verwenden, wird empfohlen, eine isolierte Python-Umgebung m
    Öffnen Sie ein Terminal und klonen Sie das Repository mit dem folgenden Befehl:
 
    ```bash
-   git clone https://github.com/ProfEngel/FineTuneLLM
-   cd FineTuneLLM
+   git clone https://github.com/ProfEngel/OpenTuneWeaver
+   cd OpenTuneWeaver
    ```
 
 2. **Erstellen einer Conda-Umgebung:**
-   Erstellen Sie eine neue Conda-Umgebung namens `finetunellm` mit Python 3.11:
+   Erstellen Sie eine neue Conda-Umgebung namens `opentuneweaver` mit Python 3.11:
 
    ```bash
-   conda create -n finetunellm python=3.11
-   conda activate finetunellm
+   conda create -n opentuneweaver python=3.11
+   conda activate opentuneweaver
    ```
 
 3. **Installieren der Abhängigkeiten:**
@@ -67,13 +67,13 @@ Nach dem Finetuning können Sie die Q&A- oder Chat-Generierungsfunktion nutzen, 
 Wir freuen uns über Beiträge von jedem! Wenn Sie einen Fehler finden, eine Funktion anfragen oder einen Pull-Request einreichen möchten, fühlen Sie sich frei, das zu tun.
 
 ## Roadmap? 🛣️
-Was als nächstes implementiert wird, habe ich auf meiner Roadmap dargestellt. Das findet man in meiner [Documentation](https://github.com/ProfEngel/FineTuneLLM/wiki/Roadmap).
+Was als nächstes implementiert wird, habe ich auf meiner Roadmap dargestellt. Das findet man in meiner [Documentation](https://github.com/ProfEngel/OpenTuneWeaver/wiki/Roadmap).
 
-#<iframe style="width:100%;height:auto;min-width:600px;min-height:400px;" src="https://star-history.com/embed?secret=Z2hwX0JRaFJPZXkxcUpibDJ6Q1dYS052YUVleEJtRG5YaDFMcjJlMw==#ProfEngel/FineTuneLLM&Timeline" frameBorder="0"></iframe>
+#<iframe style="width:100%;height:auto;min-width:600px;min-height:400px;" src="https://star-history.com/embed?secret=Z2hwX0JRaFJPZXkxcUpibDJ6Q1dYS052YUVleEJtRG5YaDFMcjJlMw==#ProfEngel/OpenTuneWeaver&Timeline" frameBorder="0"></iframe>
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=ProfEngel/FineTuneLLM&type=Timeline)](https://star-history.com/#ProfEngel/FineTuneLLM&Timeline)
+[![Star History Chart](https://api.star-history.com/svg?repos=ProfEngel/OpenTuneWeaver&type=Timeline)](https://star-history.com/#ProfEngel/OpenTuneWeaver&Timeline)
 
 
 ## Lizenz📜
