@@ -1,5 +1,6 @@
 
-# OpenTuneWeaver - FineTune your OpenSource-LLM easy in a UI
+# OpenTuneWeaver
+## FineTune your OpenSource-LLM easy in a UI in your browser
 
 Dieses Projekt ermöglicht ein vereinfachtes Finetuning eines OpenSource-LLMs. Dabei wird zunächst eine RAW-PDF hochgeladen, dann in Q&A überführt und in ein passendes Finetuning-Format überführt. Danach wird mittels ausgewählten Mitteln ein ausgewähltes OpenSource-LLM feinabgestimmt und zum Download (auch als gguf) bereitgestellt. Alles in einer anwenderfreundlichen UI.
 
