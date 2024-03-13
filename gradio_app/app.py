@@ -18,7 +18,7 @@ def generate_output(mode, input_text):
 
 # Gradio Interface
 with gr.Blocks() as app:
-    gr.Markdown("### DeinProjekt")
+    gr.Markdown("### OpenTuneWeaver")
     with gr.Tab("Datenvorbereitung"):
         with gr.Row():
             file_input = gr.Files(label="Upload PDFs")
