@@ -66,6 +66,26 @@ Nach dem Finetuning können Sie die Q&A- oder Chat-Generierungsfunktion nutzen, 
 
 Wir freuen uns über Beiträge von jedem! Wenn Sie einen Fehler finden, eine Funktion anfragen oder einen Pull-Request einreichen möchten, fühlen Sie sich frei, das zu tun.
 
-## Lizenz
+## Roadmap? 🛣️
+Was als nächstes implementiert wird, habe ich auf meiner Roadmap dargestellt. Das findet man in meiner [Documentation](https://github.com/ProfEngel/FineTuneLLM/wiki/Roadmap).
 
-[MIT](LICENSE)
+#<iframe style="width:100%;height:auto;min-width:600px;min-height:400px;" src="https://star-history.com/embed?secret=Z2hwX0JRaFJPZXkxcUpibDJ6Q1dYS052YUVleEJtRG5YaDFMcjJlMw==#ProfEngel/FineTuneLLM&Timeline" frameBorder="0"></iframe>
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=ProfEngel/FineTuneLLM&type=Timeline)](https://star-history.com/#ProfEngel/FineTuneLLM&Timeline)
+
+
+## Lizenz📜
+
+Dieses Projekt ist nach der [MIT](LICENSE)-Lizenz lizenziert. Schau in das Lizenzfile für Details und frag gegebenenfalls ChatGPT oder Dein LLM was das bedeutet.📄
+
+Erstellt von [Prof. Dr. Mathias Engel](https://github.com/ProfEngel)  - Lasst uns Open-Source LLM für alle Anwendungszwecke spezialisieren! 💪
+
+## Credits
+
+Um diese vereinfachte App zu ermöglichen wurden Inhalte aus folgenden Quellen inkludiert.
+
+## Related Papers
+
+Veröffentlichungen zu diesem Repo werde ich hier verlinken.
