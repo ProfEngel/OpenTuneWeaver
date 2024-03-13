@@ -1,6 +1,6 @@
-# DeinProjekt
+# FineTuneLLM
 
-DeinProjekt ist eine GradioApp, die darauf abzielt, eine Schnittstelle für verschiedene Funktionen zu bieten, einschließlich der Verarbeitung und Analyse von Büchern/Papers, der Generierung von Q&A und Chat basierend auf den verarbeiteten Texten sowie der Vorbereitung von Trainings- und Testdatensätzen für das Fine-Tuning von Large Language Models (LLMs).
+Dieses Projekt ermöglicht eine vereinfachtes Finetuning eines OpenSource-LLMs. Dabei wird zunächst eine RAW-PDF hochgeladen, dann in Q&A überführt und in ein passendes Finetuning-Format überführt. Danach wird mittels ausgewählten Mitteln ein ausgewähltes OpenSource-LLM feinabgestimmt und zum Download (auch als gguf) bereitgestellt. Alles in einer anwenderfreundlichen UI.
 
 ## Projektstruktur
 
@@ -16,6 +16,6 @@ DeinProjekt ist eine GradioApp, die darauf abzielt, eine Schnittstelle für vers
 Um dieses Projekt zu verwenden, klonen Sie das Repository und installieren Sie die erforderlichen Abhängigkeiten:
 
 ```bash
-git clone <repository-url>
-cd DeinProjekt
+git clone https://github.com/ProfEngel/FineTuneLLM
+cd FineTuneLLM
 pip install -r requirements.txt
