@@ -69,7 +69,7 @@ Wir freuen uns über Beiträge von jedem! Wenn Sie einen Fehler finden, eine Fun
 ## Roadmap? 🛣️
 Was als nächstes implementiert wird, habe ich auf meiner Roadmap dargestellt. Das findet man in meiner [Documentation](https://github.com/ProfEngel/OpenTuneWeaver/wiki/Roadmap).
 
-#<iframe style="width:100%;height:auto;min-width:600px;min-height:400px;" src="https://star-history.com/embed?secret=Z2hwX0JRaFJPZXkxcUpibDJ6Q1dYS052YUVleEJtRG5YaDFMcjJlMw==#ProfEngel/OpenTuneWeaver&Timeline" frameBorder="0"></iframe>
+# <iframe style="width:100%;height:auto;min-width:600px;min-height:400px;" src="https://star-history.com/embedsecret=Z2hwX0JRaFJPZXkxcUpibDJ6Q1dYS052YUVleEJtRG5YaDFMcjJlMw==#ProfEngel/OpenTuneWeaver&Timeline" frameBorder="0"></iframe>
 
 ## Star History
 
@@ -84,7 +84,7 @@ Erstellt von [Prof. Dr. Mathias Engel](https://github.com/ProfEngel)  - Lasst un
 
 ## Credits
 
-Um diese vereinfachte App zu ermöglichen wurden Inhalte aus folgenden Quellen inkludiert.
+Um diese vereinfachte App zu ermöglichen, wurden Inhalte aus folgenden Quellen (in Teilen) verwendet.
 
 ## Related Papers
 
