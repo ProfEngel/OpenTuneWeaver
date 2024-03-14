@@ -1,3 +1,4 @@
 gradio==4.21.0
 pdfminer==20191125
 pdfminer.six==20231228
+openai==1.14.0
