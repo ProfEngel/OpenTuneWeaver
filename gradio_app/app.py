@@ -48,5 +48,14 @@ with gr.Blocks() as app:
             finetune_btn = gr.Button("Finetune")
             
         finetune_btn.click(finetune, inputs=[model_select, text_input], outputs=gr.Textbox(label="Finetuning Status"))
-        
+
+    with gr.Tab("Playground"):
+        with gr.Row():
+            model_select = gr.Radio(choices=["LLM1", "LLM2"], label="Wähle ein Modell")
+            finetune_btn = gr.Button("Finetune")
+            
+        finetune_btn.click(finetune, inputs=[model_select, text_input], outputs=gr.Textbox(label="Finetuning Status"))
+   
+
+
 app.launch(share=True)
