@@ -49,4 +49,4 @@ with gr.Blocks() as app:
             
         finetune_btn.click(finetune, inputs=[model_select, text_input], outputs=gr.Textbox(label="Finetuning Status"))
         
-app.launch()
+app.launch(share=True)
