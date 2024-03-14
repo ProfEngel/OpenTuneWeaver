@@ -22,18 +22,31 @@ Dieses Projekt ermöglicht ein vereinfachtes Finetuning eines OpenSource-LLMs f�
 
 
 ⚙️ Implementierung der Q&A-Datensatzanpassung (wid mittels eines lokalen LLM zunächst getestet)
+
 ⚙️    Runpod-Integration
+
 ⚙️    OpenAI-Api Integration
+
 ⚙️    Verschiedene Trainingsdatensatzerstellungen (Q&A, Chat, Function Calling)
+
 ⚙️ Training eines LLM
+
 ⚙️    Automatischer Download von Huggingface
+
 ⚙️    Direkter Upload eines Modells
+
 ⚙️    Einbindung von QLORA und LORA (weitere sind geplant)
+
 ⚙️    Möglichkeit zur Anpassung der Hyperparameter
+
 ⚙️    Metrikenverfolgung und LOSS-Kurven-Realtime-Chart
+
 ⚙️    Download des Models und der Adapter
+
 ⚙️    Upload zu Huggingface für Model, Adapter, Dataset
+
 ⚙️    Erstellung eines GGUF-Modells zur direkten lokalen Nutzung
+
 ⚙️    und vieles mehr...
 
 
