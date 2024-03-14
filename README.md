@@ -7,6 +7,9 @@ Dieses Projekt ermöglicht ein vereinfachtes Finetuning eines OpenSource-LLMs f�
 > [!IMPORTANT]
 > Dieses Projekt ist im Entstehen und hat fast noch keine Funktionalität. -Noch nicht...
 
+![Startseite des OpenTuneWeaver](BU/otw.png)
+
+
 ## Verlauf
 
 
