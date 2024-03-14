@@ -2,21 +2,39 @@
 # OpenTuneWeaver
 ## FineTune your OpenSource-LLM easy in a UI in your browser
 
-Dieses Projekt ermöglicht ein vereinfachtes Finetuning eines OpenSource-LLMs. Dabei wird zunächst eine RAW-PDF hochgeladen, dann in Q&A überführt und in ein passendes Finetuning-Format überführt. Danach wird mittels ausgewählten Mitteln ein ausgewähltes OpenSource-LLM feinabgestimmt und zum Download (auch als gguf) bereitgestellt. Alles in einer anwenderfreundlichen UI.
+Dieses Projekt ermöglicht ein vereinfachtes Finetuning eines OpenSource-LLMs für die eigene lokale Nutzung (z.B. mit OpenWebUI, LM-Studio). Dabei wird zunächst eine oder mehrere RAW-PDF hochgeladen, dann in Q&A und in ein passendes Finetuning-Format überführt. Danach wird mittels ausgewählten Mitteln ein ausgewähltes OpenSource-LLM feinabgestimmt und zum Download (auch als gguf) bereitgestellt. Alles in einer anwenderfreundlichen UI.
 
 > [!IMPORTANT]
-> Dieses Projekt ist im Entstehen und hat noch keine Funktionalität. -Noch nicht...
+> Dieses Projekt ist im Entstehen und hat fast noch keine Funktionalität. -Noch nicht...
 
 ## Verlauf
 
 
-🔥 13 März: Was ist OpenTuneWeaver? 
+🔥 14 März: Upload und Konvertierung mehrerer PDF zu TXT implementiert 
+
+🔥 13 März: Initialisierung des Projekts OpenTuneWeaver? 
 
 📚 11 März: [Plakat](papers/MoEundMultiAgentenChatbot.pdf) und Impulsvortrag auf dem Dialogtreffen des MWK Ba-Wü "KI in der Hochschullehre Baden-Württemberg".
 
 <!-- 🎉 12. März. Neues Feature integriert. 📰Blog; 📺Youtube. -->
 
+## What´s next
 
+
+⚙️ Implementierung der Q&A-Datensatzanpassung (wid mittels eines lokalen LLM zunächst getestet)
+⚙️    Runpod-Integration
+⚙️    OpenAI-Api Integration
+⚙️    Verschiedene Trainingsdatensatzerstellungen (Q&A, Chat, Function Calling)
+⚙️ Training eines LLM
+⚙️    Automatischer Download von Huggingface
+⚙️    Direkter Upload eines Modells
+⚙️    Einbindung von QLORA und LORA (weitere sind geplant)
+⚙️    Möglichkeit zur Anpassung der Hyperparameter
+⚙️    Metrikenverfolgung und LOSS-Kurven-Realtime-Chart
+⚙️    Download des Models und der Adapter
+⚙️    Upload zu Huggingface für Model, Adapter, Dataset
+⚙️    Erstellung eines GGUF-Modells zur direkten lokalen Nutzung
+⚙️    und vieles mehr...
 
 
 ## Projektstruktur
@@ -80,7 +98,7 @@ Nach dem Finetuning können Sie die Q&A- oder Chat-Generierungsfunktion nutzen, 
 
 ## Beitrag
 
-Wir freuen uns über Beiträge von jedem! Wenn Sie einen Fehler finden, eine Funktion anfragen oder einen Pull-Request einreichen möchten, fühlen Sie sich frei, das zu tun.
+Ich freue mich über Beiträge von jedem! Wenn Sie einen Fehler finden, eine Funktion anfragen oder einen Pull-Request einreichen möchten, fühlen Sie sich frei, das zu tun.
 
 ## Roadmap? 🛣️
 Was als nächstes implementiert wird, habe ich auf meiner Roadmap dargestellt. Das findet man in meiner [Documentation](https://github.com/ProfEngel/OpenTuneWeaver/wiki/Roadmap).
@@ -96,7 +114,6 @@ Was als nächstes implementiert wird, habe ich auf meiner Roadmap dargestellt. D
 
 Dieses Projekt ist nach der [MIT](LICENSE)-Lizenz lizenziert. Schau in das Lizenzfile für Details und frag gegebenenfalls ChatGPT oder Dein LLM was das bedeutet.📄
 
-Erstellt von [Prof. Dr. Mathias Engel](https://github.com/ProfEngel)  - Lasst uns Open-Source LLM für alle Anwendungszwecke spezialisieren! 💪
 
 ## Credits
 
@@ -105,3 +122,6 @@ Um diese vereinfachte App zu ermöglichen, wurden Inhalte aus folgenden Quellen 
 ## Related Papers
 
 Veröffentlichungen zu diesem Repo werde ich hier verlinken.
+
+
+Erstellt von [Prof. Dr. Mathias Engel](https://github.com/ProfEngel)  - Lasst uns Open-Source LLM für alle Anwendungszwecke spezialisieren! 💪

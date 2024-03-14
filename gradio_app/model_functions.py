@@ -1,24 +1,36 @@
 # model_functions.py
 from pathlib import Path
+import shutil
 import os
 from pdfminer.high_level import extract_text
 
-def save_pdf_files(files, save_path="../data"):
-    """
-    Speichert hochgeladene PDF-Dateien in einem Verzeichnis.
-    Args:
-        files: Eine Liste von hochgeladenen Dateien.
-        save_path (str): Der Pfad, unter dem die Dateien gespeichert werden sollen.
-    """
-    Path(save_path).mkdir(parents=True, exist_ok=True)
+# Pfad des übergeordneten Ordners von `gradio_app`
+parent_directory = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+data_folder = os.path.join(parent_directory, 'data')
+
+# Stellen Sie sicher, dass der data-Ordner existiert
+if not os.path.exists(data_folder):
+    os.makedirs(data_folder)
+
+def save_pdf(file_infos):
+    saved_files = []  # Eine Liste, um die Namen der erfolgreich gespeicherten Dateien zu sammeln
     
-    for i, file in enumerate(files, start=1):
-        file_path = os.path.join(save_path, f"raw{i:02d}.pdf")
-        with open(file_path, "wb") as f:
-            # Schreibe den Inhalt der Datei direkt, anstatt getbuffer() zu verwenden
-            f.write(file.read())  # Verwende .read() für NamedString-Objekte
+    for file_info in file_infos:
+
+        if file_info is not None:
+            # Der Dateiname bleibt gleich, da `shutil.move` den Originalnamen beibehält
+            file_name = os.path.basename(file_info)
             
-    return f"{len(files)} PDF-Datei(en) gespeichert."
+            # Pfad, wohin die Datei verschoben wird (der `data`-Ordner)
+            save_path = data_folder
+            
+            # Datei in den `data`-Ordner verschieben
+            shutil.move(file_info, save_path)
+        
+    if saved_files:
+        return f"Datei(en) erfolgreich in {data_folder} gespeichert: {', '.join(saved_files)}"
+    else:
+        return "Keine Datei hochgeladen."
 
 def pdf_to_txt(input_folder="../data", output_folder="../data/txt"):
     """
