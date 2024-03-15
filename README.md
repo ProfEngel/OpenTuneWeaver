@@ -12,6 +12,7 @@ Dieses Projekt ermöglicht ein vereinfachtes Finetuning eines OpenSource-LLMs f�
 
 ## Verlauf
 
+🔥 15 März: Colab-Notebook mit allen relevanten Funktionalitäten hochgeladen (d.h. man kann eine pdf hochladen, einen Adapter trainieren und direkt als gguf herunterladen bzw. auch testen) 
 
 🔥 14 März: Upload und Konvertierung mehrerer PDF zu TXT implementiert 
 
