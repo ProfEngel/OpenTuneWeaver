@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # ============================================
-# OpenTuneWeaver RunPod Direct Installation
-# Version: 1.0
+# OpenTuneWeaver RunPod Setup (Überarbeitet)
+# Version: 2.0
 # ============================================
 
-set -e  # Exit on error
+set -e # Exit on error
 
 # Farben für Output
 RED='\033[0;31m'
@@ -14,7 +14,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Logging Funktion
+# Logging Funktionen
 log() {
     echo -e "${GREEN}[$(date +'%H:%M:%S')]${NC} $1"
 }
@@ -33,7 +33,7 @@ warning() {
 # ============================================
 
 log "${BLUE}========================================${NC}"
-log "${BLUE}🚀 OpenTuneWeaver RunPod Installation${NC}"
+log "${BLUE}🚀 OpenTuneWeaver RunPod Installation v2.0${NC}"
 log "${BLUE}========================================${NC}"
 
 # System Info
@@ -50,7 +50,6 @@ echo "  Current Dir: $(pwd)"
 # ============================================
 
 log "${BLUE}📦 Installing System Dependencies...${NC}"
-
 apt-get update
 apt-get upgrade -y
 apt-get install -y \
@@ -82,7 +81,8 @@ apt-get install -y \
     htop \
     nvtop \
     tmux \
-    nano
+    nano \
+    unzip
 
 log "✅ System dependencies installed"
 
@@ -91,20 +91,20 @@ log "✅ System dependencies installed"
 # ============================================
 
 log "${BLUE}🎮 Checking CUDA...${NC}"
-
 if command -v nvidia-smi &> /dev/null; then
     nvidia-smi
     log "✅ CUDA is available"
+    export CUDA_AVAILABLE=true
 else
     warning "No CUDA detected - CPU only mode"
+    export CUDA_AVAILABLE=false
 fi
 
 # ============================================
 # SCHRITT 4: Clone Repository
 # ============================================
 
-log "${BLUE}📥 Cloning OpenTuneWeaver...${NC}"
-
+log "${BLUE}📥 Cloning OpenTuneWeaver Repository...${NC}"
 cd /workspace
 
 # Remove if exists
@@ -113,13 +113,44 @@ if [ -d "OpenTuneWeaver" ]; then
     rm -rf OpenTuneWeaver
 fi
 
+# Clone repository
 git clone https://github.com/ProfEngel/OpenTuneWeaver.git
 cd OpenTuneWeaver
 
-log "✅ Repository cloned"
+log "✅ Repository cloned successfully"
 
 # ============================================
-# SCHRITT 5: Fix Path Issues in Python Files
+# SCHRITT 5: Python Environment Setup
+# ============================================
+
+log "${BLUE}🐍 Setting up Python environment...${NC}"
+
+# Upgrade pip first
+python3 -m pip install --upgrade pip setuptools wheel
+
+# Install requirements from repository
+if [ -f "requirements.txt" ]; then
+    log "Installing packages from repository requirements.txt..."
+    pip3 install -r requirements.txt
+    log "✅ Repository requirements installed"
+else
+    error "requirements.txt not found in repository!"
+fi
+
+# Install additional packages that might be needed
+log "Installing additional ML packages..."
+pip3 install "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git"
+
+# Install xformers with proper version constraints
+if [ "$CUDA_AVAILABLE" = true ]; then
+    pip3 install --no-deps "xformers<0.0.27"
+    log "✅ CUDA-specific packages installed"
+fi
+
+log "✅ Python environment setup complete"
+
+# ============================================
+# SCHRITT 6: Fix Path Issues in Python Files
 # ============================================
 
 log "${BLUE}🔧 Fixing path issues...${NC}"
@@ -133,93 +164,15 @@ fi
 
 # Fix run_pipeline.py paths if needed
 if [ -f "pipeline/run_pipeline.py" ]; then
-    # Make sure it uses relative paths correctly
     sed -i 's|Path("../|Path("|g' pipeline/run_pipeline.py
     log "✅ Fixed pipeline/run_pipeline.py paths"
 fi
 
 # Fix config_loader.py paths
 if [ -f "pipeline/config_loader.py" ]; then
-    # Ensure it looks in the right places
     sed -i 's|Path.cwd().parent.parent.parent|Path.cwd().parent.parent|g' pipeline/config_loader.py
     log "✅ Fixed pipeline/config_loader.py paths"
 fi
-
-# ============================================
-# SCHRITT 6: Python Dependencies
-# ============================================
-
-log "${BLUE}🐍 Installing Python dependencies...${NC}"
-
-# Upgrade pip
-python3 -m pip install --upgrade pip setuptools wheel
-
-# Create a cleaned requirements.txt without version conflicts
-cat > requirements_clean.txt << 'EOF'
-# Core ML/AI
-torch==2.2.0
-torchvision
-torchaudio
-transformers==4.44.0
-datasets==2.18.0
-accelerate==0.30.1
-peft==0.11.1
-bitsandbytes==0.43.1
-trl==0.9.6
-safetensors
-sentencepiece
-tokenizers
-
-# Gradio UI
-gradio
-
-# Document Processing
-docling
-pypdf
-PyPDF2
-fpdf
-python-docx
-python-pptx
-openpyxl
-beautifulsoup4
-lxml
-
-# Image Processing
-Pillow
-opencv-python
-
-# API & Networking
-openai
-requests
-aiohttp
-
-# Utilities
-numpy
-pandas
-matplotlib
-seaborn
-psutil
-python-dotenv
-huggingface-hub
-scipy
-scikit-learn
-tqdm
-pyyaml
-protobuf
-
-# GGUF
-gguf
-EOF
-
-log "Installing Python packages..."
-pip3 install -r requirements_clean.txt
-
-# Install Unsloth
-log "Installing Unsloth..."
-pip3 install "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git"
-pip3 install --no-deps "xformers<0.0.27" peft accelerate bitsandbytes
-
-log "✅ Python dependencies installed"
 
 # ============================================
 # SCHRITT 7: Build llama.cpp
@@ -227,33 +180,35 @@ log "✅ Python dependencies installed"
 
 log "${BLUE}🔨 Building llama.cpp...${NC}"
 
+# Navigate to finetuning directory
 cd /workspace/OpenTuneWeaver/pipeline/modules/06_finetuning
 
 # Clone llama.cpp if not exists
 if [ ! -d "llama.cpp" ]; then
+    log "Cloning llama.cpp..."
     git clone --recursive https://github.com/ggerganov/llama.cpp
 fi
 
 cd llama.cpp
 
-# Clean and build
+# Clean previous builds
 rm -rf build
 mkdir build
 cd build
 
-# Build with or without CUDA
-if command -v nvidia-smi &> /dev/null; then
-    log "Building with CUDA support..."
-    cmake .. -DLLAMA_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=all
+# Build with appropriate settings
+if [ "$CUDA_AVAILABLE" = true ]; then
+    log "Building llama.cpp with CUDA support..."
+    cmake .. -DLLAMA_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=all -DCMAKE_BUILD_TYPE=Release
 else
-    log "Building CPU-only version..."
+    log "Building llama.cpp CPU-only version..."
     cmake .. -DCMAKE_BUILD_TYPE=Release
 fi
 
 make -j$(nproc)
 
 # Verify build
-if [ -f "bin/llama-cli" ]; then
+if [ -f "bin/llama-cli" ] || [ -f "bin/main" ]; then
     log "✅ llama.cpp built successfully"
 else
     error "llama.cpp build failed!"
@@ -277,24 +232,35 @@ OLLAMA_PID=$!
 echo $OLLAMA_PID > /workspace/ollama.pid
 
 # Wait for Ollama to start
-sleep 5
+sleep 10
 
 # Check if Ollama is running
 if curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
-    log "✅ Ollama is running"
+    log "✅ Ollama is running successfully"
 else
-    warning "Ollama might not be running properly"
+    warning "Ollama might not be running properly, check /workspace/ollama.log"
 fi
 
 # ============================================
-# SCHRITT 9: Create pipeline_config.json
+# SCHRITT 9: Download Ollama Models
+# ============================================
+
+log "${BLUE}📥 Downloading Ollama models...${NC}"
+
+# Download a lightweight model for testing
+ollama pull llama3.2:3b || warning "Failed to pull model - will retry later"
+
+log "✅ Models downloaded"
+
+# ============================================
+# SCHRITT 10: Create Pipeline Configuration
 # ============================================
 
 log "${BLUE}📝 Creating pipeline configuration...${NC}"
 
 cat > /workspace/OpenTuneWeaver/pipeline/pipeline_config.json << 'EOF'
 {
-  "version": "1.0-runpod",
+  "version": "2.0-runpod",
   "created": "$(date -Iseconds)",
   "tokens": {
     "hf_token": "",
@@ -372,10 +338,10 @@ EOF
 log "✅ Configuration created"
 
 # ============================================
-# SCHRITT 10: Create necessary directories
+# SCHRITT 11: Create Directory Structure
 # ============================================
 
-log "${BLUE}📁 Creating directories...${NC}"
+log "${BLUE}📁 Creating directory structure...${NC}"
 
 cd /workspace/OpenTuneWeaver
 
@@ -390,45 +356,72 @@ mkdir -p pipeline/modules/06_finetuning/{INPUT,CustomModel,results}
 mkdir -p pipeline/modules/07_benchmark/{BENCHMARKFRAGEN,OUTPUT}
 mkdir -p viewer/images
 
-log "✅ Directories created"
+log "✅ Directory structure created"
 
 # ============================================
-# SCHRITT 11: Download a small Ollama model
+# SCHRITT 12: Create Startup Scripts
 # ============================================
 
-log "${BLUE}📥 Downloading Ollama model (this may take a while)...${NC}"
+log "${BLUE}📝 Creating startup scripts...${NC}"
 
-# Use smaller model for testing (llama3.2:3b instead of gemma3:12b)
-ollama pull llama3.2:3b || warning "Failed to pull model - will retry later"
-
-# ============================================
-# SCHRITT 12: Create startup script
-# ============================================
-
-log "${BLUE}📝 Creating startup script...${NC}"
-
+# Main startup script
 cat > /workspace/start_otw.sh << 'EOF'
 #!/bin/bash
+
+echo "🚀 Starting OpenTuneWeaver..."
 
 # Start Ollama if not running
 if ! pgrep -x "ollama" > /dev/null; then
     echo "Starting Ollama..."
     nohup ollama serve > /workspace/ollama.log 2>&1 &
-    sleep 5
+    sleep 10
 fi
 
-# Check Ollama
-curl -s http://localhost:11434/api/tags || echo "Ollama not responding"
+# Check Ollama status
+if curl -s http://localhost:11434/api/tags > /dev/null; then
+    echo "✅ Ollama is running"
+else
+    echo "❌ Ollama is not responding"
+    echo "Check logs: tail -f /workspace/ollama.log"
+fi
 
-# Start OpenTuneWeaver
+# Start OpenTuneWeaver UI
 cd /workspace/OpenTuneWeaver/ui
+echo "Starting OpenTuneWeaver UI on port 8080..."
 python3 app.py --server_name 0.0.0.0 --server_port 8080
 EOF
 
 chmod +x /workspace/start_otw.sh
 
+# Debug script
+cat > /workspace/debug_otw.sh << 'EOF'
+#!/bin/bash
+
+echo "🔍 OpenTuneWeaver Debug Information"
+echo "=================================="
+
+echo "Directory structure:"
+ls -la /workspace/OpenTuneWeaver/
+
+echo -e "\nPython packages:"
+pip3 list | grep -E "(torch|transformers|gradio|unsloth)"
+
+echo -e "\nOllama status:"
+curl -s http://localhost:11434/api/tags 2>/dev/null || echo "Ollama not responding"
+
+echo -e "\nGPU status:"
+nvidia-smi 2>/dev/null || echo "No GPU available"
+
+echo -e "\nProcess status:"
+ps aux | grep -E "(ollama|python)" | head -10
+EOF
+
+chmod +x /workspace/debug_otw.sh
+
+log "✅ Startup scripts created"
+
 # ============================================
-# SCHRITT 13: Test the installation
+# SCHRITT 13: Installation Test
 # ============================================
 
 log "${BLUE}🧪 Testing installation...${NC}"
@@ -437,16 +430,31 @@ cd /workspace/OpenTuneWeaver
 
 # Test Python imports
 python3 -c "
-import torch
-import transformers
-import gradio
-print('✅ Core packages imported successfully')
-print(f'PyTorch: {torch.__version__}')
-print(f'CUDA available: {torch.cuda.is_available()}')
+import sys
+try:
+    import torch
+    import transformers
+    import gradio
+    import datasets
+    print('✅ Core packages imported successfully')
+    print(f'  PyTorch: {torch.__version__}')
+    print(f'  Transformers: {transformers.__version__}')
+    print(f'  Gradio: {gradio.__version__}')
+    print(f'  CUDA available: {torch.cuda.is_available()}')
+except ImportError as e:
+    print(f'❌ Import error: {e}')
+    sys.exit(1)
 "
 
+# Test Ollama connection
+if curl -s http://localhost:11434/api/tags > /dev/null; then
+    log "✅ Ollama connection test passed"
+else
+    warning "Ollama connection test failed"
+fi
+
 # ============================================
-# SCHRITT 14: Start the application
+# SCHRITT 14: Final Setup Complete
 # ============================================
 
 log "${GREEN}========================================${NC}"
@@ -454,20 +462,24 @@ log "${GREEN}✅ Installation Complete!${NC}"
 log "${GREEN}========================================${NC}"
 
 echo ""
-echo "To start OpenTuneWeaver:"
-echo "  /workspace/start_otw.sh"
+echo "📋 Quick Start Commands:"
+echo "  Start OpenTuneWeaver:  /workspace/start_otw.sh"
+echo "  Debug information:     /workspace/debug_otw.sh"
 echo ""
-echo "Or manually:"
-echo "  cd /workspace/OpenTuneWeaver/ui"
-echo "  python3 uapp.py --server_name 0.0.0.0 --server_port 8080"
+echo "🌐 Access URLs:"
+echo "  OpenTuneWeaver UI:     http://[POD-IP]:8080"
+echo "  Ollama API:           http://[POD-IP]:11434"
 echo ""
-echo "Access the UI at:"
-echo "  http://[POD-IP]:8080"
+echo "📁 Important Paths:"
+echo "  Project directory:    /workspace/OpenTuneWeaver"
+echo "  Configuration:        /workspace/OpenTuneWeaver/pipeline/pipeline_config.json"
+echo "  Logs:                /workspace/ollama.log"
 echo ""
 
 # Optional: Auto-start
-read -p "Start OpenTuneWeaver now? (y/n) " -n 1 -r
+read -p "🚀 Start OpenTuneWeaver now? (y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
+    log "Starting OpenTuneWeaver..."
     /workspace/start_otw.sh
 fi
