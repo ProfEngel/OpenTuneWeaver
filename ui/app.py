@@ -102,28 +102,28 @@ def load_existing_config():
         "api_configs": {
             "01_convert": {
                 "use_openai_api": True,
-                "openai_base_url": "http://100.70.50.6:11434/v1",
+                "openai_base_url": "http://localhost:11434/v1",
                 "openai_api_key": "ollama",
                 "openai_model_name": "gemma3:12b-it-qat",
                 "temperature": 0.1
             },
             "02_genwiki": {
                 "use_openai_api": True,
-                "openai_base_url": "http://100.70.50.6:11434/v1",
+                "openai_base_url": "http://localhost:11434/v1",
                 "openai_api_key": "ollama",
                 "openai_model_name": "gemma3:12b-it-qat",
                 "temperature": 0.3
             },
             "03_instructQA": {
                 "use_openai_api": True,
-                "openai_base_url": "http://100.70.50.6:11434/v1",
+                "openai_base_url": "http://localhost:11434/v1",
                 "openai_api_key": "ollama",
                 "openai_model_name": "gemma3:12b-it-qat",
                 "temperature": 0.7
             },
             "05_bmcreator": {
                 "use_openai_api": True,
-                "openai_base_url": "http://100.70.50.6:11434/v1",
+                "openai_base_url": "http://localhost:11434/v1",
                 "openai_api_key": "ollama",
                 "openai_model_name": "gemma3:12b-it-qat",
                 "temperature": 0.5
@@ -182,7 +182,7 @@ def load_existing_config():
             },
             "evaluator": {
                 "type": "api",
-                "api_base_url": "http://100.70.50.6:11434/v1",
+                "api_base_url": "http://localhost:11434/v1",
                 "api_key": "ollama",
                 "model": "gemma3:12b-it-qat"
             },
@@ -881,7 +881,7 @@ def create_main_interface():
                     with gr.Row():
                         api_base_url = gr.Textbox(
                             label="API Base URL",
-                            value="http://100.70.50.6:11434/v1",
+                            value="http://localhost:11434/v1",
                             placeholder="http://localhost:11434/v1"
                         )
                         api_key = gr.Textbox(
@@ -1281,7 +1281,7 @@ def create_main_interface():
             
             # API Config (nehme ersten Eintrag als Referenz)
             api_config = config.get("api_configs", {}).get("01_convert", {})
-            api_base_url_val = api_config.get("openai_base_url", "http://100.70.50.6:11434/v1")
+            api_base_url_val = api_config.get("openai_base_url", "http://localhost:11434/v1")
             api_key_val = api_config.get("openai_api_key", "ollama")
             
             # Modelle

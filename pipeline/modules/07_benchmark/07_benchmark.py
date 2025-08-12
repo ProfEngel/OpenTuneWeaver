@@ -249,7 +249,7 @@ def cleanup_ollama_memory():
         
         # Verwende die API-URL aus der Konfiguration
         evaluator_config = bm_config.get('evaluator', {})
-        base_url = evaluator_config.get('api_base_url', "http://100.70.50.6:11434")
+        base_url = evaluator_config.get('api_base_url', "http://localhost:11434")
         model = evaluator_config.get('model', "gemma3:12b-it-qat")
         
         # Entferne /v1 suffix für direkte Ollama API
@@ -499,7 +499,7 @@ POST_FINETUNING_CONFIG = {
 # Bewertungsmodell
 evaluator_config = bm_config.get('evaluator', {})
 EVAL_API_CONFIG = {
-    'base_url': evaluator_config.get('api_base_url', "http://100.70.50.6:11434/v1"),
+    'base_url': evaluator_config.get('api_base_url', "http://localhost:11434/v1"),
     'api_key': evaluator_config.get('api_key', "ollama"),
     'model': evaluator_config.get('model', "gemma3:12b-it-qat"),
     'description': f"Evaluator: {evaluator_config.get('model', 'Unknown')}"

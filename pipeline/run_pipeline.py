@@ -482,28 +482,28 @@ class SimplifiedPipelineRunner:
             "api_configs": {
                 "01_convert": {
                     "use_openai_api": True,
-                    "openai_base_url": "http://100.70.50.6:11434/v1",
+                    "openai_base_url": "http://localhost:11434/v1",
                     "openai_api_key": "ollama",
                     "openai_model_name": "gemma3:12b-it-qat",
                     "temperature": 0.1
                 },
                 "02_genwiki": {
                     "use_openai_api": True,
-                    "openai_base_url": "http://100.70.50.6:11434/v1",
+                    "openai_base_url": "http://localhost:11434/v1",
                     "openai_api_key": "ollama",
                     "openai_model_name": "gemma3:12b-it-qat",
                     "temperature": 0.3
                 },
                 "03_instructQA": {
                     "use_openai_api": True,
-                    "openai_base_url": "http://100.70.50.6:11434/v1",
+                    "openai_base_url": "http://localhost:11434/v1",
                     "openai_api_key": "ollama",
                     "openai_model_name": "gemma3:12b-it-qat",
                     "temperature": 0.7
                 },
                 "05_bmcreator": {
                     "use_openai_api": True,
-                    "openai_base_url": "http://100.70.50.6:11434/v1",
+                    "openai_base_url": "http://localhost:11434/v1",
                     "openai_api_key": "ollama",
                     "openai_model_name": "gemma3:12b-it-qat",
                     "temperature": 0.5
@@ -562,7 +562,7 @@ class SimplifiedPipelineRunner:
                 },
                 "evaluator": {
                     "type": "api",
-                    "api_base_url": "http://100.70.50.6:11434/v1",
+                    "api_base_url": "http://localhost:11434/v1",
                     "api_key": "ollama",
                     "model": "gemma3:12b-it-qat"
                 },
@@ -643,8 +643,8 @@ class SimplifiedPipelineRunner:
         use_openai = input("OpenAI-kompatible API verwenden? (y/n) [y]: ").lower().strip() != 'n'
         
         if use_openai:
-            base_url = input("API Base URL [http://100.70.50.6:11434/v1]: ").strip()
-            base_url = base_url or "http://100.70.50.6:11434/v1"
+            base_url = input("API Base URL [http://localhost:11434/v1]: ").strip()
+            base_url = base_url or "http://localhost:11434/v1"
             api_key = input("API Key [ollama]: ").strip() or "ollama"
             
             print("\nModell-Konfiguration für jedes Modul:")
