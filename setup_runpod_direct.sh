@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # ============================================
-# OpenTuneWeaver RunPod Setup (CPU-Build Fix)
-# Version: 2.2
+# OpenTuneWeaver RunPod Setup (Ollama-Fix + Gemma3)
+# Version: 2.3
 # ============================================
 
 set -e # Exit on error
@@ -33,7 +33,7 @@ warning() {
 # ============================================
 
 log "${BLUE}========================================${NC}"
-log "${BLUE}🚀 OpenTuneWeaver RunPod Installation v2.2${NC}"
+log "${BLUE}🚀 OpenTuneWeaver RunPod Installation v2.3${NC}"
 log "${BLUE}========================================${NC}"
 
 # System Info
@@ -219,32 +219,51 @@ log "${BLUE}🦙 Installing Ollama...${NC}"
 # Install Ollama
 curl -fsSL https://ollama.com/install.sh | sh
 
-# Start Ollama in background
+# Kill any existing Ollama processes
+pkill ollama 2>/dev/null || true
+sleep 2
+
+# Start Ollama in background with robust startup
 log "Starting Ollama service..."
-nohup ollama serve > /workspace/ollama.log 2>&1 &
+ollama serve > /workspace/ollama.log 2>&1 &
 OLLAMA_PID=$!
 echo $OLLAMA_PID > /workspace/ollama.pid
 
-# Wait for Ollama to start
-sleep 10
-
-# Check if Ollama is running
-if curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
-    log "✅ Ollama is running successfully"
-else
-    warning "Ollama might not be running properly, check /workspace/ollama.log"
-fi
+# Wait for Ollama to start with proper verification
+log "Waiting for Ollama to become ready..."
+for i in {1..60}; do
+    if curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
+        log "✅ Ollama is running successfully on port 11434"
+        break
+    else
+        if [ $i -eq 60 ]; then
+            error "Ollama failed to start after 60 attempts"
+        fi
+        echo "  Waiting for Ollama... ($i/60)"
+        sleep 2
+    fi
+done
 
 # ============================================
 # SCHRITT 9: Download Ollama Models
 # ============================================
 
-log "${BLUE}📥 Downloading Ollama models...${NC}"
+log "${BLUE}📥 Downloading Ollama models (this will take a while)...${NC}"
 
-# Download a lightweight model for testing
-ollama pull llama3.2:3b || warning "Failed to pull model - will retry later"
+# Download the desired larger model
+log "Downloading gemma3:12b-it-qat (this may take 10-15 minutes)..."
+if ollama pull gemma3:12b-it-qat; then
+    log "✅ gemma3:12b-it-qat downloaded successfully"
+    export OLLAMA_MODEL="gemma3:12b-it-qat"
+else
+    warning "Failed to download gemma3:12b-it-qat, falling back to llama3.2:3b"
+    ollama pull llama3.2:3b
+    export OLLAMA_MODEL="llama3.2:3b"
+fi
 
-log "✅ Models downloaded"
+# Verify model is available
+log "Available models:"
+ollama list
 
 # ============================================
 # SCHRITT 10: Create Pipeline Configuration
@@ -252,9 +271,9 @@ log "✅ Models downloaded"
 
 log "${BLUE}📝 Creating pipeline configuration...${NC}"
 
-cat > /workspace/OpenTuneWeaver/pipeline/pipeline_config.json << 'EOF'
+cat > /workspace/OpenTuneWeaver/pipeline/pipeline_config.json << EOF
 {
-  "version": "2.2-runpod",
+  "version": "2.3-runpod",
   "created": "$(date -Iseconds)",
   "tokens": {
     "hf_token": "",
@@ -265,28 +284,28 @@ cat > /workspace/OpenTuneWeaver/pipeline/pipeline_config.json << 'EOF'
       "use_openai_api": true,
       "openai_base_url": "http://localhost:11434/v1",
       "openai_api_key": "ollama",
-      "openai_model_name": "llama3.2:3b",
+      "openai_model_name": "${OLLAMA_MODEL:-gemma3:12b-it-qat}",
       "temperature": 0.1
     },
     "02_genwiki": {
       "use_openai_api": true,
       "openai_base_url": "http://localhost:11434/v1",
       "openai_api_key": "ollama",
-      "openai_model_name": "llama3.2:3b",
+      "openai_model_name": "${OLLAMA_MODEL:-gemma3:12b-it-qat}",
       "temperature": 0.3
     },
     "03_instructQA": {
       "use_openai_api": true,
       "openai_base_url": "http://localhost:11434/v1",
       "openai_api_key": "ollama",
-      "openai_model_name": "llama3.2:3b",
+      "openai_model_name": "${OLLAMA_MODEL:-gemma3:12b-it-qat}",
       "temperature": 0.7
     },
     "05_bmcreator": {
       "use_openai_api": true,
       "openai_base_url": "http://localhost:11434/v1",
       "openai_api_key": "ollama",
-      "openai_model_name": "llama3.2:3b",
+      "openai_model_name": "${OLLAMA_MODEL:-gemma3:12b-it-qat}",
       "temperature": 0.5
     }
   },
@@ -318,7 +337,7 @@ cat > /workspace/OpenTuneWeaver/pipeline/pipeline_config.json << 'EOF'
       "type": "api",
       "api_base_url": "http://localhost:11434/v1",
       "api_key": "ollama",
-      "model": "llama3.2:3b"
+      "model": "${OLLAMA_MODEL:-gemma3:12b-it-qat}"
     }
   },
   "pipeline": {
@@ -329,7 +348,7 @@ cat > /workspace/OpenTuneWeaver/pipeline/pipeline_config.json << 'EOF'
 }
 EOF
 
-log "✅ Configuration created"
+log "✅ Configuration created with model: ${OLLAMA_MODEL:-gemma3:12b-it-qat}"
 
 # ============================================
 # SCHRITT 11: Create Directory Structure
@@ -358,25 +377,53 @@ log "✅ Directory structure created"
 
 log "${BLUE}📝 Creating startup scripts...${NC}"
 
-# Main startup script
+# Improved startup script with robust Ollama handling
 cat > /workspace/start_otw.sh << 'EOF'
 #!/bin/bash
 
 echo "🚀 Starting OpenTuneWeaver..."
 
-# Start Ollama if not running
-if ! pgrep -x "ollama" > /dev/null; then
-    echo "Starting Ollama..."
-    nohup ollama serve > /workspace/ollama.log 2>&1 &
-    sleep 10
-fi
+# Function to check if Ollama is responding
+check_ollama() {
+    curl -s http://localhost:11434/api/tags > /dev/null 2>&1
+}
 
-# Check Ollama status
-if curl -s http://localhost:11434/api/tags > /dev/null; then
-    echo "✅ Ollama is running"
+# Kill existing Ollama processes
+pkill ollama 2>/dev/null || true
+sleep 3
+
+# Start Ollama
+echo "Starting Ollama..."
+ollama serve > /workspace/ollama.log 2>&1 &
+OLLAMA_PID=$!
+echo $OLLAMA_PID > /workspace/ollama.pid
+
+# Wait for Ollama to be ready
+echo "Waiting for Ollama to become ready..."
+for i in {1..30}; do
+    if check_ollama; then
+        echo "✅ Ollama is running and responding"
+        break
+    else
+        if [ $i -eq 30 ]; then
+            echo "❌ Ollama failed to start properly"
+            echo "Check logs: tail -f /workspace/ollama.log"
+            exit 1
+        fi
+        echo "Waiting... ($i/30)"
+        sleep 2
+    fi
+done
+
+# Verify model is available
+echo "Verifying models..."
+if ollama list | grep -q "gemma3:12b-it-qat"; then
+    echo "✅ gemma3:12b-it-qat is available"
+elif ollama list | grep -q "llama3.2:3b"; then
+    echo "✅ llama3.2:3b is available"
 else
-    echo "❌ Ollama is not responding"
-    echo "Check logs: tail -f /workspace/ollama.log"
+    echo "⚠️  No models found, downloading fallback model..."
+    ollama pull llama3.2:3b
 fi
 
 # Start OpenTuneWeaver UI
@@ -387,7 +434,7 @@ EOF
 
 chmod +x /workspace/start_otw.sh
 
-# Debug script
+# Enhanced debug script
 cat > /workspace/debug_otw.sh << 'EOF'
 #!/bin/bash
 
@@ -401,16 +448,34 @@ echo -e "\nPython packages:"
 pip3 list | grep -E "(torch|transformers|gradio|unsloth)"
 
 echo -e "\nOllama status:"
-curl -s http://localhost:11434/api/tags 2>/dev/null || echo "Ollama not responding"
+if curl -s http://localhost:11434/api/tags 2>/dev/null; then
+    echo "✅ Ollama is responding"
+    echo "Available models:"
+    ollama list
+else
+    echo "❌ Ollama not responding"
+fi
+
+echo -e "\nOllama processes:"
+ps aux | grep ollama | grep -v grep
+
+echo -e "\nOllama logs (last 20 lines):"
+tail -20 /workspace/ollama.log 2>/dev/null || echo "No Ollama logs found"
 
 echo -e "\nGPU status:"
 nvidia-smi 2>/dev/null || echo "No GPU available"
+
+echo -e "\nPort 11434 status:"
+ss -tlnp | grep 11434 || echo "Port 11434 not listening"
 
 echo -e "\nProcess status:"
 ps aux | grep -E "(ollama|python)" | head -10
 
 echo -e "\nllama.cpp build status:"
 ls -la /workspace/OpenTuneWeaver/pipeline/modules/06_finetuning/llama.cpp/build/bin/ 2>/dev/null || echo "llama.cpp not built"
+
+echo -e "\nConfiguration model:"
+grep "openai_model_name" /workspace/OpenTuneWeaver/pipeline/pipeline_config.json 2>/dev/null || echo "No config found"
 EOF
 
 chmod +x /workspace/debug_otw.sh
@@ -449,6 +514,8 @@ except ImportError as e:
 # Test Ollama connection
 if curl -s http://localhost:11434/api/tags > /dev/null; then
     log "✅ Ollama connection test passed"
+    echo "Available models:"
+    ollama list
 else
     warning "Ollama connection test failed"
 fi
@@ -483,10 +550,16 @@ echo "  Configuration:        /workspace/OpenTuneWeaver/pipeline/pipeline_config
 echo "  Logs:                /workspace/ollama.log"
 echo "  llama.cpp binary:     /workspace/OpenTuneWeaver/pipeline/modules/06_finetuning/llama.cpp/build/bin/"
 echo ""
-echo "ℹ️  Build Info:"
-echo "  llama.cpp: CPU-only build (stable and reliable)"
-echo "  PyTorch: GPU-accelerated (if CUDA available)"
-echo "  Ollama: GPU-accelerated (if CUDA available)"
+echo "🤖 Model Information:"
+echo "  Primary model:        ${OLLAMA_MODEL:-gemma3:12b-it-qat}"
+echo "  llama.cpp build:      CPU-only (stable and reliable)"
+echo "  PyTorch:             GPU-accelerated (if CUDA available)"
+echo "  Ollama:              GPU-accelerated (if CUDA available)"
+echo ""
+echo "💡 Notes:"
+echo "  - gemma3:12b-it-qat is a larger, more capable model (~24GB download)"
+echo "  - If download fails, system falls back to llama3.2:3b"
+echo "  - Ollama startup is now more robust with proper waiting"
 echo ""
 
 # Optional: Auto-start
