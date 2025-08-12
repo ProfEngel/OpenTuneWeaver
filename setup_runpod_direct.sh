@@ -421,8 +421,8 @@ fi
 curl -s http://localhost:11434/api/tags || echo "Ollama not responding"
 
 # Start OpenTuneWeaver
-cd /workspace/OpenTuneWeaver
-python3 ui/app.py --server_name 0.0.0.0 --server_port 8080
+cd /workspace/OpenTuneWeaver/ui
+python3 app.py --server_name 0.0.0.0 --server_port 8080
 EOF
 
 chmod +x /workspace/start_otw.sh
@@ -458,8 +458,8 @@ echo "To start OpenTuneWeaver:"
 echo "  /workspace/start_otw.sh"
 echo ""
 echo "Or manually:"
-echo "  cd /workspace/OpenTuneWeaver"
-echo "  python3 ui/app.py --server_name 0.0.0.0 --server_port 8080"
+echo "  cd /workspace/OpenTuneWeaver/ui"
+echo "  python3 uapp.py --server_name 0.0.0.0 --server_port 8080"
 echo ""
 echo "Access the UI at:"
 echo "  http://[POD-IP]:8080"
