@@ -1,0 +1,31 @@
+{
+  "name": "OpenTuneWeaver-AIO",
+  "imageName": "USERNAME/opentuneweaver-aio:latest",
+  "volumeInGb": 100,
+  "volumeMountPath": "/workspace",
+  "ports": "8080/http,11434/http",
+  "env": [
+    {
+      "key": "HF_TOKEN",
+      "value": "your_hf_token_here"
+    },
+    {
+      "key": "OLLAMA_HOST",
+      "value": "http://localhost:11434"
+    },
+    {
+      "key": "OLLAMA_KEEP_ALIVE",
+      "value": "24h"
+    },
+    {
+      "key": "CUDA_VISIBLE_DEVICES",
+      "value": "0"
+    }
+  ],
+  "dockerArgs": "--gpus all --shm-size=16gb",
+  "containerDiskInGb": 100,
+  "minVcpus": 8,
+  "minMemoryInGb": 32,
+  "minGpuCount": 1,
+  "gpuTypePreference": ["RTX 3090", "RTX 4090", "A5000", "A6000", "A100"]
+}

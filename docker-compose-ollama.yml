@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  opentuneweaver-aio:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: opentuneweaver-aio:latest
+    container_name: otw-aio-container
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - HF_TOKEN=${HF_TOKEN}
+      - OLLAMA_HOST=http://localhost:11434
+      - OLLAMA_MODELS=/root/.ollama/models
+      - OLLAMA_KEEP_ALIVE=24h
+    ports:
+      - "8080:8080"
+      - "11434:11434"
+    volumes:
+      - ./pipeline/data:/workspace/OpenTuneWeaver/pipeline/data
+      - ./pipeline/modules:/workspace/OpenTuneWeaver/pipeline/modules
+      - ~/.cache/huggingface:/workspace/.cache/huggingface
+      - ollama-models:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+        limits:
+          memory: 32G
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  ollama-models:
+    driver: local
