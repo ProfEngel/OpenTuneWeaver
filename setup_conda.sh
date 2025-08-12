@@ -25,6 +25,16 @@ conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvi
 sudo apt-get update
 sudo apt-get install -y cmake build-essential libreoffice wkhtmltopdf
 
+sudo apt update
+
+sudo apt upgrade -y
+
+sudo apt install -y build-essential git wget curl
+
+sudo apt install libcurl4-openssl-dev
+
+sudo apt install -y cmake
+
 # Python Dependencies
 pip install -r requirements.txt
 
