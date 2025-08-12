@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # ============================================
-# OpenTuneWeaver RunPod Setup (Überarbeitet)
-# Version: 2.0
+# OpenTuneWeaver RunPod Setup (CPU-Build Fix)
+# Version: 2.2
 # ============================================
 
 set -e # Exit on error
@@ -33,7 +33,7 @@ warning() {
 # ============================================
 
 log "${BLUE}========================================${NC}"
-log "${BLUE}🚀 OpenTuneWeaver RunPod Installation v2.0${NC}"
+log "${BLUE}🚀 OpenTuneWeaver RunPod Installation v2.2${NC}"
 log "${BLUE}========================================${NC}"
 
 # System Info
@@ -175,10 +175,10 @@ if [ -f "pipeline/config_loader.py" ]; then
 fi
 
 # ============================================
-# SCHRITT 7: Build llama.cpp
+# SCHRITT 7: Build llama.cpp (CPU-ONLY)
 # ============================================
 
-log "${BLUE}🔨 Building llama.cpp...${NC}"
+log "${BLUE}🔨 Building llama.cpp (CPU-Only)...${NC}"
 
 # Navigate to finetuning directory
 cd /workspace/OpenTuneWeaver/pipeline/modules/06_finetuning
@@ -196,20 +196,14 @@ rm -rf build
 mkdir build
 cd build
 
-# Build with appropriate settings
-if [ "$CUDA_AVAILABLE" = true ]; then
-    log "Building llama.cpp with CUDA support..."
-    cmake .. -DLLAMA_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=all -DCMAKE_BUILD_TYPE=Release
-else
-    log "Building llama.cpp CPU-only version..."
-    cmake .. -DCMAKE_BUILD_TYPE=Release
-fi
-
+# CPU-Only Build (proven to work)
+log "Building llama.cpp CPU-only version..."
+cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j$(nproc)
 
 # Verify build
 if [ -f "bin/llama-cli" ] || [ -f "bin/main" ]; then
-    log "✅ llama.cpp built successfully"
+    log "✅ llama.cpp built successfully (CPU-only)"
 else
     error "llama.cpp build failed!"
 fi
@@ -260,7 +254,7 @@ log "${BLUE}📝 Creating pipeline configuration...${NC}"
 
 cat > /workspace/OpenTuneWeaver/pipeline/pipeline_config.json << 'EOF'
 {
-  "version": "2.0-runpod",
+  "version": "2.2-runpod",
   "created": "$(date -Iseconds)",
   "tokens": {
     "hf_token": "",
@@ -414,6 +408,9 @@ nvidia-smi 2>/dev/null || echo "No GPU available"
 
 echo -e "\nProcess status:"
 ps aux | grep -E "(ollama|python)" | head -10
+
+echo -e "\nllama.cpp build status:"
+ls -la /workspace/OpenTuneWeaver/pipeline/modules/06_finetuning/llama.cpp/build/bin/ 2>/dev/null || echo "llama.cpp not built"
 EOF
 
 chmod +x /workspace/debug_otw.sh
@@ -440,7 +437,10 @@ try:
     print(f'  PyTorch: {torch.__version__}')
     print(f'  Transformers: {transformers.__version__}')
     print(f'  Gradio: {gradio.__version__}')
-    print(f'  CUDA available: {torch.cuda.is_available()}')
+    if torch.cuda.is_available():
+        print(f'  CUDA available: Yes - {torch.cuda.get_device_name(0)}')
+    else:
+        print(f'  CUDA available: No (CPU-only mode)')
 except ImportError as e:
     print(f'❌ Import error: {e}')
     sys.exit(1)
@@ -451,6 +451,13 @@ if curl -s http://localhost:11434/api/tags > /dev/null; then
     log "✅ Ollama connection test passed"
 else
     warning "Ollama connection test failed"
+fi
+
+# Test llama.cpp build
+if [ -f "/workspace/OpenTuneWeaver/pipeline/modules/06_finetuning/llama.cpp/build/bin/llama-cli" ] || [ -f "/workspace/OpenTuneWeaver/pipeline/modules/06_finetuning/llama.cpp/build/bin/main" ]; then
+    log "✅ llama.cpp build verification passed"
+else
+    warning "llama.cpp build verification failed"
 fi
 
 # ============================================
@@ -474,6 +481,12 @@ echo "📁 Important Paths:"
 echo "  Project directory:    /workspace/OpenTuneWeaver"
 echo "  Configuration:        /workspace/OpenTuneWeaver/pipeline/pipeline_config.json"
 echo "  Logs:                /workspace/ollama.log"
+echo "  llama.cpp binary:     /workspace/OpenTuneWeaver/pipeline/modules/06_finetuning/llama.cpp/build/bin/"
+echo ""
+echo "ℹ️  Build Info:"
+echo "  llama.cpp: CPU-only build (stable and reliable)"
+echo "  PyTorch: GPU-accelerated (if CUDA available)"
+echo "  Ollama: GPU-accelerated (if CUDA available)"
 echo ""
 
 # Optional: Auto-start
