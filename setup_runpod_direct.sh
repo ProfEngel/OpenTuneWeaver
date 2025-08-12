@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # ============================================
-# OpenTuneWeaver RunPod Setup (Ollama-Fix + Gemma3)
-# Version: 2.3
+# OpenTuneWeaver RunPod Setup (UI-Path Fix)
+# Version: 2.4
 # ============================================
 
 set -e # Exit on error
@@ -33,7 +33,7 @@ warning() {
 # ============================================
 
 log "${BLUE}========================================${NC}"
-log "${BLUE}🚀 OpenTuneWeaver RunPod Installation v2.3${NC}"
+log "${BLUE}🚀 OpenTuneWeaver RunPod Installation v2.4${NC}"
 log "${BLUE}========================================${NC}"
 
 # System Info
@@ -150,29 +150,104 @@ fi
 log "✅ Python environment setup complete"
 
 # ============================================
-# SCHRITT 6: Fix Path Issues in Python Files
+# SCHRITT 6: Comprehensive Path & UI Fixes
 # ============================================
 
-log "${BLUE}🔧 Fixing path issues...${NC}"
+log "${BLUE}🔧 Comprehensive path and UI fixes...${NC}"
 
-# Fix app.py path issue (../pipeline -> pipeline)
+# Backup original app.py
 if [ -f "ui/app.py" ]; then
-    sed -i 's|"../pipeline/|"pipeline/|g' ui/app.py
-    sed -i 's|Path("../pipeline")|Path("pipeline")|g' ui/app.py
-    log "✅ Fixed ui/app.py paths"
+    cp ui/app.py ui/app.py.backup
+    log "Created backup of app.py"
 fi
 
-# Fix run_pipeline.py paths if needed
+# Fix 1: Create symbolic link for pipeline access from UI
+cd ui
+if [ ! -L "pipeline" ]; then
+    ln -sf ../pipeline pipeline
+    log "✅ Created symbolic link ui/pipeline -> ../pipeline"
+fi
+cd ..
+
+# Fix 2: Comprehensive app.py path corrections
+if [ -f "ui/app.py" ]; then
+    # Replace relative pipeline paths
+    sed -i 's|"../pipeline/|"pipeline/|g' ui/app.py
+    sed -i 's|Path("../pipeline")|Path("pipeline")|g' ui/app.py
+    
+    # Ensure working directory is set for subprocess calls
+    sed -i '/import subprocess/a import os' ui/app.py
+    
+    # Add working directory to subprocess.run calls
+    sed -i 's|subprocess\.run(\[|subprocess.run([|g' ui/app.py
+    sed -i '/subprocess\.run(/i\        original_cwd = os.getcwd()\n        os.chdir("/workspace/OpenTuneWeaver")' ui/app.py
+    sed -i '/subprocess\.run(/a\        os.chdir(original_cwd)' ui/app.py
+    
+    # Add working directory to subprocess.Popen calls
+    sed -i '/subprocess\.Popen(/i\        original_cwd = os.getcwd()\n        os.chdir("/workspace/OpenTuneWeaver")' ui/app.py
+    sed -i '/subprocess\.Popen(/a\        os.chdir(original_cwd)' ui/app.py
+    
+    log "✅ Fixed ui/app.py paths and working directory"
+fi
+
+# Fix 3: Update run_pipeline.py paths if needed
 if [ -f "pipeline/run_pipeline.py" ]; then
+    # Ensure relative paths are correct
     sed -i 's|Path("../|Path("|g' pipeline/run_pipeline.py
+    sed -i 's|"../|"|g' pipeline/run_pipeline.py
     log "✅ Fixed pipeline/run_pipeline.py paths"
 fi
 
-# Fix config_loader.py paths
+# Fix 4: Update config_loader.py paths
 if [ -f "pipeline/config_loader.py" ]; then
-    sed -i 's|Path.cwd().parent.parent.parent|Path.cwd().parent.parent|g' pipeline/config_loader.py
+    sed -i 's|Path.cwd().parent.parent.parent|Path.cwd().parent|g' pipeline/config_loader.py
+    sed -i 's|Path.cwd().parent.parent|Path.cwd().parent|g' pipeline/config_loader.py
     log "✅ Fixed pipeline/config_loader.py paths"
 fi
+
+# Fix 5: Create pipeline runner wrapper in UI directory
+cat > ui/run_pipeline_ui.py << 'EOF'
+#!/usr/bin/env python3
+"""
+Pipeline Runner Wrapper for UI
+Ensures correct working directory and path resolution
+"""
+import os
+import sys
+import subprocess
+from pathlib import Path
+
+def main():
+    # Set working directory to project root
+    project_root = Path(__file__).parent.parent
+    os.chdir(project_root)
+    
+    # Add pipeline to Python path
+    pipeline_path = project_root / "pipeline"
+    sys.path.insert(0, str(pipeline_path))
+    
+    # Run the actual pipeline script
+    script_path = pipeline_path / "run_pipeline.py"
+    
+    if script_path.exists():
+        result = subprocess.run([sys.executable, str(script_path)] + sys.argv[1:])
+        return result.returncode
+    else:
+        print(f"Error: {script_path} not found!")
+        return 1
+
+if __name__ == "__main__":
+    sys.exit(main())
+EOF
+
+chmod +x ui/run_pipeline_ui.py
+log "✅ Created pipeline wrapper ui/run_pipeline_ui.py"
+
+# Fix 6: Verify directory structure
+log "📁 Verifying directory structure:"
+echo "  UI directory: $(ls -la ui/ | grep -E 'app.py|pipeline' || echo 'Missing files')"
+echo "  Pipeline files: $(ls -la pipeline/ | grep 'run_pipeline.py' || echo 'Missing run_pipeline.py')"
+echo "  Symbolic link: $(ls -la ui/pipeline 2>/dev/null || echo 'No symbolic link')"
 
 # ============================================
 # SCHRITT 7: Build llama.cpp (CPU-ONLY)
@@ -273,7 +348,7 @@ log "${BLUE}📝 Creating pipeline configuration...${NC}"
 
 cat > /workspace/OpenTuneWeaver/pipeline/pipeline_config.json << EOF
 {
-  "version": "2.3-runpod",
+  "version": "2.4-runpod",
   "created": "$(date -Iseconds)",
   "tokens": {
     "hf_token": "",
@@ -372,16 +447,16 @@ mkdir -p viewer/images
 log "✅ Directory structure created"
 
 # ============================================
-# SCHRITT 12: Create Startup Scripts
+# SCHRITT 12: Create Enhanced Startup Scripts
 # ============================================
 
-log "${BLUE}📝 Creating startup scripts...${NC}"
+log "${BLUE}📝 Creating enhanced startup scripts...${NC}"
 
-# Improved startup script with robust Ollama handling
+# Enhanced startup script with UI path fixes
 cat > /workspace/start_otw.sh << 'EOF'
 #!/bin/bash
 
-echo "🚀 Starting OpenTuneWeaver..."
+echo "🚀 Starting OpenTuneWeaver with enhanced path handling..."
 
 # Function to check if Ollama is responding
 check_ollama() {
@@ -426,9 +501,22 @@ else
     ollama pull llama3.2:3b
 fi
 
-# Start OpenTuneWeaver UI
-cd /workspace/OpenTuneWeaver/ui
+# Verify UI structure before starting
+echo "🔍 Verifying UI structure..."
+if [ -L "/workspace/OpenTuneWeaver/ui/pipeline" ]; then
+    echo "✅ UI pipeline symlink exists"
+else
+    echo "🔧 Creating UI pipeline symlink..."
+    cd /workspace/OpenTuneWeaver/ui
+    ln -sf ../pipeline pipeline
+    cd ..
+fi
+
+# Set proper working directory and start UI
+cd /workspace/OpenTuneWeaver
 echo "Starting OpenTuneWeaver UI on port 8080..."
+echo "Working directory: $(pwd)"
+cd ui
 python3 app.py --server_name 0.0.0.0 --server_port 8080
 EOF
 
@@ -438,14 +526,32 @@ chmod +x /workspace/start_otw.sh
 cat > /workspace/debug_otw.sh << 'EOF'
 #!/bin/bash
 
-echo "🔍 OpenTuneWeaver Debug Information"
-echo "=================================="
+echo "🔍 OpenTuneWeaver Debug Information v2.4"
+echo "========================================"
 
-echo "Directory structure:"
-ls -la /workspace/OpenTuneWeaver/
+echo "📁 Directory structure:"
+echo "Project root:"
+ls -la /workspace/OpenTuneWeaver/ | head -10
 
-echo -e "\nPython packages:"
-pip3 list | grep -E "(torch|transformers|gradio|unsloth)"
+echo -e "\nUI directory:"
+ls -la /workspace/OpenTuneWeaver/ui/ | grep -E "(app.py|pipeline|run_pipeline)"
+
+echo -e "\nPipeline directory:"
+ls -la /workspace/OpenTuneWeaver/pipeline/ | grep -E "(run_pipeline|config)"
+
+echo -e "\nSymbolic links in UI:"
+find /workspace/OpenTuneWeaver/ui/ -type l -ls 2>/dev/null || echo "No symbolic links found"
+
+echo -e "\nPython path verification:"
+cd /workspace/OpenTuneWeaver/ui
+python3 -c "
+import sys
+import os
+print(f'Current working directory: {os.getcwd()}')
+print(f'Python path: {sys.path[:3]}')
+print(f'Pipeline symlink exists: {os.path.exists(\"pipeline\")}')
+print(f'run_pipeline.py accessible: {os.path.exists(\"pipeline/run_pipeline.py\")}')
+" 2>/dev/null || echo "Python path check failed"
 
 echo -e "\nOllama status:"
 if curl -s http://localhost:11434/api/tags 2>/dev/null; then
@@ -457,42 +563,43 @@ else
 fi
 
 echo -e "\nOllama processes:"
-ps aux | grep ollama | grep -v grep
+ps aux | grep ollama | grep -v grep || echo "No Ollama processes"
 
-echo -e "\nOllama logs (last 20 lines):"
-tail -20 /workspace/ollama.log 2>/dev/null || echo "No Ollama logs found"
+echo -e "\nOllama logs (last 10 lines):"
+tail -10 /workspace/ollama.log 2>/dev/null || echo "No Ollama logs found"
 
-echo -e "\nGPU status:"
+echo -e "\n🐍 Python packages:"
+pip3 list | grep -E "(torch|transformers|gradio|unsloth)" | head -5
+
+echo -e "\n🎮 GPU status:"
 nvidia-smi 2>/dev/null || echo "No GPU available"
 
-echo -e "\nPort 11434 status:"
+echo -e "\n🔗 Network status (port 11434):"
 ss -tlnp | grep 11434 || echo "Port 11434 not listening"
 
-echo -e "\nProcess status:"
-ps aux | grep -E "(ollama|python)" | head -10
-
-echo -e "\nllama.cpp build status:"
-ls -la /workspace/OpenTuneWeaver/pipeline/modules/06_finetuning/llama.cpp/build/bin/ 2>/dev/null || echo "llama.cpp not built"
-
-echo -e "\nConfiguration model:"
+echo -e "\n📄 Configuration model check:"
 grep "openai_model_name" /workspace/OpenTuneWeaver/pipeline/pipeline_config.json 2>/dev/null || echo "No config found"
+
+echo -e "\n🏗️ llama.cpp build status:"
+ls -la /workspace/OpenTuneWeaver/pipeline/modules/06_finetuning/llama.cpp/build/bin/ 2>/dev/null || echo "llama.cpp not built or not found"
 EOF
 
 chmod +x /workspace/debug_otw.sh
 
-log "✅ Startup scripts created"
+log "✅ Enhanced startup scripts created"
 
 # ============================================
-# SCHRITT 13: Installation Test
+# SCHRITT 13: Final Path Verification
 # ============================================
 
-log "${BLUE}🧪 Testing installation...${NC}"
+log "${BLUE}🧪 Final path verification and testing...${NC}"
 
 cd /workspace/OpenTuneWeaver
 
 # Test Python imports
 python3 -c "
 import sys
+import os
 try:
     import torch
     import transformers
@@ -511,6 +618,26 @@ except ImportError as e:
     sys.exit(1)
 "
 
+# Test UI structure
+log "📁 UI Structure Verification:"
+if [ -L "ui/pipeline" ]; then
+    echo "  ✅ UI pipeline symlink: $(ls -la ui/pipeline)"
+else
+    echo "  ❌ UI pipeline symlink missing"
+fi
+
+if [ -f "ui/app.py" ]; then
+    echo "  ✅ UI app.py exists"
+else
+    echo "  ❌ UI app.py missing"
+fi
+
+if [ -f "pipeline/run_pipeline.py" ]; then
+    echo "  ✅ Pipeline run_pipeline.py exists"
+else
+    echo "  ❌ Pipeline run_pipeline.py missing"
+fi
+
 # Test Ollama connection
 if curl -s http://localhost:11434/api/tags > /dev/null; then
     log "✅ Ollama connection test passed"
@@ -528,7 +655,7 @@ else
 fi
 
 # ============================================
-# SCHRITT 14: Final Setup Complete
+# SCHRITT 14: Installation Complete
 # ============================================
 
 log "${GREEN}========================================${NC}"
@@ -548,18 +675,20 @@ echo "📁 Important Paths:"
 echo "  Project directory:    /workspace/OpenTuneWeaver"
 echo "  Configuration:        /workspace/OpenTuneWeaver/pipeline/pipeline_config.json"
 echo "  Logs:                /workspace/ollama.log"
-echo "  llama.cpp binary:     /workspace/OpenTuneWeaver/pipeline/modules/06_finetuning/llama.cpp/build/bin/"
+echo "  UI symlink:          /workspace/OpenTuneWeaver/ui/pipeline -> ../pipeline"
+echo ""
+echo "🔧 Path Fixes Applied:"
+echo "  ✅ UI symbolic link created (ui/pipeline -> ../pipeline)"
+echo "  ✅ app.py path corrections applied"
+echo "  ✅ Working directory management added"
+echo "  ✅ Pipeline wrapper created (ui/run_pipeline_ui.py)"
+echo "  ✅ Enhanced subprocess handling in app.py"
 echo ""
 echo "🤖 Model Information:"
 echo "  Primary model:        ${OLLAMA_MODEL:-gemma3:12b-it-qat}"
 echo "  llama.cpp build:      CPU-only (stable and reliable)"
 echo "  PyTorch:             GPU-accelerated (if CUDA available)"
 echo "  Ollama:              GPU-accelerated (if CUDA available)"
-echo ""
-echo "💡 Notes:"
-echo "  - gemma3:12b-it-qat is a larger, more capable model (~24GB download)"
-echo "  - If download fails, system falls back to llama3.2:3b"
-echo "  - Ollama startup is now more robust with proper waiting"
 echo ""
 
 # Optional: Auto-start
