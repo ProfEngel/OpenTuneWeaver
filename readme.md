@@ -23,7 +23,7 @@
 **OpenTuneWeaver is a semantically-structured, curatable all-in-one LLM fine-tuning pipeline that automatically creates structured wiki entries, InstructQA datasets, and benchmarkable, deployment-ready models from any raw data (PDF, DOCX, etc.).** The system revolutionizes LLM fine-tuning through **semantic chunking**, **curatable dataset creation**, and **end-to-end automation** without requiring technical expertise.
 
 <div align="right">
-  <img src="assets/mwk_logo.png" alt="Ministry of Science, Research and Arts Logo" height="60">
+  <img src="assets/mwk_logo_w2.png" alt="Ministry of Science, Research and Arts Logo" height="60">
   <img src="assets/stifterverband_logo.jpg" alt="Stifterverband Logo" height="60">
 </div>
 
@@ -261,7 +261,7 @@ Semantically-structured, curatable all-in-one LLM fine-tuning pipeline
 **Prof. Dr. Mathias Engel - ProfEngel** 
 
 <div align="left">
-  <img src="assets/hfwu_logo.png" alt="Nürtingen-Geislingen University" width="100">
+  <img src="assets/hfwu_logo_w.png" alt="Nürtingen-Geislingen University" width="100">
 </div>
 **Hochschule für Wirtschaft und Umwelt Nürtingen-Geislingen**  
 *part-funded by MWK Baden-Württemberg and Stifterverband Deutschland*
