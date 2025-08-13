@@ -20,7 +20,10 @@
 **OpenTuneWeaver is a semantically-structured, curatable all-in-one LLM fine-tuning pipeline that automatically creates structured wiki entries, InstructQA datasets, and benchmarkable, deployment-ready models from any raw data (PDF, DOCX, etc.).** The system revolutionizes LLM fine-tuning through **semantic chunking**, **curatable dataset creation**, and **end-to-end automation** without requiring technical expertise.
 
 <div align="right">
-  <img src="assets/mwk_logo.svg" alt="MWK Logo" height="60" style="margin-right: 20px;">
+  <!-- Light Mode Logo -->
+  <img src="assets/mwk_logo_light.svg" alt="MWK Logo" height="60" style="margin-right: 20px;" media="(prefers-color-scheme: light)">
+  <!-- Dark Mode Logo -->  
+  <img src="assets/mwk_logo_dark.svg" alt="MWK Logo" height="60" style="margin-right: 20px;" media="(prefers-color-scheme: dark)">
   <img src="assets/stifterverband_logo.jpg" alt="Stifterverband Logo" height="60">
 </div>
 
