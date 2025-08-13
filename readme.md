@@ -11,8 +11,11 @@
 [![Website](https://img.shields.io/badge/Website-opentuneweaver.com-blue?logo=googlechrome&logoColor=white)](https://opentuneweaver.com/)
 
 <div align="center">
-  <img src="assets/otw_logo_banner.png" alt="OpenTuneWeaver Logo" width="800">
+  <img src="assets/otw_logo_banner.png" alt="OpenTuneWeaver Logo" width="900">
 </div>
+
+by ProfEngel, 08.2025
+
 
 
 ![OpenTuneWeaver Demo](assets/OTW_demo.gif)
