@@ -4,10 +4,10 @@
 
 **OpenTuneWeaver is a semantically-structured, curatable all-in-one LLM fine-tuning pipeline that automatically creates structured wiki entries, InstructQA datasets, and benchmarkable, deployment-ready models from any raw data (PDF, DOCX, etc.).** The system revolutionizes LLM fine-tuning through **semantic chunking**, **curatable dataset creation**, and **end-to-end automation** without requiring technical expertise.
 
-This project is funded by the **Ministry of Science, Research and Arts Baden-Württemberg (MWK)** and **Stifterverband Deutschland** as part of the digitalization of higher education.
+This project is part-funded by the **Ministry of Science, Research and Arts Baden-Württemberg (MWK)** and **Stifterverband Deutschland** as part of digital fellowship program   [Fellowship-Program](https://www.stifterverband.org/bwdigifellows/2024_engel_leiblein).
 
 > **Tip**  
-> **Looking for an [Enterprise Plan](mailto:sales@opentuneweaver.com)?** – **Speak with Our Sales Team Today!**  
+> **Looking for an [Enterprise Plan](mailto:mat.max.engel@com.com)?** – **Speak with Our Sales Team Today!**  
 > Get **enhanced capabilities**, including **custom theming and branding**, **Service Level Agreement (SLA) support**, **Long-Term Support (LTS) versions**, **priority support**, **on-premise deployment**, and **more!**
 
 ***
@@ -55,6 +55,9 @@ This project is funded by the **Ministry of Science, Research and Arts Baden-Wü
 ```
 
 runpod/pytorch:2.8.0-py3.11-cuda12.8.1-cudnn-devel-ubuntu22.04
+Disk Volume: 100 GB
+Pod Volume:  100 GB
+Open Ports: 8080,11434
 
 ```
 
@@ -70,14 +73,10 @@ chmod +x setup_runpod_direct.sh
 ```
 
 **After installation:**
-```
 
-cd OpenTuneWeaver
-python app.py
+wait until the installation is done, then press y for starting the ui. The ui starts on port http://yourip:8080
 
-```
-
-Access via Runpod web interface on port 7860.
+In Runpod access via Runpod web interface on port 8080.
 
 ### Alternative Installation Methods
 
@@ -93,7 +92,10 @@ docker run -d -p 7860:7860 --gpus all -v opentuneweaver:/app/data --name opentun
 
 conda create -n opentuneweaver python=3.11
 conda activate opentuneweaver
-pip install opentuneweaver
+git clone https://github.com/ProfEngel/OpenTuneWeaver.git
+cp OpenTuneWeaver/setup_runpod_direct.sh .
+chmod +x setup_runpod_direct.sh
+./setup_runpod_direct.sh
 
 ```
 
@@ -102,7 +104,10 @@ pip install opentuneweaver
 
 python3.11 -m venv opentuneweaver-env
 source opentuneweaver-env/bin/activate
-pip install opentuneweaver
+git clone https://github.com/ProfEngel/OpenTuneWeaver.git
+cp OpenTuneWeaver/setup_runpod_direct.sh .
+chmod +x setup_runpod_direct.sh
+./setup_runpod_direct.sh
 
 ```
 
@@ -136,7 +141,7 @@ This project is licensed under the **Apache License 2.0**.
 - ✅ **Open Source Projects**: Free use with attribution
 - ⚠️ **Commercial Use**: Enterprise plan required
 
-For commercial use, contact our [Sales Team](mailto:sales@opentuneweaver.com) for an Enterprise Plan.
+For commercial use, contact our [Sales Team](mailto:mat.max.engel@gmail.com) for an Enterprise Plan.
 
 Full license terms can be found in the [LICENSE](LICENSE) file.
 
