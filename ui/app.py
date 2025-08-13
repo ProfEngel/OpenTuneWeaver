@@ -9,7 +9,8 @@ Features:
 - Erweiterte Einstellungsseite
 - Pipeline-Steuerung über Kommandozeilenparameter
 - Live-Terminal mit Auto-Scroll
-- Download-Management
+- Getrennte Download-Buttons für Dokumente und Modelle
+- Dropdown-Auswahl für Base-Modelle
 - Aufräumen-Funktionalität
 """
 
@@ -28,6 +29,16 @@ from typing import List, Dict, Optional
 import threading
 import tempfile
 import signal
+
+# Verfügbare Gemma3-Modelle
+AVAILABLE_MODELS = [
+    "unsloth/gemma-3-1b-it",
+    "unsloth/gemma-3-4b-it",
+    "unsloth/gemma-3-12b-it",
+    "unsloth/gemma-3-27b-it",
+    "unsloth/gemma-3n-E2B-it",
+    "unsloth/gemma-3n-E4B-it"
+]
 
 # Globale Variablen
 progress_messages = []
@@ -479,83 +490,99 @@ def stop_pipeline():
         log_message(f"❌ Fehler beim Stoppen: {e}", "ERROR")
         return f"❌ Fehler beim Stoppen: {e}"
 
-# ==================== DOWNLOAD ====================
+# ==================== GETRENNTE DOWNLOAD-FUNKTIONEN ====================
 
-def create_download_zip():
-    """Erstellt eine ZIP-Datei mit allen Ergebnissen."""
+def create_documents_zip():
+    """Erstellt eine ZIP-Datei mit allen Dokumenten (ohne Modelle)."""
     try:
-        log_message("📦 Erstelle Download-ZIP...")
+        log_message("📦 Erstelle Dokumente-ZIP...")
 
         temp_dir = tempfile.mkdtemp()
-        zip_path = Path(temp_dir) / f"opentuneweaver_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
+        zip_path = Path(temp_dir) / f"opentuneweaver_documents_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
 
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            # Suche nach archivierten Ergebnissen in data/OUTPUT
-            data_output = Path("../pipeline/data/OUTPUT")
-            if data_output.exists():
-                # Finde neueste Archive
-                archives = list(data_output.glob("*.zip"))
-                if archives:
-                    # Nimm die neuesten Archive
-                    latest_archives = sorted(archives, key=os.path.getctime, reverse=True)[:2]
-                    for archive in latest_archives:
-                        # Füge Archive direkt zur ZIP hinzu
-                        zipf.write(archive, archive.name)
-                        log_message(f"📦 Hinzugefügt: {archive.name}")
-                
-                # Füge auch Metrik-Dateien hinzu
-                metric_files = list(data_output.glob("*.json"))
-                for metric_file in metric_files:
-                    zipf.write(metric_file, metric_file.name)
-                    log_message(f"📊 Hinzugefügt: {metric_file.name}")
+            # Suche nach Dokumenten in den Modulen
+            modules_dir = Path("../pipeline/modules")
+            if modules_dir.exists():
+                document_dirs = [
+                    ("01_convert", "markdown_files"),
+                    ("02_wiki", "wiki_json"),
+                    ("03_instructQA", "qa_json"),
+                    ("04_format", "formatted_dataset"),
+                    ("05_bmcreator", "benchmark_questions"),
+                    ("07_benchmark", "benchmark_results")
+                ]
 
-            # Falls keine Archive vorhanden, sammle direkt aus Modulen
-            else:
-                modules_dir = Path("../pipeline/modules")
-                if modules_dir.exists():
-                    output_dirs = [
-                        ("01_convert", "markdown_files"),
-                        ("02_wiki", "wiki_json"),
-                        ("03_instructQA", "qa_json"),
-                        ("04_format", "formatted_dataset"),
-                        ("05_bmcreator", "benchmark_questions"),
-                        ("06_finetuning", "model_files"),
-                        ("07_benchmark", "benchmark_results")
-                    ]
-
-                    total_files = 0
-                    for module_name, zip_folder in output_dirs:
-                        output_dir = modules_dir / module_name / "OUTPUT"
-                        if output_dir.exists():
-                            for file_path in output_dir.rglob("*"):
-                                if file_path.is_file():
-                                    arcname = f"{zip_folder}/{file_path.name}"
-                                    zipf.write(file_path, arcname)
-                                    total_files += 1
-
-                    # CustomModel hinzufügen
-                    custom_model_dir = modules_dir / "06_finetuning" / "CustomModel"
-                    if custom_model_dir.exists():
-                        for file_path in custom_model_dir.rglob("*"):
-                            if file_path.is_file():
-                                rel_path = file_path.relative_to(custom_model_dir)
-                                arcname = f"custom_model/{rel_path}"
+                total_files = 0
+                for module_name, zip_folder in document_dirs:
+                    output_dir = modules_dir / module_name / "OUTPUT"
+                    if output_dir.exists():
+                        for file_path in output_dir.rglob("*"):
+                            if file_path.is_file() and not file_path.suffix in ['.bin', '.safetensors', '.pt', '.pth']:
+                                arcname = f"{zip_folder}/{file_path.name}"
                                 zipf.write(file_path, arcname)
                                 total_files += 1
 
-                    if total_files == 0:
-                        return None, "❌ Keine Ergebnisse zum Download gefunden"
+                # Pipeline Reports hinzufügen (falls vorhanden)
+                pipeline_reports = ["pipeline_report.md", "benchmark_report.md"]
+                for report in pipeline_reports:
+                    report_path = modules_dir.parent / "data" / "OUTPUT" / report
+                    if report_path.exists():
+                        zipf.write(report_path, f"reports/{report}")
+                        total_files += 1
 
-            log_message(f"✅ ZIP erstellt")
-            return str(zip_path), f"✅ ZIP-Archiv erstellt"
+                if total_files == 0:
+                    return None, "❌ Keine Dokumente zum Download gefunden"
+
+            log_message(f"✅ Dokumente-ZIP erstellt ({total_files} Dateien)")
+            return str(zip_path), f"✅ Dokumente-ZIP erstellt ({total_files} Dateien)"
 
     except Exception as e:
-        error_msg = f"❌ Fehler beim Erstellen der ZIP: {e}"
+        error_msg = f"❌ Fehler beim Erstellen der Dokumente-ZIP: {e}"
         log_message(error_msg, "ERROR")
         return None, error_msg
 
-# Rest der app.py bleibt gleich (UI-Definition, Event-Handler, etc.)
-# ... [Der Rest des Codes bleibt unverändert] ...
+def create_model_zip():
+    """Erstellt eine ZIP-Datei mit allen Modell-Dateien."""
+    try:
+        log_message("📦 Erstelle Modell-ZIP...")
+
+        temp_dir = tempfile.mkdtemp()
+        zip_path = Path(temp_dir) / f"opentuneweaver_model_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
+
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            total_files = 0
+            
+            # CustomModel hinzufügen
+            custom_model_dir = Path("../pipeline/modules/06_finetuning/CustomModel")
+            if custom_model_dir.exists():
+                for file_path in custom_model_dir.rglob("*"):
+                    if file_path.is_file():
+                        rel_path = file_path.relative_to(custom_model_dir)
+                        arcname = f"custom_model/{rel_path}"
+                        zipf.write(file_path, arcname)
+                        total_files += 1
+
+            # Finetuning OUTPUT hinzufügen (für zusätzliche Modell-Dateien)
+            finetuning_output = Path("../pipeline/modules/06_finetuning/OUTPUT")
+            if finetuning_output.exists():
+                for file_path in finetuning_output.rglob("*"):
+                    if file_path.is_file() and file_path.suffix in ['.bin', '.safetensors', '.pt', '.pth', '.gguf', '.json']:
+                        rel_path = file_path.relative_to(finetuning_output)
+                        arcname = f"model_files/{rel_path}"
+                        zipf.write(file_path, arcname)
+                        total_files += 1
+
+            if total_files == 0:
+                return None, "❌ Keine Modell-Dateien zum Download gefunden"
+
+            log_message(f"✅ Modell-ZIP erstellt ({total_files} Dateien)")
+            return str(zip_path), f"✅ Modell-ZIP erstellt ({total_files} Dateien)"
+
+    except Exception as e:
+        error_msg = f"❌ Fehler beim Erstellen der Modell-ZIP: {e}"
+        log_message(error_msg, "ERROR")
+        return None, error_msg
 
 # ==================== AUFRÄUMEN ====================
 
@@ -815,7 +842,10 @@ def create_main_interface():
 
                         gr.Markdown("### 📥 Download & Aufräumen")
                         with gr.Row():
-                            download_btn = gr.Button("📦 Ergebnisse herunterladen", variant="secondary")
+                            download_docs_btn = gr.Button("📄 Dokumente herunterladen", variant="secondary")
+                            download_model_btn = gr.Button("🤖 Modell herunterladen", variant="secondary")
+                        
+                        with gr.Row():
                             cleanup_btn = gr.Button("🗑️ Aufräumen", variant="stop")
                         
                         download_status = gr.Textbox(
@@ -840,7 +870,7 @@ def create_main_interface():
                         4. **🔧 Dataset Formatting** - Formatierung für das Training
                         5. **📊 Benchmark Creation** - Erstellung von Benchmark-Fragen
                         6. **🤖 Fine-tuning** - Training des Modells
-                        7. **🏁 Benchmarking** - Evaluation des trainierten Modells
+                        7. **🏆 Benchmarking** - Evaluation des trainierten Modells
                         8. **📦 Results Archive** - Archivierung aller Ergebnisse
                         
                         **Verwendung:**
@@ -949,9 +979,12 @@ def create_main_interface():
                             label="Modell-Name",
                             value="OpenTuneWeaver-Model"
                         )
-                        base_model = gr.Textbox(
+                        # Geändert: Dropdown statt Textbox für Base Model
+                        base_model = gr.Dropdown(
                             label="Base Model",
-                            value="unsloth/gemma-3n-E2B-it"
+                            choices=AVAILABLE_MODELS,
+                            value="unsloth/gemma-3n-E2B-it",
+                            interactive=True
                         )
 
                     with gr.Row():
@@ -1070,7 +1103,7 @@ def create_main_interface():
                             value=False
                         )
 
-                with gr.Accordion("🏁 Benchmark-Konfiguration", open=False):
+                with gr.Accordion("🏆 Benchmark-Konfiguration", open=False):
                     with gr.Row():
                         benchmark_mode = gr.Dropdown(
                             label="Benchmark Modus",
@@ -1241,16 +1274,28 @@ def create_main_interface():
             outputs=[terminal_output]
         )
 
-        # Download-Handler
-        def handle_download():
-            zip_path, status = create_download_zip()
+        # Getrennte Download-Handler
+        def handle_documents_download():
+            zip_path, status = create_documents_zip()
             if zip_path:
                 return status, zip_path, gr.update(visible=True)
             else:
                 return status, None, gr.update(visible=False)
 
-        download_btn.click(
-            fn=handle_download,
+        def handle_model_download():
+            zip_path, status = create_model_zip()
+            if zip_path:
+                return status, zip_path, gr.update(visible=True)
+            else:
+                return status, None, gr.update(visible=False)
+
+        download_docs_btn.click(
+            fn=handle_documents_download,
+            outputs=[download_status, download_file, download_file]
+        )
+
+        download_model_btn.click(
+            fn=handle_model_download,
             outputs=[download_status, download_file, download_file]
         )
 
@@ -1405,7 +1450,7 @@ def main():
     print(" 🎯 OPENTUNEWEAVER - FINETUNING PIPELINE UI")
     print("="*80)
     log_message("🚀 Starte OpenTuneWeaver UI...")
-    log_message("✨ Features: Upload, Konfiguration, Pipeline, Terminal, Download, Aufräumen")
+    log_message("✨ Features: Upload, Konfiguration, Pipeline, Terminal, getrennte Downloads, Aufräumen")
 
     # Erstelle Interface
     interface = create_main_interface()
@@ -1417,9 +1462,9 @@ def main():
     print(" - Netzwerk: http://YOUR_IP:8080")
     print("\n🎯 Features:")
     print(" - 📤 Datei-Upload für alle Dokumentformate")
-    print(" - ⚙️ Vollständige Pipeline-Konfiguration")
+    print(" - ⚙️ Vollständige Pipeline-Konfiguration mit Modell-Dropdown")
     print(" - 🖥️ Live-Terminal mit Auto-Refresh und Auto-Scroll")
-    print(" - 📦 Download aller Ergebnisse als ZIP")
+    print(" - 📄 Getrennter Download für Dokumente und Modelle")
     print(" - 🤖 Vollautomatische Pipeline-Ausführung")
     print(" - 🗑️ Umfassendes Aufräumen")
 

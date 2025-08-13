@@ -488,8 +488,8 @@
                         <h1>Universal Document Hub</h1>
                         <p class="hub-subtitle">Viewer und Editor für OpenTuneWeaver Pipeline-Dokumente</p>
                         <div style="margin-top: 15px; color: #4a5568; font-size: 0.95em; line-height: 1.5;">
-                            <strong>🔄 Pipeline-Integration:</strong> Verarbeiten Sie Dokumente aus allen 7 Schritten der OpenTuneWeaver-Pipeline<br>
-                            <strong>📁 Unterstützte Formate:</strong> Markdown, Lexikon-JSON, QA-Instruct, Konversationen, Benchmark-Fragen<br>
+                            <strong>📄 Pipeline-Integration:</strong> Verarbeiten Sie Dokumente aus allen 7 Schritten der OpenTuneWeaver-Pipeline<br>
+                            <strong>🔍 Unterstützte Formate:</strong> Markdown, Lexikon-JSON, QA-Instruct, Benchmark-Fragen, Pipeline-Reports<br>
                             <strong>🎯 Workflow:</strong> Von der Dokumentkonvertierung bis zum LLM Fine-tuning
                         </div>
                     </div>
@@ -532,7 +532,7 @@
                 </div>
 
                 <div class="hub-card" data-viewer="qa-instruct">
-                    <div class="hub-card-icon">📝</div>
+                    <div class="hub-card-icon">🔍</div>
                     <div class="hub-card-title">QA Instruct Viewer</div>
                     <div class="hub-card-description">
                         Verwalten Sie Q&A-Instruktionsdatensätze für Training und Analyse
@@ -542,20 +542,6 @@
                         <li>Metadaten-Tags und -Filter</li>
                         <li>Statistiken und Analysen</li>
                         <li>Bearbeitung und Export</li>
-                    </ul>
-                </div>
-
-                <div class="hub-card" data-viewer="conversation">
-                    <div class="hub-card-icon">💬</div>
-                    <div class="hub-card-title">Conversation Viewer</div>
-                    <div class="hub-card-description">
-                        Betrachten und bearbeiten Sie Konversationsdaten im Chat-Format
-                    </div>
-                    <ul class="hub-card-features">
-                        <li>Chat-ähnliche Darstellung</li>
-                        <li>User/Model Avatar-System</li>
-                        <li>Nachrichten-Editor</li>
-                        <li>Conversation-Statistiken</li>
                     </ul>
                 </div>
 
@@ -570,6 +556,34 @@
                         <li>Frage-Antwort-Paare</li>
                         <li>Ausklappbare lange Antworten</li>
                         <li>Bearbeitung und Export</li>
+                    </ul>
+                </div>
+
+                <div class="hub-card" data-viewer="bmReport">
+                    <div class="hub-card-icon">📊</div>
+                    <div class="hub-card-title">BM-Report Viewer</div>
+                    <div class="hub-card-description">
+                        Anzeige und Analyse von Benchmark-Reports aus der Pipeline
+                    </div>
+                    <ul class="hub-card-features">
+                        <li>Benchmark-Ergebnisse Visualisierung</li>
+                        <li>Modell-Vergleiche</li>
+                        <li>Performance-Metriken</li>
+                        <li>Markdown-formatierte Reports</li>
+                    </ul>
+                </div>
+
+                <div class="hub-card" data-viewer="pipelineReport">
+                    <div class="hub-card-icon">📋</div>
+                    <div class="hub-card-title">Pipeline Report Viewer</div>
+                    <div class="hub-card-description">
+                        Detaillierte Pipeline-Berichte mit Schritt-für-Schritt Analysen
+                    </div>
+                    <ul class="hub-card-features">
+                        <li>Vollständige Pipeline-Übersicht</li>
+                        <li>Schritt-Statistiken</li>
+                        <li>Fehler- und Erfolgs-Logs</li>
+                        <li>Zeitstempel und Metriken</li>
                     </ul>
                 </div>
             </div>
@@ -591,7 +605,7 @@
                 </div>
             </div>
             <div class="file-drop-zone" onclick="document.getElementById('markdownFile').click()">
-                <h3>📝 Markdown-Datei laden</h3>
+                <h3>📁 Markdown-Datei laden</h3>
                 <p>Ziehen Sie Ihre .md Datei hierher oder klicken Sie zum Auswählen</p>
                 <input type="file" class="file-input" id="markdownFile" accept=".md,.markdown,.txt">
             </div>
@@ -617,35 +631,18 @@
 
         <div id="qaInstructViewer" class="viewer-page">
             <div class="viewer-header">
-                <h1 class="viewer-title">📝 QA Instruct Viewer</h1>
+                <h1 class="viewer-title">🔍 QA Instruct Viewer</h1>
                 <div class="viewer-controls">
                     <button class="back-btn" onclick="showHub()">← Zurück zum Hub</button>
                     <button class="control-btn" id="toggleAllQaInstruct">📖 Alle aufklappen</button>
                 </div>
             </div>
             <div class="file-drop-zone" onclick="document.getElementById('qaFile').click()">
-                <h3>📝 QA Instruct Datei laden</h3>
+                <h3>🔍 QA Instruct Datei laden</h3>
                 <p>Ziehen Sie Ihre qa_instruct_*.json Datei hierher</p>
                 <input type="file" class="file-input" id="qaFile" accept=".json">
             </div>
             <div class="content-area" id="qaContent" style="display: none;"></div>
-        </div>
-
-        <div id="conversationViewer" class="viewer-page">
-            <div class="viewer-header">
-                <h1 class="viewer-title">💬 Conversation Viewer</h1>
-                <div class="viewer-controls">
-                    <button class="back-btn" onclick="showHub()">← Zurück zum Hub</button>
-                    <button class="control-btn" id="toggleAllConversation">📖 Alle aufklappen</button>
-                    <button class="control-btn" id="editModeConversation">✏️ Bearbeiten</button>
-                </div>
-            </div>
-            <div class="file-drop-zone" onclick="document.getElementById('conversationFile').click()">
-                <h3>💬 Conversation Datei laden</h3>
-                <p>Ziehen Sie Ihre dataset.json oder conversation.json Datei hierher</p>
-                <input type="file" class="file-input" id="conversationFile" accept=".json">
-            </div>
-            <div class="content-area" id="conversationContent" style="display: none;"></div>
         </div>
 
         <div id="benchmarkViewer" class="viewer-page">
@@ -663,6 +660,40 @@
                 <input type="file" class="file-input" id="benchmarkFile" accept=".json">
             </div>
             <div class="content-area" id="benchmarkContent" style="display: none;"></div>
+        </div>
+
+        <div id="bmReportViewer" class="viewer-page">
+            <div class="viewer-header">
+                <h1 class="viewer-title">📊 BM-Report Viewer</h1>
+                <div class="viewer-controls">
+                    <button class="back-btn" onclick="showHub()">← Zurück zum Hub</button>
+                    <button class="control-btn" id="toggleAllBmReport">📖 Alle aufklappen</button>
+                    <button class="control-btn" id="editModeBmReport">✏️ Bearbeiten</button>
+                </div>
+            </div>
+            <div class="file-drop-zone" onclick="document.getElementById('bmReportFile').click()">
+                <h3>📊 BM-Report Datei laden</h3>
+                <p>Ziehen Sie Ihre benchmark_report.md Datei hierher</p>
+                <input type="file" class="file-input" id="bmReportFile" accept=".md,.markdown,.txt">
+            </div>
+            <div class="content-area" id="bmReportContent" style="display: none;"></div>
+        </div>
+
+        <div id="pipelineReportViewer" class="viewer-page">
+            <div class="viewer-header">
+                <h1 class="viewer-title">📋 Pipeline Report Viewer</h1>
+                <div class="viewer-controls">
+                    <button class="back-btn" onclick="showHub()">← Zurück zum Hub</button>
+                    <button class="control-btn" id="toggleAllPipelineReport">📖 Alle aufklappen</button>
+                    <button class="control-btn" id="editModePipelineReport">✏️ Bearbeiten</button>
+                </div>
+            </div>
+            <div class="file-drop-zone" onclick="document.getElementById('pipelineReportFile').click()">
+                <h3>📋 Pipeline Report Datei laden</h3>
+                <p>Ziehen Sie Ihre pipeline_report.md Datei hierher</p>
+                <input type="file" class="file-input" id="pipelineReportFile" accept=".md,.markdown,.txt">
+            </div>
+            <div class="content-area" id="pipelineReportContent" style="display: none;"></div>
         </div>
     </div>
 
@@ -759,8 +790,10 @@
                 'markdown': 'markdownViewer',
                 'lexikon': 'lexikonViewer', 
                 'qaInstruct': 'qaInstructViewer',
-                'conversation': 'conversationViewer',
-                'benchmark': 'benchmarkViewer'
+                'qa-instruct': 'qaInstructViewer',
+                'benchmark': 'benchmarkViewer',
+                'bmReport': 'bmReportViewer',
+                'pipelineReport': 'pipelineReportViewer'
             };
             
             const viewerId = viewerIdMap[viewerType] || viewerType + 'Viewer';
@@ -774,7 +807,7 @@
                 // Debug: Check if file drop zone is visible
                 const fileDropZone = viewerElement.querySelector('.file-drop-zone');
                 if (fileDropZone) {
-                    log(`📁 File drop zone found and should be visible`);
+                    log(`🔍 File drop zone found and should be visible`);
                 } else {
                     log(`❌ File drop zone not found in ${viewerId}`);
                 }
@@ -938,7 +971,7 @@
                         }
                     }
                     
-                    log(`📝 Extracted for entry ${index}:`);
+                    log(`🔍 Extracted for entry ${index}:`);
                     log(`   Instruction: "${currentInstruction.substring(0, 50)}..."`);
                     log(`   Input: "${currentInput.substring(0, 30)}..."`);
                     log(`   Output: "${currentOutput.substring(0, 50)}..."`);
@@ -953,7 +986,7 @@
                             <h4 style="color: #e67e22; margin-bottom: 20px; font-size: 16px;">✏️ Q&A Eintrag #${index + 1} bearbeiten</h4>
                             
                             <div style="margin-bottom: 20px;">
-                                <label style="display: block; font-weight: bold; color: #2c5282; margin-bottom: 8px; font-size: 14px;">📝 Instruktion/Frage: *</label>
+                                <label style="display: block; font-weight: bold; color: #2c5282; margin-bottom: 8px; font-size: 14px;">🔍 Instruktion/Frage: *</label>
                                 <textarea 
                                     id="edit-instruction-${index}" 
                                     placeholder="Geben Sie hier die Instruktion oder Frage ein..."
@@ -1163,6 +1196,71 @@
             reader.readAsText(file);
         }
 
+        // Report file handlers (same as markdown but for specific viewers)
+        function handleBmReportFile(file) {
+            if (!file) return;
+            
+            log(`📊 Loading BM report file: ${file.name}`);
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const content = e.target.result;
+                    originalData.bmReport = content;
+                    const html = convertMarkdownToHTML(content);
+                    
+                    document.getElementById('bmReportContent').innerHTML = `
+                        <div class="entry-card">
+                            <div class="entry-title">📊 ${file.name}</div>
+                            <div class="entry-content expandable-content collapsed">
+                                ${html}
+                            </div>
+                            <button class="expand-btn" onclick="toggleContent(this, true)">🔽 Weiterlesen</button>
+                        </div>
+                    `;
+                    
+                    document.getElementById('bmReportContent').style.display = 'block';
+                    log('✅ BM Report file loaded successfully');
+                } catch (error) {
+                    log(`❌ Error loading BM report: ${error.message}`);
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+
+        function handlePipelineReportFile(file) {
+            if (!file) return;
+            
+            log(`📋 Loading Pipeline report file: ${file.name}`);
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const content = e.target.result;
+                    originalData.pipelineReport = content;
+                    const html = convertMarkdownToHTML(content);
+                    
+                    document.getElementById('pipelineReportContent').innerHTML = `
+                        <div class="entry-card">
+                            <div class="entry-title">📋 ${file.name}</div>
+                            <div class="entry-content expandable-content collapsed">
+                                ${html}
+                            </div>
+                            <button class="expand-btn" onclick="toggleContent(this, true)">🔽 Weiterlesen</button>
+                        </div>
+                    `;
+                    
+                    document.getElementById('pipelineReportContent').style.display = 'block';
+                    log('✅ Pipeline Report file loaded successfully');
+                } catch (error) {
+                    log(`❌ Error loading Pipeline report: ${error.message}`);
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+
         function handleLexikonFile(file) {
             if (!file) return;
             
@@ -1212,7 +1310,7 @@
         function handleQAFile(file) {
             if (!file) return;
             
-            log(`📝 Loading QA file: ${file.name}`);
+            log(`🔍 Loading QA file: ${file.name}`);
             
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -1334,7 +1432,7 @@
                             ${metadataHTML ? `<div style="margin-bottom: 15px;">${metadataHTML}</div>` : ''}
                             
                             <div style="margin-bottom: 20px;">
-                                <div style="font-weight: bold; color: #2c5282; margin-bottom: 8px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">📝 Instruktion</div>
+                                <div style="font-weight: bold; color: #2c5282; margin-bottom: 8px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">🔍 Instruktion</div>
                                 <textarea id="instruction-${entry.id}" style="width: 100%; min-height: 80px; padding: 12px; border: 2px solid #2c5282; border-radius: 10px; font-family: inherit; font-size: 14px; resize: vertical; background: white;">${entry.instruction || ''}</textarea>
                             </div>
                             
@@ -1378,7 +1476,7 @@
                             ${metadataHTML ? `<div style="margin-bottom: 15px;">${metadataHTML}</div>` : ''}
                             
                             <div class="expandable-content collapsed entry-content">
-                                <h4 style="color: #2c5282; font-size: 1.1em; font-weight: bold; margin-bottom: 8px;">📝 Instruktion</h4>
+                                <h4 style="color: #2c5282; font-size: 1.1em; font-weight: bold; margin-bottom: 8px;">🔍 Instruktion</h4>
                                 <div style="background: #f0f9ff; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #2c5282; font-size: 1.1em; font-weight: 500; color: #2d3748;">
                                     ${convertedInstruction}
                                 </div>
@@ -1461,114 +1559,6 @@
             
             const entriesHtml = window.qaEntries.map((entry, index) => createQAEntryHTML(entry, index)).join('');
             document.getElementById('qaContent').innerHTML = entriesHtml;
-        }
-
-        function handleConversationFile(file) {
-            if (!file) return;
-            
-            log(`💬 Loading conversation file: ${file.name}`);
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    originalData.conversation = data;
-                    log(`🔍 Conversation Data structure: ${JSON.stringify(Object.keys(data))}`);
-                    
-                    // Try different data structures
-                    let conversations = data.conversations || data.data || [];
-                    
-                    if (Array.isArray(data)) {
-                        conversations = data;
-                    }
-                    
-                    // If it's a single conversation, wrap it in an array
-                    if (data.content || data.messages) {
-                        conversations = [data];
-                    }
-                    
-                    log(`📊 Found ${conversations.length} conversations`);
-                    
-                    if (conversations.length === 0) {
-                        throw new Error('Keine Konversationen gefunden. Unterstützte Formate: {conversations: [...]} oder Array von Nachrichten');
-                    }
-                    
-                    const conversationsHtml = conversations.map((conv, index) => {
-                        // Handle different message structures
-                        let messages = conv.content || conv.messages || conv.chat || [];
-                        
-                        if (!Array.isArray(messages)) {
-                            messages = [];
-                        }
-                        
-                        const messagesHtml = messages.map((msg, msgIndex) => {
-                            // Handle different message formats
-                            let messageText = '';
-                            let role = msg.role || msg.sender || msg.from || 'unknown';
-                            
-                            if (typeof msg === 'string') {
-                                messageText = msg;
-                                role = msgIndex % 2 === 0 ? 'user' : 'assistant';
-                            } else {
-                                messageText = msg.text || msg.message || msg.content || '';
-                                
-                                // Handle Claude API format
-                                if (Array.isArray(msg.content)) {
-                                    messageText = msg.content.map(c => c.text || c).join(' ');
-                                }
-                            }
-                            
-                            const convertedMessage = convertMarkdownToHTML(messageText);
-                            const isUser = role.toLowerCase().includes('user') || role.toLowerCase().includes('human');
-                            
-                            return `
-                                <div class="message-bubble ${isUser ? 'message-user' : 'message-assistant'}">
-                                    <div class="message-role">${isUser ? '👤 User' : '🤖 Assistant'}</div>
-                                    <div class="entry-content">
-                                        ${convertedMessage || '<em>Leere Nachricht</em>'}
-                                    </div>
-                                </div>
-                            `;
-                        }).join('') || '<p>Keine Nachrichten gefunden</p>';
-                        
-                        return `
-                            <div class="entry-card">
-                                <div class="entry-title">💬 Conversation #${index + 1} (${messages.length} Nachrichten)</div>
-                                <div class="expandable-content collapsed">
-                                    ${messagesHtml}
-                                </div>
-                                <button class="expand-btn" onclick="toggleContent(this, true)">🔽 Weiterlesen</button>
-                            </div>
-                        `;
-                    }).join('');
-                    
-                    document.getElementById('conversationContent').innerHTML = conversationsHtml;
-                    document.getElementById('conversationContent').style.display = 'block';
-                    log(`✅ Conversation file loaded: ${conversations.length} conversations`);
-                } catch (error) {
-                    log(`❌ Error loading conversation file: ${error.message}`);
-                    document.getElementById('conversationContent').innerHTML = `
-                        <div class="entry-card">
-                            <div class="entry-title">❌ Fehler beim Laden</div>
-                            <div class="entry-content">
-                                <p><strong>Fehler:</strong> ${error.message}</p>
-                                <p><strong>Dateiname:</strong> ${file.name}</p>
-                                <p><strong>Dateigröße:</strong> ${(file.size / 1024).toFixed(2)} KB</p>
-                                <h4>💡 Hinweise zur Dateistruktur:</h4>
-                                <ul>
-                                    <li>JSON-Datei mit "conversations" Array</li>
-                                    <li>Jede Konversation sollte "content" oder "messages" Array haben</li>
-                                    <li>Nachrichten mit "role" und "text" oder "content" Feldern</li>
-                                    <li>Alternative: Array von Nachrichten direkt</li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    document.getElementById('conversationContent').style.display = 'block';
-                }
-            };
-            
-            reader.readAsText(file);
         }
 
         function handleBenchmarkFile(file) {
@@ -1711,8 +1701,8 @@
                 });
             });
             
-            // Setup toggle all buttons (QA Instruct now uses individual edit buttons)
-            ['markdown', 'lexikon', 'conversation', 'benchmark'].forEach(viewerType => {
+            // Setup toggle all buttons (no conversation viewer anymore)
+            ['markdown', 'lexikon', 'benchmark', 'bmReport', 'pipelineReport'].forEach(viewerType => {
                 const toggleBtn = document.getElementById('toggleAll' + viewerType.charAt(0).toUpperCase() + viewerType.slice(1));
                 const editBtn = document.getElementById('editMode' + viewerType.charAt(0).toUpperCase() + viewerType.slice(1));
                 
@@ -1734,19 +1724,20 @@
                 log(`🔧 QA Instruct toggle button set up`);
             }
             
-            // File input handlers
+            // File input handlers (no conversation anymore, added report viewers)
             document.getElementById('markdownFile').addEventListener('change', e => handleMarkdownFile(e.target.files[0]));
             document.getElementById('lexikonFile').addEventListener('change', e => handleLexikonFile(e.target.files[0]));
             document.getElementById('qaFile').addEventListener('change', e => handleQAFile(e.target.files[0]));
-            document.getElementById('conversationFile').addEventListener('change', e => handleConversationFile(e.target.files[0]));
             document.getElementById('benchmarkFile').addEventListener('change', e => handleBenchmarkFile(e.target.files[0]));
+            document.getElementById('bmReportFile').addEventListener('change', e => handleBmReportFile(e.target.files[0]));
+            document.getElementById('pipelineReportFile').addEventListener('change', e => handlePipelineReportFile(e.target.files[0]));
             
             log('✅ OTW Hub initialization complete');
             
             // Final verification
             setTimeout(() => {
                 const cards = document.querySelectorAll('.hub-card');
-                log(`🔍 Final check: ${cards.length} hub cards ready for OpenTuneWeaver`);
+                log(`🔍 Final check: ${cards.length} hub cards ready for OpenTuneWeaver (including new Report viewers)`);
             }, 1000);
         });
     </script>
