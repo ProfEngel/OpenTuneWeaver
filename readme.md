@@ -27,7 +27,7 @@ This project is part-funded by the **Ministry of Science, Research and Arts Bade
 ***
 
 ![OpenTuneWeaver Viewer Demo](assets/OTW_viewer_demo.gif)
-With this viewer, all generated documents (converted Markdown files, lexicon wiki entries, QA instruct datasets, benchmark question datasets) can be read and curated as well as edited and saved back. Additionally, reports about the benchmark run and the pipeline run can be displayed.
+With the OTW-Viewer, all generated documents (converted Markdown files, lexicon wiki entries, QA instruct datasets, benchmark question datasets) can be read and curated as well as edited and saved back. Additionally, reports about the benchmark run and the pipeline run can be displayed.
 
 ## Key Features 🚀
 
