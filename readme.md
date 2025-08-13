@@ -11,7 +11,7 @@
 [![Website](https://img.shields.io/badge/Website-opentuneweaver.com-blue?logo=googlechrome&logoColor=white)](https://opentuneweaver.com/)
 
 <div align="center">
-  <img src="assets/otw_logo.png" alt="OpenTuneWeaver Logo" width="250">
+  <img src="assets/otw_logo_banner.png" alt="OpenTuneWeaver Logo" height="100">
 </div>
 
 
@@ -97,7 +97,7 @@ chmod +x setup_runpod_direct.sh
 
 **After installation:**
 
-wait until the installation is done, then press y for starting the ui. The ui starts on port http://yourip:8080
+wait until the installation is done, then press y for starting the ui. The ui starts on port http://yourIP:8080
 
 In Runpod access via Runpod web interface on port 8080.
 
@@ -251,7 +251,15 @@ Do you have questions, suggestions, or need support?
 
 Semantically-structured, curatable all-in-one LLM fine-tuning pipeline
 
+<div align="left">
+  <img src="assets/otw_logo.png" alt="OpenTuneWeaver Logo" width="60">
+</div>
+
 **Prof. Dr. Mathias Engel - ProfEngel** 
+
+<div align="left">
+  <img src="assets/hfwu_logo.png" alt="Nürtingen-Geislingen University" width="60">
+</div>
 **Hochschule für Wirtschaft und Umwelt Nürtingen-Geislingen**  
 *part-funded by MWK Baden-Württemberg and Stifterverband Deutschland*
 
