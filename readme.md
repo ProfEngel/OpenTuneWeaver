@@ -1,16 +1,33 @@
 # OpenTuneWeaver 🧬
 
-![OpenTuneWeaver Logo](assets/otw_logo.png)
+![GitHub stars](https://img.shields.io/github/stars/ProfEngel/OpenTuneWeaver?style=social)
+![GitHub forks](https://img.shields.io/github/forks/ProfEngel/OpenTuneWeaver?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/ProfEngel/OpenTuneWeaver?style=social)
+![GitHub repo size](https://img.shields.io/github/repo-size/ProfEngel/OpenTuneWeaver)
+![GitHub language count](https://img.shields.io/github/languages/count/ProfEngel/OpenTuneWeaver)
+![GitHub top language](https://img.shields.io/github/languages/top/ProfEngel/OpenTuneWeaver)
+![GitHub last commit](https://img.shields.io/github/last-commit/ProfEngel/OpenTuneWeaver?color=red)
+
+
+<div align="center">
+  <img src="assets/otw_logo.png" alt="OpenTuneWeaver Logo" width="250">
+</div>
+
+
+![OpenTuneWeaver Demo](assets/OTW_demo.gif)
 
 **OpenTuneWeaver is a semantically-structured, curatable all-in-one LLM fine-tuning pipeline that automatically creates structured wiki entries, InstructQA datasets, and benchmarkable, deployment-ready models from any raw data (PDF, DOCX, etc.).** The system revolutionizes LLM fine-tuning through **semantic chunking**, **curatable dataset creation**, and **end-to-end automation** without requiring technical expertise.
 
 This project is part-funded by the **Ministry of Science, Research and Arts Baden-Württemberg (MWK)** and **Stifterverband Deutschland** as part of digital fellowship program   [Fellowship-Program](https://www.stifterverband.org/bwdigifellows/2024_engel_leiblein).
 
 > **Tip**  
-> **Looking for an [Enterprise Plan](mailto:mat.max.engel@com.com)?** – **Speak with Our Sales Team Today!**  
+> **Looking for an [Enterprise Plan](mailto:sales@opentuneweaver.com)?** – **Speak with Our Sales Team Today!**  
 > Get **enhanced capabilities**, including **custom theming and branding**, **Service Level Agreement (SLA) support**, **Long-Term Support (LTS) versions**, **priority support**, **on-premise deployment**, and **more!**
 
 ***
+
+![OpenTuneWeaver Viewer Demo](assets/OTW_viewer_demo.gif)
+With this viewer, all generated documents (converted Markdown files, lexicon wiki entries, QA instruct datasets, benchmark question datasets) can be read and curated as well as edited and saved back. Additionally, reports about the benchmark run and the pipeline run can be displayed.
 
 ## Key Features 🚀
 
@@ -21,7 +38,7 @@ This project is part-funded by the **Ministry of Science, Research and Arts Bade
 - 📊 **Integrated Telemetry**: Real-time monitoring, metrics and audit trails for complete transparency
 - 🤖 **GPU-Adaptive Training**: Automatic hardware optimization with LoRA/QLoRA for 100+ models
 - 📱 **No-Code Gradio Interface**: Drag-&-drop upload with live terminal and complete pipeline control
-- 🌐 **Multi-Format Export**: LoRA, Merged, GGUF with quantizations for local deployment (OpenWebUI/LM-Studio)
+- 🌐 **Multi-Format Export**: LoRA, Merged (both for transformers, vLLM, etc.), GGUF in Q_8 with quantizations for local deployment (OpenWebUI/LM-Studio)
 - 🔍 **VLM Integration**: Vision-Language-Models for automatic image descriptions in documents
 - ⚡ **Runpod Integration**: Scalable cloud GPU support for cost-effective training
 
@@ -141,7 +158,7 @@ This project is licensed under the **Apache License 2.0**.
 - ✅ **Open Source Projects**: Free use with attribution
 - ⚠️ **Commercial Use**: Enterprise plan required
 
-For commercial use, contact our [Sales Team](mailto:mat.max.engel@gmail.com) for an Enterprise Plan.
+For commercial use, contact our [Sales Team](mailto:sales@opentuneweaver.com) for an Enterprise Plan.
 
 Full license terms can be found in the [LICENSE](LICENSE) file.
 
@@ -208,7 +225,7 @@ Do you have questions, suggestions, or need support?
 
 ***
 
-**Created by Prof. Dr. Mathias Engel** - Let's make OpenTuneWeaver even greater together! 💪
+**Created by Prof. Dr. Mathias Engel 2023-2025** - Let's make OpenTuneWeaver even greater together! 💪
 
 ***
 
@@ -218,6 +235,16 @@ Semantically-structured, curatable all-in-one LLM fine-tuning pipeline
 
 **Hochschule für Wirtschaft und Umwelt Nürtingen-Geislingen**  
 *Funded by MWK Baden-Württemberg and Stifterverband Deutschland*
+
+## Star History
+<a href="https://star-history.com/#ProfEngel/OpenTuneWeaver&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=ProfEngel/OpenTuneWeaver&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=ProfEngel/OpenTuneWeaver&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=ProfEngel/OpenTuneWeaver&type=Date" />
+  </picture>
+</a>
+
 
 ### Topics
 
