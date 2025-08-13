@@ -130,9 +130,15 @@ chmod +x setup_runpod_direct.sh
 
 python3.11 -m venv opentuneweaver-env
 source opentuneweaver-env/bin/activate
+apt-get update && apt-get upgrade -y
 git clone https://github.com/ProfEngel/OpenTuneWeaver.git
 cp OpenTuneWeaver/setup_runpod_direct.sh .
 chmod +x setup_runpod_direct.sh
+
+# Installation von unsloth_zoo direkt von GitHub
+pip install --upgrade --no-cache-dir --no-deps git+https://github.com/unslothai/unsloth-zoo.git
+
+# Dann das Setup-Skript ausführen
 ./setup_runpod_direct.sh
 
 ```
