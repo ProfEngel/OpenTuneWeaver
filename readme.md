@@ -255,13 +255,13 @@ Do you have questions, suggestions, or need support?
 Semantically-structured, curatable all-in-one LLM fine-tuning pipeline
 
 <div align="left">
-  <img src="assets/otw_logo.png" alt="OpenTuneWeaver Logo" width="60">
+  <img src="assets/otw_logo.png" alt="OpenTuneWeaver Logo" width="100">
 </div>
 
 **Prof. Dr. Mathias Engel - ProfEngel** 
 
 <div align="left">
-  <img src="assets/hfwu_logo.png" alt="Nürtingen-Geislingen University" width="60">
+  <img src="assets/hfwu_logo.png" alt="Nürtingen-Geislingen University" width="100">
 </div>
 **Hochschule für Wirtschaft und Umwelt Nürtingen-Geislingen**  
 *part-funded by MWK Baden-Württemberg and Stifterverband Deutschland*
