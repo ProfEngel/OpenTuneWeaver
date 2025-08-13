@@ -7,7 +7,8 @@
 ![GitHub language count](https://img.shields.io/github/languages/count/ProfEngel/OpenTuneWeaver)
 ![GitHub top language](https://img.shields.io/github/languages/top/ProfEngel/OpenTuneWeaver)
 ![GitHub last commit](https://img.shields.io/github/last-commit/ProfEngel/OpenTuneWeaver?color=red)
-
+[![YouTube](https://img.shields.io/badge/YouTube-MatMaxEngel-red?logo=youtube&logoColor=white)](https://www.youtube.com/user/MatMaxEngel)
+[![Website](https://img.shields.io/badge/Website-opentuneweaver.com-blue?logo=googlechrome&logoColor=white)](https://opentuneweaver.com/)
 
 <div align="center">
   <img src="assets/otw_logo.png" alt="OpenTuneWeaver Logo" width="250">
@@ -237,7 +238,7 @@ Do you have questions, suggestions, or need support?
 ## About
 
 Semantically-structured, curatable all-in-one LLM fine-tuning pipeline
-
+**Prof. Dr. Mathias Engel - ProfEngel** 
 **Hochschule für Wirtschaft und Umwelt Nürtingen-Geislingen**  
 *Funded by MWK Baden-Württemberg and Stifterverband Deutschland*
 
