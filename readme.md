@@ -110,7 +110,7 @@ export OPENAI_MODEL_NAME=meta-llama/llama-3.2-3b-instruct
 # Option 3: For local Ollama (default)
 export OPENAI_API_TYPE=ollama
 export OPENAI_API_BASE=http://localhost:11434/v1
-export OPENAI_MODEL_NAME=llama3.2:latest
+export OPENAI_MODEL_NAME=gemma3:12b-it-qat #VLM-Model for Image description
 
 # Option 4: For LM Studio
 export OPENAI_API_TYPE=lmstudio
@@ -173,7 +173,7 @@ export OPENAI_MODEL_NAME=your-model
 ./setup_universal.sh
 ```
 
-#### Docker Installation (Recommended for Production)
+#### Docker Installation (Recommended for Production) (not tested yet)
 
 ```bash
 # Clone repository
@@ -190,7 +190,7 @@ docker-compose up -d
 # Access at http://localhost:8080
 ```
 
-### Runpod Installation (For GPU Training)
+### Runpod Installation (For Simple Online-GPU Training)
 
 **Runpod Template:**
 ```
@@ -224,7 +224,7 @@ export OPENAI_MODEL_NAME=gpt-4
 export OPENAI_API_TYPE=openai
 export OPENAI_API_BASE=https://api.openai.com/v1
 export OPENAI_API_KEY=sk-...your-key...
-export OPENAI_MODEL_NAME=gpt-4  # or gpt-3.5-turbo
+export OPENAI_MODEL_NAME=gpt-5-mini  # or gpt-4
 ```
 
 #### Using OpenRouter
@@ -240,12 +240,12 @@ export OPENAI_MODEL_NAME=meta-llama/llama-3.2-3b-instruct
 ```bash
 # First install Ollama
 curl -fsSL https://ollama.com/install.sh | sh
-ollama pull llama3.2
+ollama pull gemma3:12b-it-qat
 
 # Configure OpenTuneWeaver
 export OPENAI_API_TYPE=ollama
 export OPENAI_API_BASE=http://localhost:11434/v1
-export OPENAI_MODEL_NAME=llama3.2:latest
+export OPENAI_MODEL_NAME=gemma3:12b-it-qat
 ```
 
 #### Using LM Studio
