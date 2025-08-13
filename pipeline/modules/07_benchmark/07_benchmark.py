@@ -1,21 +1,16 @@
 #!/usr/bin/env python3
 
 """
-OTW Benchmark Script - VERSION 5.1 + BATCH MODUS + VERBESSERTE ADAPTER-ERKENNUNG
+OTW Benchmark Script - VERSION 5.2 + AUTO-DOWNLOAD + DYNAMIC BASE MODEL
 
-Mit separater Generation und Bewertung zur Vermeidung von VRAM-Konflikten zwischen
-Generierungs- und Bewertermodell (Ollama)
+Mit automatischem Download des Basis-Modells und dynamischer Erkennung
+aus der Finetuning-Konfiguration für konsistente Benchmarks.
 
 HAUPTVERBESSERUNGEN:
-- Verbesserte Adapter-Pfad-Erkennung (ohne _merged)
-- Nutzt Config-Type aus pipeline_config.json
-- Batch-Modus: Alle Antworten generieren, dann alle bewerten
-- Kein VRAM-Konflikt zwischen Generierungs- und Bewertermodell
-- Aggressives Memory Management zwischen Phasen
-- Ollama-spezifisches Memory Cleanup
-- Verbesserte Fehlerbehandlung
-- Fallback zu Base-Modell + LoRA-Adapter
-- Zentrale Konfiguration über PipelineConfigLoader
+- Automatisches Herunterladen des Basis-Modells wenn nicht im Cache
+- Dynamische Erkennung des verwendeten Basis-Modells aus Finetuning-Config
+- Konsistenter Vergleich: gleiches Basis-Modell für PRE und POST
+- Batch-Modus zur VRAM-Konflikt-Vermeidung bleibt erhalten
 """
 
 import json
@@ -49,10 +44,10 @@ print("📋 KONFIGURATION GELADEN (07_benchmark + BATCH MODUS)")
 print("=" * 60)
 config_loader.print_config_summary()
 
-print(f"\n 📊 Modus: {bm_config.get('mode', 'Unknown')}")
-print(f" ⚖️ Evaluator: {bm_config.get('evaluator', {}).get('type', 'Unknown')}")
-print(f" 🔑 HF-Token: {'✅' if tokens.get('hf_token') else '❌'}")
-print(f" 🚀 Batch-Modus: Aktiviert (vermeidet VRAM-Konflikte)")
+print(f"\n📊 Modus: {bm_config.get('mode', 'Unknown')}")
+print(f"⚖️ Evaluator: {bm_config.get('evaluator', {}).get('type', 'Unknown')}")
+print(f"🔑 HF-Token: {'✅' if tokens.get('hf_token') else '❌'}")
+print(f"🚀 Batch-Modus: Aktiviert (vermeidet VRAM-Konflikte)")
 print("=" * 60)
 
 # =============================================================================
@@ -124,6 +119,50 @@ except ImportError:
     MATPLOTLIB_AVAILABLE = False
 
 # =============================================================================
+# DYNAMISCHE BASIS-MODELL ERKENNUNG
+# =============================================================================
+
+def get_base_model_from_finetuning():
+    """Ermittelt das im Finetuning verwendete Basis-Modell aus der Config"""
+    ft_config = config_loader.get_finetuning_config()
+    base_model = ft_config.get('base_model', 'unsloth/gemma-3n-E2B-it')
+    
+    print(f"🔍 Basis-Modell aus Finetuning-Config: {base_model}")
+    return base_model
+
+def find_trained_model():
+    """Findet das trainierte Modell (Adapter oder Merged)"""
+    ft_config = config_loader.get_finetuning_config()
+    custom_model_dir = ft_config.get('custom_model_dir', 'CustomModel')
+    model_name = ft_config.get('model_name', 'model')
+    
+    print(f"🔍 Suche trainiertes Modell: {model_name} in {custom_model_dir}")
+    
+    # Prüfe verschiedene Pfad-Kombinationen
+    paths_to_check = [
+        (f"../06_finetuning/{custom_model_dir}/{model_name}", "adapter"),
+        (f"../06_finetuning/{custom_model_dir}/{model_name}_merged", "merged"),
+        (f"../../modules/06_finetuning/{custom_model_dir}/{model_name}", "adapter"),
+        (f"../../modules/06_finetuning/{custom_model_dir}/{model_name}_merged", "merged"),
+        (f"{custom_model_dir}/{model_name}", "adapter"),
+        (f"{custom_model_dir}/{model_name}_merged", "merged"),
+    ]
+    
+    for path, model_type in paths_to_check:
+        if os.path.exists(path):
+            if model_type == "adapter" and os.path.exists(os.path.join(path, 'adapter_config.json')):
+                return os.path.abspath(path), "adapter"
+            elif model_type == "merged" and (
+                os.path.exists(os.path.join(path, 'config.json')) or
+                os.path.exists(os.path.join(path, 'model.safetensors'))
+            ):
+                return os.path.abspath(path), "merged"
+    
+    # Fallback auf Adapter wenn nichts gefunden
+    default_path = f"../06_finetuning/{custom_model_dir}/{model_name}"
+    return default_path, "adapter"
+
+# =============================================================================
 # FALLBACK-FUNKTIONEN FÜR BASE + ADAPTER
 # =============================================================================
 
@@ -180,19 +219,24 @@ def get_base_model_for_adapter(adapter_path):
     config_path = os.path.join(adapter_path, 'adapter_config.json')
     
     if not os.path.exists(config_path):
-        return "unsloth/gemma-3n-E2B-it"  # Fallback
+        # Fallback auf Basis-Modell aus Finetuning-Config
+        return get_base_model_from_finetuning()
     
     try:
         with open(config_path, 'r', encoding='utf-8') as f:
             config = json.load(f)
         
-        base_model = config.get('base_model_name_or_path', 'unsloth/gemma-3n-E2B-it')
+        base_model = config.get('base_model_name_or_path')
+        if not base_model:
+            # Fallback auf Finetuning-Config
+            base_model = get_base_model_from_finetuning()
+        
         print(f"   📋 Base-Modell aus Adapter-Config: {base_model}")
         return base_model
         
     except Exception as e:
         print(f"   ⚠️ Fehler beim Lesen der Adapter-Config: {e}")
-        return "unsloth/gemma-3n-E2B-it"  # Fallback
+        return get_base_model_from_finetuning()
 
 # =============================================================================
 # VERBESSERTE MEMORY-FUNKTIONEN MIT OLLAMA-SUPPORT
@@ -324,7 +368,7 @@ def print_memory_status(prefix=""):
 def check_device_placement(model):
     """Prüft wo das Modell tatsächlich liegt"""
     if hasattr(model, 'hf_device_map'):
-        print("📍 Device Map:", model.hf_device_map)
+        print("🔍 Device Map:", model.hf_device_map)
     
     # Prüfe Module-Platzierung
     cpu_modules = []
@@ -368,132 +412,32 @@ def ultra_cleanup(phase):
     print_memory_status("   Nach Ultra-Cleanup: ")
 
 # =============================================================================
-# KONFIGURATION AUS ZENTRALER CONFIG - VERBESSERT
+# KONFIGURATION AUS ZENTRALER CONFIG - DYNAMISCH VERBESSERT
 # =============================================================================
 
-# Pre-Finetuning (Original)
-pre_model_config = bm_config.get('pre_model', {})
+# Ermittle das verwendete Basis-Modell aus der Finetuning-Config
+BASE_MODEL_NAME = get_base_model_from_finetuning()
+
+# Pre-Finetuning (Basis-Modell aus Finetuning)
 PRE_FINETUNING_CONFIG = {
-    'model_name': pre_model_config.get('name', "unsloth/gemma-3n-E2B-it"),
-    'model_type': pre_model_config.get('type', "transformers"),
-    'load_in_4bit': pre_model_config.get('load_in_4bit', False),
-    'max_seq_length': pre_model_config.get('max_seq_length', 2048),
-    'description': "Pre-Finetuning Modell",
+    'model_name': BASE_MODEL_NAME,  # Dynamisch aus Finetuning-Config
+    'model_type': "base",
+    'load_in_4bit': False,  # Gemma ohne Quantization
+    'max_seq_length': 2048,
+    'description': f"Pre-Finetuning: {BASE_MODEL_NAME}",
     'chat_template': "gemma-3"
 }
 
-# Post-Finetuning (Trainiert) - VERBESSERTE ERKENNUNG
-post_model_config = bm_config.get('post_model', {})
-ft_config = config_loader.get_finetuning_config()
-
-# Helper function to find the correct path
-def find_model_path(path):
-    """Findet den korrekten Pfad relativ zum aktuellen Verzeichnis"""
-    # Mögliche Pfad-Varianten
-    possible_paths = [
-        path,  # Original
-        f"../{path}",  # Eine Ebene höher
-        f"../06_finetuning/{path}",  # Direkt im finetuning Modul
-        f"../../{path}",  # Zwei Ebenen höher
-        os.path.join("..", "..", path),  # Zwei Ebenen höher (OS-unabhängig)
-    ]
-    
-    # Wenn der Pfad "modules/" enthält, versuche auch ohne
-    if "modules/" in path:
-        base_path = path.replace("modules/06_finetuning/", "")
-        possible_paths.extend([
-            f"../06_finetuning/{base_path}",
-            f"../../modules/06_finetuning/{base_path}",
-        ])
-    
-    for p in possible_paths:
-        if os.path.exists(p):
-            return os.path.abspath(p)
-    return None
-
-# Verwende den konfigurierten Pfad direkt
-post_model_name = post_model_config.get('name', 'auto-detect')
-post_model_type = post_model_config.get('type', 'unknown')
-
-# Wenn type "adapter" ist, behandle es entsprechend
-if post_model_type == 'adapter':
-    print(f"✅ Post-Model als Adapter erkannt: {post_model_name}")
-    # Stelle sicher, dass der Pfad OHNE _merged ist
-    if post_model_name.endswith('_merged'):
-        post_model_name = post_model_name.replace('_merged', '')
-        print(f"   📂 Korrigiert zu: {post_model_name}")
-    
-    # Finde den tatsächlichen Pfad
-    actual_path = find_model_path(post_model_name)
-    if actual_path:
-        post_model_name = actual_path
-        print(f"   📁 Tatsächlicher Pfad: {actual_path}")
-
-elif post_model_name == 'auto-detect' or not os.path.exists(post_model_name):
-    # Versuche das trainierte Modell zu finden
-    custom_model_dir = ft_config.get('custom_model_dir', 'CustomModel')
-    model_name = ft_config.get('model_name', 'model')
-    
-    print(f"🔍 Suche Modell: {model_name} in {custom_model_dir}")
-    
-    # Prüfe verschiedene Pfad-Kombinationen
-    paths_to_check = [
-        (f"../06_finetuning/{custom_model_dir}/{model_name}", "adapter"),
-        (f"../06_finetuning/{custom_model_dir}/{model_name}_merged", "merged"),
-        (f"../../modules/06_finetuning/{custom_model_dir}/{model_name}", "adapter"),
-        (f"../../modules/06_finetuning/{custom_model_dir}/{model_name}_merged", "merged"),
-        (f"{custom_model_dir}/{model_name}", "adapter"),
-        (f"{custom_model_dir}/{model_name}_merged", "merged"),
-    ]
-    
-    # Prüfe welcher Pfad existiert
-    for path, model_type in paths_to_check:
-        if os.path.exists(path):
-            # Prüfe ob es wirklich ein Adapter ist
-            if model_type == "adapter" and os.path.exists(os.path.join(path, 'adapter_config.json')):
-                post_model_name = os.path.abspath(path)
-                post_model_type = 'adapter'
-                print(f"✅ Auto-detected Adapter: {post_model_name}")
-                break
-            # Oder ein merged Modell
-            elif model_type == "merged" and (
-                os.path.exists(os.path.join(path, 'config.json')) or
-                os.path.exists(os.path.join(path, 'pytorch_model.bin')) or
-                os.path.exists(os.path.join(path, 'model.safetensors'))
-            ):
-                post_model_name = os.path.abspath(path)
-                post_model_type = 'merged'
-                print(f"✅ Auto-detected Merged Model: {post_model_name}")
-                break
-    else:
-        # Kein Modell gefunden - versuche Fallback auf Adapter
-        for path, model_type in paths_to_check:
-            if model_type == "adapter":
-                actual_path = find_model_path(path)
-                if actual_path:
-                    post_model_name = actual_path
-                    post_model_type = 'adapter'
-                    print(f"⚠️ Fallback auf Adapter: {post_model_name}")
-                    break
-        else:
-            print(f"❌ Kein Modell gefunden in üblichen Pfaden")
-            post_model_name = f"../06_finetuning/{custom_model_dir}/{model_name}"
-            post_model_type = 'unknown'
-else:
-    # Pfad existiert bereits
-    actual_path = find_model_path(post_model_name)
-    if actual_path:
-        post_model_name = actual_path
-        print(f"✅ Verwende konfigurierten Pfad: {actual_path}")
-
+# Post-Finetuning (Trainiertes Modell)
+trained_model_path, trained_model_type = find_trained_model()
 POST_FINETUNING_CONFIG = {
-    'model_name': post_model_name,
-    'model_type': post_model_type,  # "merged", "adapter" oder "unknown"
-    'load_in_4bit': post_model_config.get('load_in_4bit', False),
-    'max_seq_length': post_model_config.get('max_seq_length', 2048),
-    'description': f"Post-Finetuning: {ft_config.get('model_name', 'Unknown')}",
+    'model_name': trained_model_path,
+    'model_type': trained_model_type,
+    'load_in_4bit': False,
+    'max_seq_length': 2048,
+    'description': f"Post-Finetuning: Trainierter Adapter",
     'chat_template': "gemma-3",
-    'base_model': post_model_config.get('base_model', ft_config.get('base_model'))  # Für Adapter
+    'base_model': BASE_MODEL_NAME  # Für Adapter-Loading
 }
 
 # Bewertungsmodell
@@ -528,9 +472,21 @@ def detect_model_type(model_name: str, config_type: str = None) -> dict:
     
     Args:
         model_name: Pfad zum Modell
-        config_type: Typ aus der Config ("merged", "adapter", "unknown")
+        config_type: Typ aus der Config ("merged", "adapter", "unknown", "base")
     """
     model_name_lower = model_name.lower()
+    
+    # Base-Modell (PRE)
+    if config_type == 'base':
+        return {
+            'type': 'base',
+            'use_quantization': False,
+            'use_unsloth': False,
+            'dtype': torch.bfloat16 if 'gemma' in model_name_lower else torch.float16,
+            'reason': 'Basis-Modell für PRE-Benchmark',
+            'fallback_available': False,
+            'fallback_adapter': None
+        }
     
     # Verwende Config-Type wenn vorhanden
     if config_type == 'adapter':
@@ -607,59 +563,46 @@ def detect_model_type(model_name: str, config_type: str = None) -> dict:
         'fallback_adapter': None
     }
 
-def check_model_in_cache(model_name):
-    """Check if model is already in cache and return cache path"""
-    cache_dir = os.environ.get("HUGGINGFACE_HUB_CACHE", os.path.expanduser("~/.cache/huggingface/hub"))
-    
-    # First check if it's a local path that exists
+def ensure_model_downloaded(model_name):
+    """Stellt sicher, dass das Modell heruntergeladen ist"""
+    # Prüfe ob es ein lokaler Pfad ist
     if os.path.exists(model_name):
-        # It's a valid local path
-        return True, model_name
+        print(f"✅ Lokales Modell gefunden: {model_name}")
+        return model_name
     
-    if not os.path.exists(cache_dir):
-        return False, None
-    
-    # Handle HuggingFace format: "unsloth/gemma-3n-E2B-it"
+    # Prüfe ob es ein HuggingFace Modell ist
     if "/" in model_name and not model_name.startswith("./") and not model_name.startswith("../"):
-        # HuggingFace format - cache name uses "models--" prefix
-        cache_model_name = "models--" + model_name.replace("/", "--")
-    else:
-        # It's a path that doesn't exist
-        return False, None
-    
-    # Suche im Cache-Verzeichnis
-    cache_entries = []
-    for entry in os.listdir(cache_dir):
-        if cache_model_name in entry and os.path.isdir(os.path.join(cache_dir, entry)):
-            cache_entries.append(entry)
-    
-    if cache_entries:
-        # Verwende den ersten gefundenen Eintrag
-        cache_path = os.path.join(cache_dir, cache_entries[0])
-        snapshots_dir = os.path.join(cache_path, "snapshots")
+        print(f"🔍 Prüfe HuggingFace Modell: {model_name}")
         
-        if os.path.exists(snapshots_dir):
-            snapshot_dirs = sorted(os.listdir(snapshots_dir))  # Sortiert für Konsistenz
-            if snapshot_dirs:
-                # Verwende den neuesten Snapshot
-                latest_snapshot = os.path.join(snapshots_dir, snapshot_dirs[-1])
-                # Prüfe ob Model-Dateien vorhanden sind
-                model_files = [f for f in os.listdir(latest_snapshot) 
-                              if f.endswith(('.safetensors', '.bin', '.pth'))]
-                
-                if model_files:
-                    total_size = sum(os.path.getsize(os.path.join(latest_snapshot, f)) 
-                                   for f in model_files) / (1024**3)
-                    print(f"✅ Model im Cache gefunden: {model_name}")
-                    print(f"   📊 Größe: {total_size:.1f} GB")
-                    print(f"   📁 Cache-Pfad: {latest_snapshot}")
-                    return True, latest_snapshot
+        # Versuche das Modell herunterzuladen
+        try:
+            from huggingface_hub import snapshot_download
+            
+            print(f"📥 Lade Modell herunter: {model_name}")
+            print("   Dies kann beim ersten Mal einige Minuten dauern...")
+            
+            # Download mit Token wenn verfügbar
+            download_kwargs = {
+                'repo_id': model_name,
+                'cache_dir': cache_base,
+            }
+            
+            if hf_token:
+                download_kwargs['token'] = hf_token
+            
+            local_path = snapshot_download(**download_kwargs)
+            print(f"✅ Modell heruntergeladen nach: {local_path}")
+            return local_path
+            
+        except Exception as e:
+            print(f"❌ Fehler beim Download: {e}")
+            # Versuche trotzdem mit dem Original-Namen
+            return model_name
     
-    print(f"❌ Model nicht im Cache: {model_name}")
-    return False, None
+    return model_name
 
 # =============================================================================
-# MODEL WRAPPER mit verbessertem Device Management und FALLBACK
+# MODEL WRAPPER mit verbessertem Device Management und AUTO-DOWNLOAD
 # =============================================================================
 
 class TransformersModelWrapper:
@@ -720,7 +663,10 @@ class TransformersModelWrapper:
         if not base_model_name:
             base_model_name = get_base_model_for_adapter(adapter_path)
         
-        print(f"   📁 Base-Modell: {base_model_name}")
+        # Stelle sicher, dass Base-Modell heruntergeladen ist
+        base_model_path = ensure_model_downloaded(base_model_name)
+        
+        print(f"   🔍 Base-Modell: {base_model_name}")
         print(f"   🔧 Adapter: {adapter_path}")
         
         try:
@@ -733,7 +679,7 @@ class TransformersModelWrapper:
                 tokenizer_kwargs['token'] = hf_token
             
             self.tokenizer = AutoTokenizer.from_pretrained(
-                base_model_name,
+                base_model_path,
                 **tokenizer_kwargs
             )
             
@@ -766,7 +712,7 @@ class TransformersModelWrapper:
             print("   🔧 OHNE Quantization - Base-Modell Loading")
             
             self.model = AutoModelForCausalLM.from_pretrained(
-                base_model_name,
+                base_model_path,
                 **model_kwargs
             )
             
@@ -822,11 +768,11 @@ class TransformersModelWrapper:
             return False
     
     def load_model(self):
-        """Lädt Modell mit optimaler Strategie, Device-Map Kontrolle und FALLBACK"""
+        """Lädt Modell mit optimaler Strategie, Device-Map Kontrolle und AUTO-DOWNLOAD"""
         model_name = os.path.basename(self.config['model_name'])
         print(f"\n🔄 Lade Modell: {model_name}")
         print(f"   📋 {self.model_info['reason']}")
-        print(f"   📁 Vollständiger Pfad: {self.config['model_name']}")
+        print(f"   📍 Vollständiger Pfad: {self.config['model_name']}")
         
         # Cleanup vor dem Laden
         cleanup_memory()
@@ -837,6 +783,11 @@ class TransformersModelWrapper:
             print("   🔧 Lade als Adapter...")
             return self._load_base_with_adapter()
         
+        # Für Base-Modelle: Stelle sicher, dass es heruntergeladen ist
+        if self.model_info['type'] == 'base':
+            print("   📥 Stelle sicher, dass Basis-Modell verfügbar ist...")
+            self.config['model_name'] = ensure_model_downloaded(self.config['model_name'])
+        
         # Prüfe ob der Pfad existiert
         model_path = self.config['model_name']
         
@@ -845,12 +796,11 @@ class TransformersModelWrapper:
             print(f"   ✅ Lokaler Pfad existiert: {model_path}")
             use_local = True
         else:
-            # Prüfe ob Modell im Cache ist (nur für HuggingFace Modelle)
-            is_cached, cache_path = check_model_in_cache(model_path)
-            if is_cached and cache_path:
-                model_path = cache_path
+            # Für HuggingFace Modelle: Download wenn nötig
+            if "/" in model_path and not model_path.startswith("./") and not model_path.startswith("../"):
+                print(f"   📥 Versuche Modell zu laden/herunterzuladen: {model_path}")
+                model_path = ensure_model_downloaded(model_path)
                 use_local = True
-                print(f"   🗄️ Verwende Cache: {cache_path}")
             else:
                 print(f"   ❌ Modell nicht gefunden: {model_path}")
                 
@@ -862,7 +812,7 @@ class TransformersModelWrapper:
                     raise FileNotFoundError(f"Model not found: {model_path}")
         
         try:
-            # Versuche merged Modell zu laden
+            # Versuche merged/base Modell zu laden
             return self._load_merged_model(model_path, use_local)
             
         except Exception as merged_error:
@@ -908,14 +858,9 @@ class TransformersModelWrapper:
             return False
     
     def _load_merged_model(self, model_path, use_local):
-        """Lädt das merged Modell (ursprüngliche Logik mit Verbesserungen)"""
+        """Lädt das merged/base Modell (ursprüngliche Logik mit Verbesserungen)"""
         
-        # Wichtig: Prüfe ob der Pfad wirklich existiert
-        if not os.path.exists(model_path):
-            print(f"   ❌ Pfad existiert nicht: {model_path}")
-            raise FileNotFoundError(f"Model path does not exist: {model_path}")
-        
-        print(f"   📂 Lade von lokalem Pfad: {model_path}")
+        print(f"   📂 Lade von: {model_path}")
         
         # Tokenizer laden
         tokenizer_kwargs = {
@@ -937,8 +882,9 @@ class TransformersModelWrapper:
             # Fallback: Versuche Base-Model Tokenizer
             if self.config.get('base_model'):
                 print(f"   🔄 Lade Base-Model Tokenizer: {self.config['base_model']}")
+                base_tokenizer_path = ensure_model_downloaded(self.config['base_model'])
                 self.tokenizer = AutoTokenizer.from_pretrained(
-                    self.config['base_model'],
+                    base_tokenizer_path,
                     **tokenizer_kwargs
                 )
             else:
@@ -1361,6 +1307,7 @@ Gib nur die GESAMTPUNKTE als Zahl zwischen 0 und 10 zurück."""
         
         # Pre-Finetuning Antworten
         print("\n🔄 Generiere PRE-Finetuning Antworten...")
+        print(f"   Basis-Modell: {pre_config['model_name']}")
         print_memory_status("Vor Pre-Generation: ")
         
         pre_benchmark = TransformersBenchmark(pre_config, self.eval_config, use_api_eval=False)
@@ -1374,6 +1321,7 @@ Gib nur die GESAMTPUNKTE als Zahl zwischen 0 und 10 zurück."""
         
         # Post-Finetuning Antworten  
         print("\n🔄 Generiere POST-Finetuning Antworten...")
+        print(f"   Trainiertes Modell: {post_config['model_name']}")
         print_memory_status("Vor Post-Generation: ")
         
         post_benchmark = TransformersBenchmark(post_config, self.eval_config, use_api_eval=False)
@@ -1453,8 +1401,9 @@ Gib nur die GESAMTPUNKTE als Zahl zwischen 0 und 10 zurück."""
 
 def main():
     """Hauptfunktion mit zentraler Konfiguration und Batch-Modus"""
-    print("🎯 OTW Benchmark Tool - MIT ZENTRALER CONFIG + BATCH MODUS")
-    print("✅ Konfiguration aus pipeline_config.json")
+    print("🎯 OTW Benchmark Tool - MIT AUTO-DOWNLOAD + DYNAMISCHER CONFIG")
+    print("✅ Basis-Modell aus Finetuning-Config")
+    print("✅ Automatisches Herunterladen bei Bedarf")
     print("✅ Batch-Modus gegen VRAM-Konflikte")
     print("✅ Base + Adapter Fallback")
     print("✅ Ollama-kompatibles Memory Management")
@@ -1465,8 +1414,14 @@ def main():
     aggressive_cleanup()
     
     # Zeige Cache-Status
-    print(f"\n📁 Cache-Verzeichnis: {cache_base}")
+    print(f"\n📍 Cache-Verzeichnis: {cache_base}")
     print_memory_status("Start-Status: ")
+    
+    # Zeige verwendete Modelle
+    print(f"\n📋 Konfigurierte Modelle:")
+    print(f"   Basis-Modell: {BASE_MODEL_NAME}")
+    print(f"   Trainiertes Modell: {POST_FINETUNING_CONFIG['model_name']}")
+    print(f"   Typ: {POST_FINETUNING_CONFIG['model_type']}")
     
     # Verwende Evaluator-Typ aus Config
     use_api = evaluator_config.get('type', 'api') == 'api'
