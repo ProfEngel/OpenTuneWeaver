@@ -1,0 +1,164 @@
+{
+  "pipeline_version": "5.3",
+  "start_time": "2025-08-13T12:13:33.986196",
+  "end_time": "2025-08-13T15:59:20.365257",
+  "total_duration": "3:45:46.379064",
+  "model_name": "MeinModell",
+  "steps": {
+    "step_1": {
+      "name": "Document Conversion",
+      "start_time": "2025-08-13T12:13:35.503562",
+      "success": true,
+      "duration_seconds": 183.648877,
+      "error": null,
+      "files_processed": 0,
+      "files_created": 7
+    },
+    "step_2": {
+      "name": "Wiki Generation",
+      "start_time": "2025-08-13T12:16:41.152767",
+      "success": true,
+      "duration_seconds": 2976.343508,
+      "error": null,
+      "files_processed": 0,
+      "files_created": 3,
+      "lexikon_entries": 0,
+      "lexikon_categories": 0
+    },
+    "step_3": {
+      "name": "Instruct QA Creation",
+      "start_time": "2025-08-13T13:06:19.507017",
+      "success": true,
+      "duration_seconds": 4242.979882,
+      "error": null,
+      "files_processed": 0,
+      "files_created": 1,
+      "qa_pairs": 0
+    },
+    "step_4": {
+      "name": "Dataset Formatting",
+      "start_time": "2025-08-13T14:17:04.497324",
+      "success": true,
+      "duration_seconds": 0.118078,
+      "error": null,
+      "files_processed": 0,
+      "files_created": 1
+    },
+    "step_5": {
+      "name": "Benchmark Creation",
+      "start_time": "2025-08-13T14:17:06.615640",
+      "success": true,
+      "duration_seconds": 627.971929,
+      "error": null,
+      "files_processed": 0,
+      "files_created": 1,
+      "benchmark_questions": 80,
+      "benchmark_categories": 3
+    },
+    "step_6": {
+      "name": "Fine-tuning",
+      "start_time": "2025-08-13T14:27:36.590505",
+      "success": true,
+      "duration_seconds": 1102.964774,
+      "error": null,
+      "files_processed": 0,
+      "files_created": 0
+    },
+    "step_7": {
+      "name": "Benchmarking",
+      "start_time": "2025-08-13T14:46:01.558061",
+      "success": true,
+      "duration_seconds": 4396.77711,
+      "error": null,
+      "files_processed": 0,
+      "files_created": 1
+    }
+  },
+  "data_statistics": {
+    "lexikon": {
+      "total_entries": 0,
+      "categories": {},
+      "file_count": 3,
+      "total_size_mb": 1.2261028289794922
+    },
+    "qa_dataset": {
+      "total_qa_pairs": 0,
+      "instruction_types": {},
+      "file_count": 1,
+      "total_size_mb": 0.975224494934082,
+      "avg_question_length": 0,
+      "avg_answer_length": 0
+    },
+    "formatted_dataset": {
+      "total_qa_pairs": 0,
+      "instruction_types": {},
+      "file_count": 1,
+      "total_size_mb": 1.676513671875,
+      "avg_question_length": 0,
+      "avg_answer_length": 0
+    },
+    "benchmark_questions": {
+      "total_questions": 80,
+      "categories": {
+        "Jahresabschlussanalyse": 27,
+        "Liquiditätsplanung": 32,
+        "Budgetierung": 21
+      },
+      "difficulty_distribution": {
+        "mittel": 80
+      },
+      "file_size_mb": 0.11441326141357422
+    },
+    "training": {
+      "model_trained": true,
+      "training_duration": null,
+      "final_loss": null,
+      "model_size_gb": 10.131938233971596,
+      "adapter_size_mb": 40.37120056152344,
+      "merged_model_available": true,
+      "gguf_available": false
+    }
+  },
+  "benchmark_results": {
+    "comparison_available": true,
+    "pre_score": 48.75,
+    "post_score": 55.125,
+    "improvement": 6.375,
+    "category_scores": {
+      "pre": {
+        "Jahresabschlussanalyse": 4.78,
+        "Liquiditätsplanung": 4.78,
+        "Budgetierung": 5.14
+      },
+      "post": {
+        "Jahresabschlussanalyse": 6.07,
+        "Liquiditätsplanung": 5.28,
+        "Budgetierung": 5.14
+      }
+    },
+    "detailed_results": {},
+    "benchmark_file": "comparison_batch_20250813_155912.json",
+    "benchmark_timestamp": "2025-08-13T15:59:12.519839"
+  },
+  "system_info": {
+    "python_version": "3.11.13",
+    "platform": "linux",
+    "cpu_count": 128,
+    "ram_gb": 503.7,
+    "cuda_available": true,
+    "gpu_name": "NVIDIA RTX A6000",
+    "gpu_memory_gb": 47.5
+  },
+  "errors": [],
+  "warnings": [
+    "Fehler beim Analysieren von modules/04_format/OUTPUT/dataset.json: Extra data: line 2 column 1 (char 1540)"
+  ],
+  "total_duration_seconds": 13546.379064,
+  "archive_info": {
+    "timestamp": "20250813_155920",
+    "model_name": "MeinModell",
+    "documents_archive": "MeinModell_20250813_155920_documents.zip",
+    "models_archive": "MeinModell_20250813_155920_models.zip",
+    "total_files": 14
+  }
+}
