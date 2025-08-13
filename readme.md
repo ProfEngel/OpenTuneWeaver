@@ -11,7 +11,7 @@
 [![Website](https://img.shields.io/badge/Website-opentuneweaver.com-blue?logo=googlechrome&logoColor=white)](https://opentuneweaver.com/)
 
 <div align="center">
-  <img src="assets/otw_logo_banner.png" alt="OpenTuneWeaver Logo" height="100">
+  <img src="assets/otw_logo_banner.png" alt="OpenTuneWeaver Logo" width="200">
 </div>
 
 
