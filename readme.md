@@ -49,7 +49,7 @@ With the OTW-Viewer, all generated documents (converted Markdown files, lexicon 
 - 📱 **No-Code Gradio Interface**: Drag-&-drop upload with live terminal and complete pipeline control
 - 🌐 **Multi-Format Export**: LoRA, Merged (both for transformers, vLLM, etc.), GGUF in Q_8 with quantizations for local deployment (OpenWebUI/LM-Studio)
 - 🔍 **VLM Integration**: Vision-Language-Models for automatic image descriptions in documents
-- ⚡ **Runpod Integration**: Scalable cloud GPU support for cost-effective training
+- ⚡ **Universal API Support**: Works with OpenAI, OpenRouter, Ollama, LM Studio, and any OpenAI-compatible API
 
 ***
 
@@ -60,13 +60,20 @@ With the OTW-Viewer, all generated documents (converted Markdown files, lexicon 
 **Hardware:**
 - **Linux system recommended** (Ubuntu 22.04 LTS or similar)
 - **At least 100 GB free storage space**
-- **NVIDIA GPU with at least 20 GB VRAM** (depending on the model being trained)
+- **For Training: NVIDIA GPU with at least 20 GB VRAM** (depending on the model being trained)
   - RTX 4090/A6000/A100 recommended
   - For smaller models: RTX 3090/4080 (16GB) possible
-- **CUDA 12.8+ and cuDNN installed**
+- **For Dataset Generation Only: No GPU required** (can use cloud APIs)
+- **CUDA 12.8+ and cuDNN** (only if using local GPU)
 
 **Accounts:**
 - **HuggingFace Account** with Access Token (Read + optional Write)
+- **API Access** (choose one):
+  - OpenAI API Key
+  - OpenRouter API Key
+  - Ollama (local installation)
+  - LM Studio (local installation)
+  - Any OpenAI-compatible API endpoint
 
 ### HuggingFace Token Setup
 
@@ -75,78 +82,222 @@ With the OTW-Viewer, all generated documents (converted Markdown files, lexicon 
 3. Create a new token with **Read** permission (and **Write** for model upload)
 4. Note down the token for installation
 
-### Quick Start with Runpod (Recommended)
+### Universal Installation (NEW - Works with any API)
+
+OpenTuneWeaver now supports **any OpenAI-compatible API** for dataset generation. Choose your preferred installation method:
+
+#### Quick Installation with Direct Script
+
+```bash
+# Download and run the universal setup script
+wget https://raw.githubusercontent.com/ProfEngel/OpenTuneWeaver/main/setup_universal.sh
+chmod +x setup_universal.sh
+
+# Configure your API (choose one):
+
+# Option 1: For OpenAI
+export OPENAI_API_TYPE=openai
+export OPENAI_API_BASE=https://api.openai.com/v1
+export OPENAI_API_KEY=sk-your-key-here
+export OPENAI_MODEL_NAME=gpt-4
+
+# Option 2: For OpenRouter
+export OPENAI_API_TYPE=openrouter
+export OPENAI_API_BASE=https://openrouter.ai/api/v1
+export OPENAI_API_KEY=your-openrouter-key
+export OPENAI_MODEL_NAME=meta-llama/llama-3.2-3b-instruct
+
+# Option 3: For local Ollama (default)
+export OPENAI_API_TYPE=ollama
+export OPENAI_API_BASE=http://localhost:11434/v1
+export OPENAI_MODEL_NAME=llama3.2:latest
+
+# Option 4: For LM Studio
+export OPENAI_API_TYPE=lmstudio
+export OPENAI_API_BASE=http://localhost:1234/v1
+export OPENAI_MODEL_NAME=your-loaded-model
+
+# Run the installation
+./setup_universal.sh
+```
+
+#### Installation with Virtual Environment (Recommended)
+
+```bash
+# Create and activate virtual environment
+python3 -m venv opentuneweaver-env
+source opentuneweaver-env/bin/activate
+
+# Clone repository
+git clone https://github.com/ProfEngel/OpenTuneWeaver.git
+cd OpenTuneWeaver
+
+# Install dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# Configure API (see options above)
+export OPENAI_API_TYPE=openai  # or your preferred API
+export OPENAI_API_BASE=https://api.openai.com/v1
+export OPENAI_API_KEY=your-api-key
+export OPENAI_MODEL_NAME=gpt-4
+
+# Run setup
+./setup_universal.sh
+```
+
+#### Installation with Conda
+
+```bash
+# Create conda environment
+conda create -n opentuneweaver python=3.11
+conda activate opentuneweaver
+
+# Clone repository
+git clone https://github.com/ProfEngel/OpenTuneWeaver.git
+cd OpenTuneWeaver
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Install unsloth (for training)
+pip install --upgrade --no-cache-dir --no-deps git+https://github.com/unslothai/unsloth-zoo.git
+
+# Configure API (see options above)
+export OPENAI_API_TYPE=your-api-type
+export OPENAI_API_BASE=your-api-base-url
+export OPENAI_API_KEY=your-api-key
+export OPENAI_MODEL_NAME=your-model
+
+# Run setup
+./setup_universal.sh
+```
+
+#### Docker Installation (Recommended for Production)
+
+```bash
+# Clone repository
+git clone https://github.com/ProfEngel/OpenTuneWeaver.git
+cd OpenTuneWeaver
+
+# Copy and configure environment
+cp .env.example .env
+# Edit .env with your API settings
+
+# Build and run with Docker Compose
+docker-compose up -d
+
+# Access at http://localhost:8080
+```
+
+### Runpod Installation (For GPU Training)
 
 **Runpod Template:**
 ```
-
 runpod/pytorch:2.8.0-py3.11-cuda12.8.1-cudnn-devel-ubuntu22.04
 Disk Volume: 100 GB
 Pod Volume:  100 GB
 Open Ports: 8080,11434
-
 ```
 
 **Installation:**
-```
-
+```bash
 cd /workspace
 git clone https://github.com/ProfEngel/OpenTuneWeaver.git
-cp OpenTuneWeaver/setup_runpod_direct.sh .
-chmod +x setup_runpod_direct.sh
+cd OpenTuneWeaver
+
+# For Runpod with Ollama (local inference)
 ./setup_runpod_direct.sh
 
+# OR for Runpod with external API
+export OPENAI_API_TYPE=openai
+export OPENAI_API_BASE=https://api.openai.com/v1
+export OPENAI_API_KEY=your-key
+export OPENAI_MODEL_NAME=gpt-4
+./setup_universal.sh
 ```
 
-**After installation:**
+### API Configuration Examples
 
-wait until the installation is done, then press y for starting the ui. The ui starts on port http://yourIP:8080
-
-In Runpod access via Runpod web interface on port 8080.
-
-### Alternative Installation Methods
-
-**Docker Installation:** *(Coming Soon)*
+#### Using OpenAI GPT-4
+```bash
+export OPENAI_API_TYPE=openai
+export OPENAI_API_BASE=https://api.openai.com/v1
+export OPENAI_API_KEY=sk-...your-key...
+export OPENAI_MODEL_NAME=gpt-4  # or gpt-3.5-turbo
 ```
 
-docker run -d -p 7860:7860 --gpus all -v opentuneweaver:/app/data --name opentuneweaver opentuneweaver/opentuneweaver:latest
-
+#### Using OpenRouter
+```bash
+export OPENAI_API_TYPE=openrouter
+export OPENAI_API_BASE=https://openrouter.ai/api/v1
+export OPENAI_API_KEY=your-openrouter-key
+export OPENAI_MODEL_NAME=meta-llama/llama-3.2-3b-instruct
+# Other models: claude-3-opus, mistral-large, etc.
 ```
 
-**Conda Installation:**
+#### Using Local Ollama
+```bash
+# First install Ollama
+curl -fsSL https://ollama.com/install.sh | sh
+ollama pull llama3.2
+
+# Configure OpenTuneWeaver
+export OPENAI_API_TYPE=ollama
+export OPENAI_API_BASE=http://localhost:11434/v1
+export OPENAI_MODEL_NAME=llama3.2:latest
 ```
 
-conda create -n opentuneweaver python=3.11
-conda activate opentuneweaver
-apt-get update && apt-get upgrade -y
-git clone https://github.com/ProfEngel/OpenTuneWeaver.git
-cp OpenTuneWeaver/setup_runpod_direct.sh .
-chmod +x setup_runpod_direct.sh
-
-# Installation von unsloth_zoo direkt von GitHub
-pip install --upgrade --no-cache-dir --no-deps git+https://github.com/unslothai/unsloth-zoo.git
-
-# Dann das Setup-Skript ausführen
-./setup_runpod_direct.sh
-
+#### Using LM Studio
+```bash
+# Start LM Studio and load a model
+# Then configure:
+export OPENAI_API_TYPE=lmstudio
+export OPENAI_API_BASE=http://localhost:1234/v1
+export OPENAI_MODEL_NAME=your-loaded-model
 ```
 
-**Virtual Environment:**
+#### Using Custom API Endpoint
+```bash
+export OPENAI_API_TYPE=custom
+export OPENAI_API_BASE=https://your-api-endpoint.com/v1
+export OPENAI_API_KEY=your-api-key
+export OPENAI_MODEL_NAME=your-model-name
 ```
 
-python3.11 -m venv opentuneweaver-env
-source opentuneweaver-env/bin/activate
-apt-get update && apt-get upgrade -y
-git clone https://github.com/ProfEngel/OpenTuneWeaver.git
-cp OpenTuneWeaver/setup_runpod_direct.sh .
-chmod +x setup_runpod_direct.sh
+### Starting OpenTuneWeaver
 
-# Installation von unsloth_zoo direkt von GitHub
-pip install --upgrade --no-cache-dir --no-deps git+https://github.com/unslothai/unsloth-zoo.git
+After installation, start the application:
 
-# Dann das Setup-Skript ausführen
-./setup_runpod_direct.sh
+```bash
+# Direct start
+./start_otw.sh
 
+# Or with custom port
+export SERVER_PORT=7860
+./start_otw.sh
+
+# Access the UI
+# Local: http://localhost:8080
+# Remote: http://your-server-ip:8080
+```
+
+### Troubleshooting
+
+If you encounter issues:
+
+```bash
+# Check installation
+./debug_otw.sh
+
+# View logs
+tail -f logs/pipeline.log
+
+# Test API connection
+curl -X POST $OPENAI_API_BASE/chat/completions \
+  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "'$OPENAI_MODEL_NAME'", "messages": [{"role": "user", "content": "Test"}]}'
 ```
 
 ***
@@ -216,17 +367,15 @@ OpenTuneWeaver would not be possible without these excellent open-source framewo
 
 If you use OpenTuneWeaver in your research, please cite our paper:
 
-```
-
+```bibtex
 @article{opentuneweaver2024,
-title={OpenTuneWeaver: Semantically-structured, Curatable LLM Fine-tuning Pipeline for Research and Education},
-author={Engel, Prof. Dr. Mathias},
-journal={arXiv preprint},
-year={2024},
-institution={Hochschule für Wirtschaft und Umwelt Nürtingen-Geislingen},
-note={Funded by MWK Baden-Württemberg and Stifterverband Deutschland}
+  title={OpenTuneWeaver: Semantically-structured, Curatable LLM Fine-tuning Pipeline for Research and Education},
+  author={Engel, Prof. Dr. Mathias},
+  journal={arXiv preprint},
+  year={2024},
+  institution={Hochschule für Wirtschaft und Umwelt Nürtingen-Geislingen},
+  note={Funded by MWK Baden-Württemberg and Stifterverband Deutschland}
 }
-
 ```
 
 **Paper available:**
