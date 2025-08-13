@@ -6,11 +6,11 @@ Version: 6.3 - Mit verbesserter Pipeline-Automatisierung
 
 Features:
 - Upload-Interface für Dokumente
-- Erweiterte Einstellungsseite
+- Erweiterte Einstellungsseite mit Modell-Dropdown
 - Pipeline-Steuerung über Kommandozeilenparameter
 - Live-Terminal mit Auto-Scroll
 - Getrennte Download-Buttons für Dokumente und Modelle
-- Dropdown-Auswahl für Base-Modelle
+- Verbesserte Dateiensammlung für Downloads
 - Aufräumen-Funktionalität
 """
 
@@ -490,7 +490,7 @@ def stop_pipeline():
         log_message(f"❌ Fehler beim Stoppen: {e}", "ERROR")
         return f"❌ Fehler beim Stoppen: {e}"
 
-# ==================== GETRENNTE DOWNLOAD-FUNKTIONEN ====================
+# ==================== VERBESSERTE DOWNLOAD-FUNKTIONEN ====================
 
 def create_documents_zip():
     """Erstellt eine ZIP-Datei mit allen Dokumenten (ohne Modelle)."""
@@ -501,38 +501,130 @@ def create_documents_zip():
         zip_path = Path(temp_dir) / f"opentuneweaver_documents_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
 
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            # Suche nach Dokumenten in den Modulen
+            total_files = 0
             modules_dir = Path("../pipeline/modules")
+            pipeline_dir = Path("../pipeline")
+            
+            # 1. Suche in allen Module-Verzeichnissen (INPUT, OUTPUT, andere)
             if modules_dir.exists():
                 document_dirs = [
-                    ("01_convert", "markdown_files"),
-                    ("02_wiki", "wiki_json"),
-                    ("03_instructQA", "qa_json"),
-                    ("04_format", "formatted_dataset"),
-                    ("05_bmcreator", "benchmark_questions"),
-                    ("07_benchmark", "benchmark_results")
+                    ("01_convert", ["OUTPUT", "INPUT", "UPLOAD"]),
+                    ("02_wiki", ["OUTPUT", "INPUT"]), 
+                    ("03_instructQA", ["OUTPUT", "INPUT"]),
+                    ("04_format", ["OUTPUT", "INPUT"]),
+                    ("05_bmcreator", ["OUTPUT", "INPUT", "BENCHMARKFRAGEN"]),
+                    ("07_benchmark", ["OUTPUT", "INPUT", "BENCHMARKFRAGEN"])
                 ]
 
-                total_files = 0
-                for module_name, zip_folder in document_dirs:
-                    output_dir = modules_dir / module_name / "OUTPUT"
-                    if output_dir.exists():
-                        for file_path in output_dir.rglob("*"):
-                            if file_path.is_file() and not file_path.suffix in ['.bin', '.safetensors', '.pt', '.pth']:
-                                arcname = f"{zip_folder}/{file_path.name}"
-                                zipf.write(file_path, arcname)
-                                total_files += 1
+                for module_name, folders in document_dirs:
+                    module_dir = modules_dir / module_name
+                    if module_dir.exists():
+                        log_message(f"🔍 Durchsuche Modul: {module_name}")
+                        for folder in folders:
+                            folder_path = module_dir / folder
+                            if folder_path.exists():
+                                found_in_folder = 0
+                                for file_path in folder_path.rglob("*"):
+                                    if file_path.is_file() and not file_path.suffix.lower() in ['.bin', '.safetensors', '.pt', '.pth', '.gguf']:
+                                        rel_path = file_path.relative_to(folder_path)
+                                        arcname = f"{module_name}_{folder}/{rel_path}"
+                                        zipf.write(file_path, arcname)
+                                        total_files += 1
+                                        found_in_folder += 1
+                                        log_message(f"  📁 {file_path.name}")
+                                
+                                if found_in_folder > 0:
+                                    log_message(f"✅ {module_name}/{folder}: {found_in_folder} Dateien")
 
-                # Pipeline Reports hinzufügen (falls vorhanden)
-                pipeline_reports = ["pipeline_report.md", "benchmark_report.md"]
-                for report in pipeline_reports:
-                    report_path = modules_dir.parent / "data" / "OUTPUT" / report
-                    if report_path.exists():
-                        zipf.write(report_path, f"reports/{report}")
+            # 2. Pipeline-weite Ausgaben in data/OUTPUT
+            data_output_dir = pipeline_dir / "data" / "OUTPUT"
+            if data_output_dir.exists():
+                log_message("🔍 Durchsuche data/OUTPUT...")
+                for file_path in data_output_dir.rglob("*"):
+                    if file_path.is_file():
+                        rel_path = file_path.relative_to(data_output_dir)
+                        arcname = f"pipeline_output/{rel_path}"
+                        zipf.write(file_path, arcname)
+                        total_files += 1
+                        log_message(f"  📁 {file_path.name}")
+
+            # 3. Root-Level Dateien (Metriken, Reports)
+            root_files = [
+                "pipeline_metrics.json",
+                "pipeline_report.md", 
+                "benchmark_report.md",
+                "pipeline_config.json"
+            ]
+            
+            for filename in root_files:
+                file_path = pipeline_dir / filename
+                if file_path.exists():
+                    zipf.write(file_path, f"reports/{filename}")
+                    total_files += 1
+                    log_message(f"  📊 {filename}")
+
+            # 4. Viewer und UI-Dateien hinzufügen
+            viewer_dir = pipeline_dir / "viewer"
+            if viewer_dir.exists():
+                log_message("🔍 Füge Viewer hinzu...")
+                for file_path in viewer_dir.rglob("*"):
+                    if file_path.is_file():
+                        rel_path = file_path.relative_to(viewer_dir)
+                        arcname = f"viewer/{rel_path}"
+                        zipf.write(file_path, arcname)
                         total_files += 1
 
-                if total_files == 0:
-                    return None, "❌ Keine Dokumente zum Download gefunden"
+            # 5. UI-Verzeichnis 
+            ui_dir = pipeline_dir.parent / "ui"
+            if ui_dir.exists():
+                log_message("🔍 Füge UI hinzu...")
+                ui_files = ["otw_dataeditor.html"]
+                for filename in ui_files:
+                    file_path = ui_dir / filename
+                    if file_path.exists():
+                        zipf.write(file_path, f"ui/{filename}")
+                        total_files += 1
+
+            # 6. Direkte Suche nach bekannten Dateitypen (Fallback)
+            if total_files < 5:  # Wenn wenig gefunden wurde, erweiterte Suche
+                log_message("🔍 Erweiterte Suche nach Dokumenten...")
+                for pattern in ["*.md", "*.json", "*.txt", "*.csv", "*.html"]:
+                    for file_path in pipeline_dir.rglob(pattern):
+                        # Überspringe bereits hinzugefügte und Modell-Dateien
+                        if (file_path.is_file() and 
+                            "CustomModel" not in str(file_path) and
+                            "__pycache__" not in str(file_path) and
+                            not file_path.name.startswith(".")):
+                            
+                            rel_path = file_path.relative_to(pipeline_dir)
+                            arcname = f"found/{rel_path}"
+                            try:
+                                zipf.write(file_path, arcname)
+                                total_files += 1
+                                log_message(f"  🔎 {file_path.name}")
+                            except:
+                                pass  # Datei könnte bereits hinzugefügt sein
+
+            # 7. Images für den Viewer
+            for img_pattern in ["*.png", "*.jpg", "*.jpeg", "*.gif", "*.svg"]:
+                for img_path in pipeline_dir.rglob(img_pattern):
+                    if img_path.is_file() and "CustomModel" not in str(img_path):
+                        rel_path = img_path.relative_to(pipeline_dir)
+                        arcname = f"images/{rel_path}"
+                        try:
+                            zipf.write(img_path, arcname)
+                            total_files += 1
+                        except:
+                            pass
+
+            if total_files == 0:
+                # Detaillierte Diagnose
+                log_message("❌ Keine Dateien gefunden - Diagnose:")
+                log_message(f"  Pipeline-Dir existiert: {pipeline_dir.exists()}")
+                log_message(f"  Modules-Dir existiert: {modules_dir.exists()}")
+                if modules_dir.exists():
+                    log_message(f"  Module gefunden: {[d.name for d in modules_dir.iterdir() if d.is_dir()]}")
+                return None, "❌ Keine Dokumente zum Download gefunden - siehe Terminal für Details"
 
             log_message(f"✅ Dokumente-ZIP erstellt ({total_files} Dateien)")
             return str(zip_path), f"✅ Dokumente-ZIP erstellt ({total_files} Dateien)"
@@ -553,31 +645,98 @@ def create_model_zip():
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             total_files = 0
             
-            # CustomModel hinzufügen
-            custom_model_dir = Path("../pipeline/modules/06_finetuning/CustomModel")
-            if custom_model_dir.exists():
-                for file_path in custom_model_dir.rglob("*"):
-                    if file_path.is_file():
-                        rel_path = file_path.relative_to(custom_model_dir)
-                        arcname = f"custom_model/{rel_path}"
-                        zipf.write(file_path, arcname)
-                        total_files += 1
+            # 1. CustomModel Verzeichnis (Hauptmodell)
+            custom_model_paths = [
+                Path("../pipeline/modules/06_finetuning/CustomModel"),
+                Path("../pipeline/CustomModel")
+            ]
+            
+            for custom_model_dir in custom_model_paths:
+                if custom_model_dir.exists():
+                    log_message(f"🔍 Durchsuche Modell-Verzeichnis: {custom_model_dir}")
+                    for file_path in custom_model_dir.rglob("*"):
+                        if file_path.is_file():
+                            rel_path = file_path.relative_to(custom_model_dir)
+                            arcname = f"custom_model/{rel_path}"
+                            zipf.write(file_path, arcname)
+                            total_files += 1
+                            log_message(f"  🤖 {file_path.name} ({file_path.stat().st_size / (1024*1024):.1f} MB)")
 
-            # Finetuning OUTPUT hinzufügen (für zusätzliche Modell-Dateien)
+            # 2. Finetuning OUTPUT (für zusätzliche Modell-Dateien)
             finetuning_output = Path("../pipeline/modules/06_finetuning/OUTPUT")
             if finetuning_output.exists():
+                log_message("🔍 Durchsuche Finetuning OUTPUT...")
                 for file_path in finetuning_output.rglob("*"):
-                    if file_path.is_file() and file_path.suffix in ['.bin', '.safetensors', '.pt', '.pth', '.gguf', '.json']:
+                    if (file_path.is_file() and 
+                        file_path.suffix.lower() in ['.bin', '.safetensors', '.pt', '.pth', '.gguf', '.json', '.txt']):
                         rel_path = file_path.relative_to(finetuning_output)
                         arcname = f"model_files/{rel_path}"
                         zipf.write(file_path, arcname)
                         total_files += 1
+                        log_message(f"  📄 {file_path.name}")
+
+            # 3. Adapter-Dateien (LoRA)
+            adapter_patterns = ["adapter_*.safetensors", "adapter_config.json", "*.lora"]
+            pipeline_dir = Path("../pipeline")
+            for pattern in adapter_patterns:
+                for file_path in pipeline_dir.rglob(pattern):
+                    if (file_path.is_file() and 
+                        "CustomModel" not in str(file_path.parent)):  # Vermeiden Duplikate
+                        rel_path = file_path.relative_to(pipeline_dir)
+                        arcname = f"adapters/{rel_path}"
+                        try:
+                            zipf.write(file_path, arcname)
+                            total_files += 1
+                            log_message(f"  🔧 {file_path.name}")
+                        except:
+                            pass
+
+            # 4. Training-Logs und -Konfigurationen
+            training_files = [
+                "training_args.json",
+                "trainer_state.json", 
+                "tokenizer_config.json",
+                "special_tokens_map.json",
+                "tokenizer.json"
+            ]
+            
+            for filename in training_files:
+                for file_path in pipeline_dir.rglob(filename):
+                    if file_path.is_file():
+                        rel_path = file_path.relative_to(pipeline_dir)
+                        arcname = f"training_config/{rel_path}"
+                        try:
+                            zipf.write(file_path, arcname)
+                            total_files += 1
+                            log_message(f"  ⚙️ {filename}")
+                        except:
+                            pass
+
+            # 5. GGUF-Dateien (falls vorhanden)
+            for gguf_path in pipeline_dir.rglob("*.gguf"):
+                if gguf_path.is_file():
+                    rel_path = gguf_path.relative_to(pipeline_dir)
+                    arcname = f"gguf_models/{rel_path}"
+                    zipf.write(gguf_path, arcname)
+                    total_files += 1
+                    log_message(f"  📦 {gguf_path.name}")
 
             if total_files == 0:
-                return None, "❌ Keine Modell-Dateien zum Download gefunden"
+                # Detaillierte Diagnose
+                log_message("❌ Keine Modell-Dateien gefunden - Diagnose:")
+                for path in custom_model_paths:
+                    log_message(f"  {path}: {'EXISTS' if path.exists() else 'NOT FOUND'}")
+                    if path.exists():
+                        files = list(path.rglob("*"))
+                        log_message(f"    Dateien: {len(files)} gefunden")
+                        for f in files[:5]:  # Erste 5 Dateien zeigen
+                            log_message(f"      - {f.name}")
+                
+                return None, "❌ Keine Modell-Dateien zum Download gefunden - siehe Terminal für Details"
 
-            log_message(f"✅ Modell-ZIP erstellt ({total_files} Dateien)")
-            return str(zip_path), f"✅ Modell-ZIP erstellt ({total_files} Dateien)"
+            file_size_mb = zip_path.stat().st_size / (1024 * 1024)
+            log_message(f"✅ Modell-ZIP erstellt ({total_files} Dateien, {file_size_mb:.1f} MB)")
+            return str(zip_path), f"✅ Modell-ZIP erstellt ({total_files} Dateien, {file_size_mb:.1f} MB)"
 
     except Exception as e:
         error_msg = f"❌ Fehler beim Erstellen der Modell-ZIP: {e}"
