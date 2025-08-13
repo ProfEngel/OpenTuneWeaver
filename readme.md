@@ -110,19 +110,25 @@ docker run -d -p 7860:7860 --gpus all -v opentuneweaver:/app/data --name opentun
 
 ```
 
-**Conda Installation:** *(Coming Soon)*
+**Conda Installation:**
 ```
 
 conda create -n opentuneweaver python=3.11
 conda activate opentuneweaver
+apt-get update && apt-get upgrade -y
 git clone https://github.com/ProfEngel/OpenTuneWeaver.git
 cp OpenTuneWeaver/setup_runpod_direct.sh .
 chmod +x setup_runpod_direct.sh
+
+# Installation von unsloth_zoo direkt von GitHub
+pip install --upgrade --no-cache-dir --no-deps git+https://github.com/unslothai/unsloth-zoo.git
+
+# Dann das Setup-Skript ausführen
 ./setup_runpod_direct.sh
 
 ```
 
-**Virtual Environment:** *(not finally tested)*
+**Virtual Environment:**
 ```
 
 python3.11 -m venv opentuneweaver-env
