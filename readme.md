@@ -125,7 +125,7 @@ chmod +x setup_runpod_direct.sh
 
 ```
 
-**Virtual Environment:** *(Coming Soon)*
+**Virtual Environment:** *(not finally tested)*
 ```
 
 python3.11 -m venv opentuneweaver-env
