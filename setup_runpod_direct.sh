@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # ============================================
-# OpenTuneWeaver RunPod Setup (Safe Path Fix)
-# Version: 2.5
+# OpenTuneWeaver RunPod Setup (FIXED VERSION)
+# Version: 2.6 - Modell-Konsistenz-Fix
 # ============================================
 
 set -e # Exit on error
@@ -33,7 +33,7 @@ warning() {
 # ============================================
 
 log "${BLUE}========================================${NC}"
-log "${BLUE}🚀 OpenTuneWeaver RunPod Installation v2.5${NC}"
+log "${BLUE}🚀 OpenTuneWeaver RunPod Installation v2.6${NC}"
 log "${BLUE}========================================${NC}"
 
 # System Info
@@ -150,7 +150,26 @@ fi
 log "✅ Python environment setup complete"
 
 # ============================================
-# SCHRITT 6: Safe Path Fixes (KORRIGIERT)
+# SCHRITT 6: Create HuggingFace Cache Directory
+# ============================================
+
+log "${BLUE}🗂️ Setting up model cache directories...${NC}"
+
+# Create consistent cache directories
+export HF_HOME="/workspace/hf_cache"
+export TRANSFORMERS_CACHE="/workspace/hf_cache/transformers"
+export HF_DATASETS_CACHE="/workspace/hf_cache/datasets"
+
+mkdir -p $HF_HOME
+mkdir -p $TRANSFORMERS_CACHE
+mkdir -p $HF_DATASETS_CACHE
+
+log "✅ Cache directories created:"
+log "  HF_HOME: $HF_HOME"
+log "  TRANSFORMERS_CACHE: $TRANSFORMERS_CACHE"
+
+# ============================================
+# SCHRITT 7: Safe Path Fixes (KORRIGIERT)
 # ============================================
 
 log "${BLUE}🔧 Safe path fixes...${NC}"
@@ -189,7 +208,7 @@ if [ -f "pipeline/config_loader.py" ]; then
 fi
 
 # ============================================
-# SCHRITT 7: Build llama.cpp (CPU-ONLY)
+# SCHRITT 8: Build llama.cpp (CPU-ONLY)
 # ============================================
 
 log "${BLUE}🔨 Building llama.cpp (CPU-Only)...${NC}"
@@ -225,7 +244,7 @@ fi
 cd /workspace/OpenTuneWeaver
 
 # ============================================
-# SCHRITT 8: Install and Configure Ollama
+# SCHRITT 9: Install and Configure Ollama
 # ============================================
 
 log "${BLUE}🦙 Installing Ollama...${NC}"
@@ -259,20 +278,18 @@ for i in {1..60}; do
 done
 
 # ============================================
-# SCHRITT 9: Download Ollama Models
+# SCHRITT 10: Download Ollama Models
 # ============================================
 
 log "${BLUE}📥 Downloading Ollama models (this will take a while)...${NC}"
 
-# Download the desired larger model
-log "Downloading gemma3:12b-it-qat (this may take 10-15 minutes)..."
-if ollama pull gemma3:12b-it-qat; then
-    log "✅ gemma3:12b-it-qat downloaded successfully"
-    export OLLAMA_MODEL="gemma3:12b-it-qat"
-else
-    warning "Failed to download gemma3:12b-it-qat, falling back to llama3.2:3b"
-    ollama pull llama3.2:3b
+# Download the desired smaller model for consistency
+log "Downloading llama3.2:3b..."
+if ollama pull llama3.2:3b; then
+    log "✅ llama3.2:3b downloaded successfully"
     export OLLAMA_MODEL="llama3.2:3b"
+else
+    error "Failed to download llama3.2:3b"
 fi
 
 # Verify model is available
@@ -280,14 +297,18 @@ log "Available models:"
 ollama list
 
 # ============================================
-# SCHRITT 10: Create Pipeline Configuration
+# SCHRITT 11: Create FIXED Pipeline Configuration
 # ============================================
 
-log "${BLUE}📝 Creating pipeline configuration...${NC}"
+log "${BLUE}📝 Creating FIXED pipeline configuration...${NC}"
+
+# IMPORTANT: Use consistent model names!
+FINETUNING_BASE_MODEL="unsloth/llama-3.2-3b-instruct"
+FINETUNING_OUTPUT_NAME="OTW-Model-RunPod"
 
 cat > /workspace/OpenTuneWeaver/pipeline/pipeline_config.json << EOF
 {
-  "version": "2.5-runpod",
+  "version": "2.6-runpod-fixed",
   "created": "$(date -Iseconds)",
   "tokens": {
     "hf_token": "",
@@ -298,38 +319,40 @@ cat > /workspace/OpenTuneWeaver/pipeline/pipeline_config.json << EOF
       "use_openai_api": true,
       "openai_base_url": "http://localhost:11434/v1",
       "openai_api_key": "ollama",
-      "openai_model_name": "${OLLAMA_MODEL:-gemma3:12b-it-qat}",
+      "openai_model_name": "${OLLAMA_MODEL}",
       "temperature": 0.1
     },
     "02_genwiki": {
       "use_openai_api": true,
       "openai_base_url": "http://localhost:11434/v1",
       "openai_api_key": "ollama",
-      "openai_model_name": "${OLLAMA_MODEL:-gemma3:12b-it-qat}",
+      "openai_model_name": "${OLLAMA_MODEL}",
       "temperature": 0.3
     },
     "03_instructQA": {
       "use_openai_api": true,
       "openai_base_url": "http://localhost:11434/v1",
       "openai_api_key": "ollama",
-      "openai_model_name": "${OLLAMA_MODEL:-gemma3:12b-it-qat}",
+      "openai_model_name": "${OLLAMA_MODEL}",
       "temperature": 0.7
     },
     "05_bmcreator": {
       "use_openai_api": true,
       "openai_base_url": "http://localhost:11434/v1",
       "openai_api_key": "ollama",
-      "openai_model_name": "${OLLAMA_MODEL:-gemma3:12b-it-qat}",
+      "openai_model_name": "${OLLAMA_MODEL}",
       "temperature": 0.5
     }
   },
   "finetuning": {
-    "model_name": "OTW-Model",
-    "base_model": "unsloth/gemma-2b-it",
-    "hf_repo_id": "user/OTW-Model",
+    "model_name": "${FINETUNING_OUTPUT_NAME}",
+    "base_model": "${FINETUNING_BASE_MODEL}",
+    "hf_repo_id": "user/${FINETUNING_OUTPUT_NAME}",
     "dataset_path": "INPUT/dataset.json",
-    "chat_template": "gemma",
+    "chat_template": "llama",
     "custom_model_dir": "CustomModel",
+    "output_dir": "/workspace/OpenTuneWeaver/pipeline/modules/06_finetuning/CustomModel",
+    "cache_dir": "${TRANSFORMERS_CACHE}",
     "max_seq_length": 2048,
     "load_in_4bit": true,
     "full_finetuning": false,
@@ -347,25 +370,36 @@ cat > /workspace/OpenTuneWeaver/pipeline/pipeline_config.json << EOF
   },
   "benchmark": {
     "mode": "comparison",
+    "base_model": "${FINETUNING_BASE_MODEL}",
+    "finetuned_model": "/workspace/OpenTuneWeaver/pipeline/modules/06_finetuning/CustomModel",
+    "model_cache_dir": "${TRANSFORMERS_CACHE}",
     "evaluator": {
       "type": "api",
       "api_base_url": "http://localhost:11434/v1",
       "api_key": "ollama",
-      "model": "${OLLAMA_MODEL:-gemma3:12b-it-qat}"
+      "model": "${OLLAMA_MODEL}"
     }
   },
   "pipeline": {
     "auto_cleanup": false,
     "verbose": true,
     "continue_on_error": true
+  },
+  "environment": {
+    "HF_HOME": "${HF_HOME}",
+    "TRANSFORMERS_CACHE": "${TRANSFORMERS_CACHE}",
+    "HF_DATASETS_CACHE": "${HF_DATASETS_CACHE}"
   }
 }
 EOF
 
-log "✅ Configuration created with model: ${OLLAMA_MODEL:-gemma3:12b-it-qat}"
+log "✅ FIXED Configuration created with consistent model names:"
+log "  Base Model: ${FINETUNING_BASE_MODEL}"
+log "  Output Model: ${FINETUNING_OUTPUT_NAME}"
+log "  Ollama Model: ${OLLAMA_MODEL}"
 
 # ============================================
-# SCHRITT 11: Create Directory Structure
+# SCHRITT 12: Create Directory Structure
 # ============================================
 
 log "${BLUE}📁 Creating directory structure...${NC}"
@@ -383,19 +417,49 @@ mkdir -p pipeline/modules/06_finetuning/{INPUT,CustomModel,results}
 mkdir -p pipeline/modules/07_benchmark/{BENCHMARKFRAGEN,OUTPUT}
 mkdir -p viewer/images
 
+# Create model storage directories
+mkdir -p /workspace/OpenTuneWeaver/pipeline/modules/06_finetuning/CustomModel
+mkdir -p $TRANSFORMERS_CACHE
+
 log "✅ Directory structure created"
 
 # ============================================
-# SCHRITT 12: Create Simple Startup Scripts
+# SCHRITT 13: Create Environment Script
 # ============================================
 
-log "${BLUE}📝 Creating startup scripts...${NC}"
+log "${BLUE}📝 Creating environment script...${NC}"
 
-# Simple, reliable startup script
+cat > /workspace/set_env.sh << 'EOF'
+#!/bin/bash
+
+# Set environment variables for OpenTuneWeaver
+export HF_HOME="/workspace/hf_cache"
+export TRANSFORMERS_CACHE="/workspace/hf_cache/transformers"
+export HF_DATASETS_CACHE="/workspace/hf_cache/datasets"
+export CUDA_VISIBLE_DEVICES="0"
+
+echo "✅ Environment variables set:"
+echo "  HF_HOME: $HF_HOME"
+echo "  TRANSFORMERS_CACHE: $TRANSFORMERS_CACHE"
+echo "  HF_DATASETS_CACHE: $HF_DATASETS_CACHE"
+EOF
+
+chmod +x /workspace/set_env.sh
+
+# ============================================
+# SCHRITT 14: Create Enhanced Startup Scripts
+# ============================================
+
+log "${BLUE}📝 Creating enhanced startup scripts...${NC}"
+
+# Enhanced startup script with environment setup
 cat > /workspace/start_otw.sh << 'EOF'
 #!/bin/bash
 
-echo "🚀 Starting OpenTuneWeaver..."
+echo "🚀 Starting OpenTuneWeaver with FIXED configuration..."
+
+# Set environment variables
+source /workspace/set_env.sh
 
 # Function to check if Ollama is responding
 check_ollama() {
@@ -430,12 +494,21 @@ for i in {1..30}; do
 done
 
 # Verify UI structure
-echo "🔍 Verifying UI structure..."
+echo "📁 Verifying UI structure..."
 cd /workspace/OpenTuneWeaver/ui
 if [ ! -L "pipeline" ]; then
     echo "🔧 Creating pipeline symlink..."
     ln -sf ../pipeline pipeline
     echo "✅ Pipeline symlink created"
+fi
+
+# Verify configuration
+echo "📋 Verifying configuration..."
+if [ -f "/workspace/OpenTuneWeaver/pipeline/pipeline_config.json" ]; then
+    echo "✅ Configuration file found"
+else
+    echo "❌ Configuration file missing!"
+    exit 1
 fi
 
 # Start OpenTuneWeaver UI
@@ -445,14 +518,22 @@ EOF
 
 chmod +x /workspace/start_otw.sh
 
-# Debug script
+# Enhanced debug script
 cat > /workspace/debug_otw.sh << 'EOF'
 #!/bin/bash
 
-echo "🔍 OpenTuneWeaver Debug Information v2.5"
+echo "🔍 OpenTuneWeaver Debug Information v2.6"
 echo "========================================"
 
-echo "📁 Directory structure:"
+# Set environment
+source /workspace/set_env.sh
+
+echo "🌍 Environment Variables:"
+echo "  HF_HOME: $HF_HOME"
+echo "  TRANSFORMERS_CACHE: $TRANSFORMERS_CACHE"
+echo "  HF_DATASETS_CACHE: $HF_DATASETS_CACHE"
+
+echo -e "\n📁 Directory structure:"
 ls -la /workspace/OpenTuneWeaver/ | head -10
 
 echo -e "\nUI directory:"
@@ -461,8 +542,27 @@ ls -la /workspace/OpenTuneWeaver/ui/ 2>/dev/null || echo "UI directory not found
 echo -e "\nPipeline directory:"
 ls -la /workspace/OpenTuneWeaver/pipeline/ | head -5 2>/dev/null || echo "Pipeline directory not found"
 
+echo -e "\nFinetuning directory:"
+ls -la /workspace/OpenTuneWeaver/pipeline/modules/06_finetuning/ 2>/dev/null || echo "Finetuning directory not found"
+
+echo -e "\nCustomModel directory:"
+ls -la /workspace/OpenTuneWeaver/pipeline/modules/06_finetuning/CustomModel/ 2>/dev/null || echo "CustomModel directory not found"
+
+echo -e "\nCache directories:"
+ls -la /workspace/hf_cache/ 2>/dev/null || echo "Cache directory not found"
+ls -la /workspace/hf_cache/transformers/ 2>/dev/null || echo "Transformers cache not found"
+
 echo -e "\nSymbolic links:"
 find /workspace/OpenTuneWeaver/ui/ -type l -ls 2>/dev/null || echo "No symbolic links found"
+
+echo -e "\nConfiguration file:"
+if [ -f "/workspace/OpenTuneWeaver/pipeline/pipeline_config.json" ]; then
+    echo "✅ Configuration file exists"
+    echo "Base model: $(grep -o '"base_model": "[^"]*"' /workspace/OpenTuneWeaver/pipeline/pipeline_config.json | cut -d'"' -f4)"
+    echo "Output dir: $(grep -o '"output_dir": "[^"]*"' /workspace/OpenTuneWeaver/pipeline/pipeline_config.json | cut -d'"' -f4)"
+else
+    echo "❌ Configuration file missing"
+fi
 
 echo -e "\nApp.py syntax check:"
 cd /workspace/OpenTuneWeaver/ui 2>/dev/null && python3 -m py_compile app.py 2>/dev/null && echo "✅ app.py syntax OK" || echo "❌ app.py syntax error"
@@ -476,20 +576,26 @@ else
 fi
 
 echo -e "\nPython packages:"
-pip3 list | grep -E "(torch|transformers|gradio)" | head -3
+pip3 list | grep -E "(torch|transformers|gradio|unsloth)" | head -5
+
+echo -e "\nGPU Status:"
+nvidia-smi 2>/dev/null || echo "No GPU or nvidia-smi not available"
 EOF
 
 chmod +x /workspace/debug_otw.sh
 
-log "✅ Simple startup scripts created"
+log "✅ Enhanced startup scripts created"
 
 # ============================================
-# SCHRITT 13: Final Installation Test
+# SCHRITT 15: Final Installation Test
 # ============================================
 
 log "${BLUE}🧪 Final installation test...${NC}"
 
 cd /workspace/OpenTuneWeaver
+
+# Set environment for test
+source /workspace/set_env.sh
 
 # Test Python imports
 python3 -c "
@@ -521,29 +627,42 @@ else
     warning "Ollama connection test failed"
 fi
 
+# Test configuration
+if [ -f "/workspace/OpenTuneWeaver/pipeline/pipeline_config.json" ]; then
+    log "✅ Configuration file created successfully"
+else
+    error "Configuration file missing!"
+fi
+
 # ============================================
-# SCHRITT 14: Installation Complete
+# SCHRITT 16: Installation Complete
 # ============================================
 
 log "${GREEN}========================================${NC}"
-log "${GREEN}✅ Installation Complete! (Safe Version)${NC}"
+log "${GREEN}✅ Installation Complete! (FIXED Version)${NC}"
 log "${GREEN}========================================${NC}"
 
 echo ""
-echo "🛡️ Safe Path Fixes Applied:"
-echo "  ✅ UI symbolic link: ui/pipeline -> ../pipeline"
-echo "  ✅ Simple app.py path corrections (no complex modifications)"
-echo "  ✅ No risky sed operations on Python code"
+echo "🔧 FIXED Issues:"
+echo "  ✅ Consistent model names in configuration"
+echo "  ✅ Proper cache directory setup"
+echo "  ✅ Fixed base model: ${FINETUNING_BASE_MODEL}"
+echo "  ✅ Fixed output model: ${FINETUNING_OUTPUT_NAME}"
+echo "  ✅ Enhanced environment variable management"
 echo ""
 echo "📋 Quick Start Commands:"
 echo "  Start OpenTuneWeaver:  /workspace/start_otw.sh"
 echo "  Debug information:     /workspace/debug_otw.sh"
+echo "  Set environment:       source /workspace/set_env.sh"
 echo ""
 echo "🌐 Access URLs:"
 echo "  OpenTuneWeaver UI:     http://[POD-IP]:8080"
 echo "  Ollama API:           http://[POD-IP]:11434"
 echo ""
-echo "🤖 Model: ${OLLAMA_MODEL:-gemma3:12b-it-qat}"
+echo "🤖 Models:"
+echo "  Base Model: ${FINETUNING_BASE_MODEL}"
+echo "  Ollama Model: ${OLLAMA_MODEL}"
+echo "  Output Model: ${FINETUNING_OUTPUT_NAME}"
 echo ""
 
 # Optional: Auto-start
