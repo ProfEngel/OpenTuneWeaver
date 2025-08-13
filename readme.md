@@ -238,9 +238,10 @@ Do you have questions, suggestions, or need support?
 ## About
 
 Semantically-structured, curatable all-in-one LLM fine-tuning pipeline
+
 **Prof. Dr. Mathias Engel - ProfEngel** 
 **Hochschule für Wirtschaft und Umwelt Nürtingen-Geislingen**  
-*Funded by MWK Baden-Württemberg and Stifterverband Deutschland*
+*part-funded by MWK Baden-Württemberg and Stifterverband Deutschland*
 
 ## Star History
 <a href="https://star-history.com/#ProfEngel/OpenTuneWeaver&Date">
