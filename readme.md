@@ -22,7 +22,8 @@
   <img src="assets/mwk_logo.svg" alt="MWK Logo" height="60" style="margin-right: 20px;">
   <img src="assets/stifterverband_logo.jpg" alt="Stifterverband Logo" height="60">
 </div>
-This project is part-funded by the **Ministry of Science, Research and Arts Baden-Württemberg (MWK)** and **Stifterverband Deutschland** as part of digital fellowship program   [Fellowship-Program](https://www.stifterverband.org/bwdigifellows/2024_engel_leiblein).
+This project is part-funded by the **Ministry of Science, Research and Arts Baden-Württemberg (MWK)** and **Stifterverband Deutschland** as part of digital fellowship program [Fellowship-Program](https://www.stifterverband.org/bwdigifellows/2024_engel_leiblein).
+
 
 > **Tip**  
 > **Looking for an [Enterprise Plan](mailto:sales@opentuneweaver.com)?** – **Speak with Our Sales Team Today!**  
