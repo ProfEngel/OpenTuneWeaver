@@ -14,7 +14,7 @@
   <img src="assets/otw_logo_banner.png" alt="OpenTuneWeaver Logo" width="900">
 </div>
 
-by ProfEngel, 08.2025
+ 
 
 
 
