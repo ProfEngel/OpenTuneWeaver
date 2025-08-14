@@ -92,9 +92,9 @@ Open Ports: 8080,11434
 
 cd /workspace
 git clone https://github.com/ProfEngel/OpenTuneWeaver.git
-cp OpenTuneWeaver/setup_runpod_direct.sh .
-chmod +x setup_runpod_direct.sh
-./setup_runpod_direct.sh
+cp OpenTuneWeaver/setup_with_ollama.sh .
+chmod +x setup_with_ollama.sh
+./setup_with_ollama.sh
 
 ```
 
@@ -120,14 +120,14 @@ conda create -n opentuneweaver python=3.11
 conda activate opentuneweaver
 apt-get update && apt-get upgrade -y
 git clone https://github.com/ProfEngel/OpenTuneWeaver.git
-cp OpenTuneWeaver/setup_runpod_direct.sh .
-chmod +x setup_runpod_direct.sh
+cp OpenTuneWeaver/setup_with_ollama.sh .
+chmod +x setup_with_ollama.sh
 
 # Installation von unsloth_zoo direkt von GitHub
 pip install --upgrade --no-cache-dir --no-deps git+https://github.com/unslothai/unsloth-zoo.git
 
 # Dann das Setup-Skript ausführen
-./setup_runpod_direct.sh
+./setup_with_ollama.sh
 
 ```
 
@@ -138,14 +138,14 @@ python3.11 -m venv opentuneweaver-env
 source opentuneweaver-env/bin/activate
 apt-get update && apt-get upgrade -y
 git clone https://github.com/ProfEngel/OpenTuneWeaver.git
-cp OpenTuneWeaver/setup_runpod_direct.sh .
-chmod +x setup_runpod_direct.sh
+cp OpenTuneWeaver/setup_with_ollama.sh .
+chmod +x setup_with_ollama.sh
 
 # Installation von unsloth_zoo direkt von GitHub
 pip install --upgrade --no-cache-dir --no-deps git+https://github.com/unslothai/unsloth-zoo.git
 
 # Dann das Setup-Skript ausführen
-./setup_runpod_direct.sh
+./setup_with_ollama.sh
 
 ```
 
