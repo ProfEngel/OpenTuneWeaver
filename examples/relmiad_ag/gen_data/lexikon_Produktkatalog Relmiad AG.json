@@ -1,0 +1,55 @@
+{
+  "metadata": {
+    "source_file": "Produktkatalog Relmiad AG.md",
+    "total_sections": 6,
+    "processed_sections": 5,
+    "skipped_sections": 1,
+    "api_used": "OpenAI-API",
+    "model_used": "gemma3:12b-it-qat",
+    "skipped_section_titles": [
+      "Relmiad AG - Produktkatalog"
+    ]
+  },
+  "lexikon_entries": [
+    {
+      "title": "Multi-Parameter Industriesensor für Hochtemperatur-Anwendungen",
+      "original_title": "KTS-4000 - Krantastrahler 4000",
+      "level": 2,
+      "original_content": "Beschreibung: Multi-Parameter Industriesensor für Hochtemperatur-Anwendungen, misst Temperatur, Druck und Feuchte.\n\nTechnische Spezifikationen: Temp.-Bereich: -40°C bis 1200°C, Signal: 4-20mA, IP67 Schutz, Betriebsspannung 12-30V DC",
+      "lexikon_entry": "**Multi-Parameter Industriesensor für Hochtemperatur-Anwendungen**\n\nEin Multi-Parameter Industriesensor für Hochtemperatur-Anwendungen ist ein Sensorbauelement, das zur gleichzeitigen Messung mehrerer physikalischer Parameter in Umgebungen mit hohen Temperaturen eingesetzt wird. Typischerweise werden Temperatur, Druck und relative Feuchtigkeit erfasst.\n\n**Hauptmerkmale:**\n\n*   **Messparameter:** Temperatur, Druck, relative Feuchtigkeit\n*   **Temperaturbereich:** -40 °C bis 1200 °C\n*   **Ausgangssignal:** 4-20 mA (Analogsignal)\n*   **Schutzart:** IP67 (Schutz gegen Staub und zeitweiliges Untertauchen)\n*   **Betriebsspannung:** 12-30 V DC\n\n**Praktische Bedeutung/Anwendungen:**\n\nDiese Sensoren finden Anwendung in anspruchsvollen Industrieumgebungen, in denen die Überwachung mehrerer Parameter entscheidend für die Prozesssicherheit und -optimierung ist. Typische Einsatzbereiche sind beispielsweise die Metallurgie (z.B. Überwachung von Öfen), die Glasherstellung, die chemische Industrie sowie die Energieerzeugung (z.B. in Kraftwerken). Die gleichzeitige Erfassung mehrerer Parameter ermöglicht eine umfassendere Prozessanalyse und -steuerung.",
+      "source": "Section: KTS-4000 - Krantastrahler 4000"
+    },
+    {
+      "title": "Flüssigkeitsdurchflusssensor mit IoT-Konnektivität",
+      "original_title": "PFS-2500 - Pulsoflex-Sensor 2500",
+      "level": 2,
+      "original_content": "Beschreibung: Flüssigkeitsdurchflusssensor mit IoT-Konnektivität zur Überwachung von Prozessflüssigkeiten.\n\nTechnische Spezifikationen: Durchflussbereich: 0,1-25 l/min, Digitale Genauigkeit Klasse A+ +, LPWAN Kommunikation, Service-Lifecycle 7 Jahre",
+      "lexikon_entry": "**Flüssigkeitsdurchflusssensor mit IoT-Konnektivität**\n\nEin Flüssigkeitsdurchflusssensor mit IoT-Konnektivität ist ein Messgerät zur Erfassung und Übertragung von Durchflussdaten von Prozessflüssigkeiten, das zusätzlich eine drahtlose Verbindung zu einem Internet der Dinge (IoT)-Netzwerk aufweist. Diese Sensoren kombinieren die Funktionalität eines Durchflusssensors mit der Möglichkeit, Daten in Echtzeit an eine zentrale Plattform oder andere IoT-Geräte zu übertragen.\n\n**Hauptmerkmale:**\n\n*   **Durchflussmessung:** Erfasst den Volumenstrom einer Flüssigkeit. Typische Durchflussbereiche liegen bei 0,1 bis 25 l/min.\n*   **IoT-Konnektivität:** Nutzt Low-Power Wide-Area Network (LPWAN)-Technologien zur drahtlosen Datenübertragung über große Entfernungen bei geringem Energieverbrauch.\n*   **Digitale Genauigkeit:** Bietet eine hohe Messgenauigkeit, typischerweise Klasse A++.\n*   **Lange Lebensdauer:** Konzipiert für eine lange Betriebslebensdauer, oft mit einer Service-Lifecycle von 7 Jahren.\n\n**Praktische Bedeutung und Anwendung:**\n\nFlüssigkeitsdurchflusssensoren mit IoT-Konnektivität finden Anwendung in verschiedenen Industriezweigen, darunter:\n\n*   **Automatisierte Fertigung:** Überwachung und Steuerung von Flüssigkeitszufuhr in Produktionsprozessen.\n*   **Gebäudemanagement:** Erfassung des Wasserverbrauchs und -flusses zur Optimierung des Ressourcenmanagements.\n*   **Landwirtschaft:** Präzisionsbewässerung und Überwachung von Flüssigdüngung.\n*   **Fernüberwachung:** Ermöglicht die Überwachung von Flüssigkeitsflussprozessen in abgelegenen Standorten ohne direkten Zugriff.\n\nDie Integration in IoT-Systeme ermöglicht die Fernüberwachung, Datenanalyse und die Integration in automatisierte Steuerungssysteme, was zu einer verbesserten Effizienz und Prozessoptimierung führt.",
+      "source": "Section: PFS-2500 - Pulsoflex-Sensor 2500"
+    },
+    {
+      "title": "Simultane Vibrations- und Temperaturmessung",
+      "original_title": "VTM-1200 - Vibrotherm Messgerät 1200",
+      "level": 2,
+      "original_content": "Beschreibung: Simultane Vibrations- und Temperaturmessung für Maschinenzustandsüberwachung.\n\nTechnische Spezifikationen: Vibrationsfrequenz: 1 Hz bis 10 kHz, Temperaturbereich: -25°C bis 180°C, Datenrate: 1000 Samples/Sekunde",
+      "lexikon_entry": "**Simultane Vibrations- und Temperaturmessung**\n\nDie simultane Vibrations- und Temperaturmessung bezeichnet die gleichzeitige Erfassung von Schwingungsdaten (Vibration) und Temperaturwerten an einem Objekt oder einer Maschine. Diese Methode ermöglicht die Analyse des Zusammenhangs zwischen Temperatur und Vibration, was für die Zustandsüberwachung und vorausschauende Wartung von Maschinen und Anlagen von entscheidender Bedeutung sein kann.\n\n**Hauptmerkmale:**\n\n*   **Gleichzeitige Erfassung:** Die Messung erfolgt synchron, wodurch zeitliche Verzögerungen zwischen Temperatur- und Vibrationsdaten vermieden werden.\n*   **Vibrationsfrequenzbereich:** Typischerweise 1 Hz bis 10 kHz.\n*   **Temperaturbereich:** Üblicherweise -25°C bis 180°C, abhängig vom verwendeten Sensor.\n*   **Datenrate:** Eine Datenrate von 1000 Samples/Sekunde ermöglicht eine detaillierte Analyse der dynamischen Zusammenhänge.\n\n**Praktische Bedeutung und Anwendung:**\n\nDie simultane Messung wird häufig in der Zustandsüberwachung eingesetzt, um frühzeitig auf potenzielle Fehlerzustände hinzuweisen. Beispielsweise kann eine erhöhte Temperatur in Verbindung mit ungewöhnlichen Vibrationen auf Lagerschäden, Unwuchten oder andere mechanische Probleme hindeuten. Die Methode findet Anwendung in verschiedenen Industriezweigen, darunter Maschinenbau, Automobilindustrie, Energieerzeugung und Prozessindustrie. Die gewonnenen Daten ermöglichen eine optimierte Wartungsplanung und reduzieren ungeplante Stillstände.",
+      "source": "Section: VTM-1200 - Vibrotherm Messgerät 1200"
+    },
+    {
+      "title": "Erkennung und Analyse von Fluidtemperaturen und Strömungen",
+      "original_title": "TFD-800 - Thermofluid-Detektor 800",
+      "level": 2,
+      "original_content": "Beschreibung: Sensor zur Erkennung und Analyse von Fluidtemperaturen und strömungen.\n\nTechnische Spezifikationen: Temperaturbereich: -50°C bis 150°C, Ansprechzeit &lt; 1 Sekunde, Kompatibel mit SCADA-Systemen",
+      "lexikon_entry": "**Erkennung und Analyse von Fluidtemperaturen und Strömungen**\n\nDie Erkennung und Analyse von Fluidtemperaturen und Strömungen bezeichnet den Prozess der Messung und Auswertung von Temperatur und Strömungsgeschwindigkeit von Flüssigkeiten oder Gasen. Ziel ist es, Informationen über den Zustand und das Verhalten des Fluids zu gewinnen, die für Prozesskontrolle, Anlagenüberwachung und Fehlerdiagnose relevant sind.\n\n**Hauptmerkmale und Charakteristika:**\n\n*   **Temperaturmessung:** Erfasst die Temperatur des Fluids innerhalb eines typischen Bereichs von -50°C bis 150°C.\n*   **Strömungsmessung:** Bestimmt die Strömungsgeschwindigkeit des Fluids.\n*   **Ansprechzeit:** Die Messung erfolgt mit einer Ansprechzeit von unter einer Sekunde, was eine schnelle Reaktion auf Änderungen ermöglicht.\n*   **Datenintegration:** Kompatibilität mit SCADA-Systemen (Supervisory Control and Data Acquisition) ermöglicht die Integration der Messdaten in zentrale Überwachungssysteme.\n\n**Praktische Bedeutung und Anwendung:**\n\nDie Erkennung und Analyse von Fluidtemperaturen und Strömungen findet breite Anwendung in verschiedenen Industriezweigen, darunter:\n\n*   **Prozessindustrie:** Überwachung und Regelung von chemischen Prozessen, Raffinerien und petrochemischen Anlagen.\n*   **Heizungs-, Lüftungs- und Klimatechnik (HLK):** Optimierung der Energieeffizienz und Regelung von Temperatur und Strömung in Gebäuden und Anlagen.\n*   **Automobilindustrie:** Überwachung der Kühlmittelkreisläufe und des Motorbetriebs.\n*   **Energieerzeugung:** Überwachung von Kühlwasser- und Dampfkreisläufen in Kraftwerken.",
+      "source": "Section: TFD-800 - Thermofluid-Detektor 800"
+    },
+    {
+      "title": "Hochpräzisions-Sensor-Modul 900",
+      "original_title": "HSM-900 - Hochpräzisions-Sensor-Modul 900",
+      "level": 2,
+      "original_content": "Beschreibung: Modulares Sensor-Framework für präzise Messungen in der Industrie.\n\nTechnische Spezifikationen: Modulare Bauweise, 24-bit Signalverarbeitung, wartungsfrei bis 36 Monate",
+      "lexikon_entry": "**Hochpräzisions-Sensor-Modul 900**\n\nDas Hochpräzisions-Sensor-Modul 900 ist ein modulares Sensor-Framework, das für die Erfassung präziser Messdaten in industriellen Anwendungen konzipiert wurde. Es dient als eigenständige Messeinheit und kann in bestehende Automatisierungssysteme integriert werden.\n\n**Hauptmerkmale:**\n\n*   **Modulare Bauweise:** Ermöglicht eine flexible Anpassung an unterschiedliche Messanforderungen und eine einfache Erweiterbarkeit.\n*   **24-Bit-Signalverarbeitung:** Bietet eine hohe Auflösung und Genauigkeit bei der Datenerfassung und -verarbeitung, was zu präzisen Messergebnissen führt.\n*   **Wartungsfreiheit:** Das Modul ist für einen wartungsfreien Betrieb über einen Zeitraum von bis zu 36 Monaten ausgelegt, was die Betriebskosten reduziert.\n\n**Praktische Bedeutung/Anwendung:**\n\nDas Hochpräzisions-Sensor-Modul 900 findet Anwendung in Bereichen, in denen genaue und zuverlässige Messdaten entscheidend sind, beispielsweise in der Prozessautomatisierung, der Qualitätskontrolle und der Anlagenüberwachung. Typische Einsatzgebiete sind die Messung von Temperatur, Druck, Füllstand, Durchfluss und Position.",
+      "source": "Section: HSM-900 - Hochpräzisions-Sensor-Modul 900"
+    }
+  ]
+}

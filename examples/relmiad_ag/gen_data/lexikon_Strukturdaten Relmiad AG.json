@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "source_file": "Strukturdaten Relmiad AG.md",
+    "total_sections": 5,
+    "processed_sections": 0,
+    "skipped_sections": 5,
+    "api_used": "OpenAI-API",
+    "model_used": "gemma3:12b-it-qat",
+    "skipped_section_titles": [
+      "Deutsche Bundesländer",
+      "Geschäftsform",
+      "Mitarbeiterqualität (1-10) Loyalität (ja/nein)",
+      "Lieferant für Handelsware (Lieferantennummer) Ausprägung Farbe",
+      "Preis je Stück"
+    ]
+  },
+  "lexikon_entries": []
+}
