@@ -31,7 +31,8 @@ This project is part-funded by the **Ministry of Science, Research and Arts Bade
 
 > **Tip**  
 > **Looking for an [Enterprise Plan](mailto:sales@opentuneweaver.com)?** – **Speak with Our Sales Team Today!**  
-> Get **enhanced capabilities**, including **custom theming and branding**, **Service Level Agreement (SLA) support**, **Long-Term Support (LTS) versions**, **priority support**, **on-premise deployment**, and **more!**
+> > **Enterprise License**: One-time payment, including **1 year of updates**.  
+> After the first year, updates can optionally be extended for an additional fee.  
 
 ***
 
@@ -248,6 +249,8 @@ Do you have questions, suggestions, or need support?
 
 **Created by Prof. Dr. Mathias Engel 2023-2025** - Let's make OpenTuneWeaver even greater together! 💪
 
+_Made with ❤️ in Stuttgart / Nürtingen, Germany_
+
 ***
 
 ## About
@@ -265,6 +268,12 @@ Semantically-structured, curatable all-in-one LLM fine-tuning pipeline
 </div>
 **Hochschule für Wirtschaft und Umwelt Nürtingen-Geislingen**  
 *part-funded by MWK Baden-Württemberg and Stifterverband Deutschland*
+
+## 🤝 Open for Contributions
+
+Contributions are welcome!  
+If you have ideas, improvements, or bug reports, feel free to open an **Issue** or submit a **Pull Request**.
+
 
 ## Star History
 <a href="https://star-history.com/#ProfEngel/OpenTuneWeaver&Date">
