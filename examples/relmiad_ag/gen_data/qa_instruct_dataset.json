@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "total_entries": 28,
-    "total_qa_pairs": 82,
+    "total_entries": 32,
+    "total_qa_pairs": 87,
     "api_used": "OpenAI-API",
     "model_used": "gemma3:12b-it-qat",
     "server_used": "http://localhost:11434/v1",
@@ -10,9 +10,59 @@
   },
   "data": [
     {
+      "instruction": "Was ist ein Organisationshandbuch?",
+      "input": "",
+      "output": "Ein **Organisationshandbuch** ist ein zentrales Dokument, das die Struktur, die Rollenverteilung, die Verantwortlichkeiten und die wesentlichen Prozesse einer Organisation detailliert beschreibt. Es dient als umfassender Leitfaden für Mitarbeiter und Führungskräfte und soll die interne Kommunikation, die Zusammenarbeit und die Effizienzsteigerung unterstützen.  Dieses Handbuch bietet eine *Strukturübersicht* über Abteilungen und Teams, definiert klare *Rollen- und Verantwortlichkeiten* und beschreibt wichtige *Prozessbeschreibungen* sowie *Richtlinien und Standards*. Im Wesentlichen dient es der Standardisierung von Abläufen und der Sicherstellung, dass alle Beteiligten die gleichen Informationen haben.",
+      "metadata": {
+        "source": "Section: 1. Einführung",
+        "title": "Organisationshandbuch",
+        "question_type": "definition"
+      }
+    },
+    {
+      "instruction": "Was ist ein Organisationshandbuch und welche Hauptmerkmale zeichnen es aus?",
+      "input": "",
+      "output": "Ein **Organisationshandbuch** ist ein zentrales Dokument, das die Struktur, die Rollenverteilung, die Verantwortlichkeiten und die wesentlichen Prozesse einer Organisation detailliert beschreibt. Es dient als umfassender Leitfaden für Mitarbeiter und Führungskräfte und unterstützt die interne Kommunikation und Effizienzsteigerung. Zu den Hauptmerkmalen gehören eine **Strukturübersicht** (organisatorische Hierarchie), klare **Rollen- und Verantwortlichkeiten**, detaillierte **Prozessbeschreibungen** sowie festgelegte **Richtlinien und Standards**. Im Wesentlichen standardisiert es Abläufe, minimiert Missverständnisse und gewährleistet die Compliance.",
+      "metadata": {
+        "source": "Section: 1. Einführung",
+        "title": "Organisationshandbuch",
+        "question_type": "detailed_explanation"
+      }
+    },
+    {
       "instruction": "Was ist ein Unternehmensprofil und welche Hauptmerkmale umfasst es?",
       "input": "",
-      "output": "Ein **Unternehmensprofil** ist eine prägnante Zusammenfassung der wichtigsten Merkmale und Aktivitäten eines Unternehmens, die dazu dient, es gegenüber externen Stakeholdern darzustellen. Es beschreibt typischerweise die **Branche**, die angebotenen **Produkte/Dienstleistungen**, die **Unternehmenskultur**, die **strategischen Ziele** und die **Wettbewerbsvorteile**. Ein umfassendes Profil beinhaltet zudem Angaben zu **Unternehmensname und Rechtsform**, **Standorten** und der **Mitarbeiterzahl**, um ein vollständiges Bild des Unternehmens zu vermitteln.",
+      "output": "Ein **Unternehmensprofil** ist eine prägnante Zusammenfassung der wichtigsten Merkmale und Aktivitäten eines Unternehmens, die dazu dient, es gegenüber externen Stakeholdern darzustellen. Es beinhaltet typischerweise Informationen wie **Unternehmensname**, **Rechtsform**, **Gründungsdatum**, **Standort(e)**, **Branche**, **Tätigkeitsbereich**, **Produkte oder Dienstleistungen**, **Unternehmensstruktur**, **Mitarbeiterzahl**, **Mission und Vision** sowie **Wettbewerbsvorteile**.  Zusätzlich können Angaben zu **Zertifizierungen**, **Auszeichnungen** und **Nachhaltigkeitsinitiativen** enthalten sein, um ein umfassendes Bild des Unternehmens zu vermitteln. Ein Beispiel hierfür wäre das Profil der Relmiad AG, die als Qualitätsführer in der Industriemesstechnik mit Standorten in Stuttgart, Erfurt und München agiert.",
+      "metadata": {
+        "source": "Section: 2. Unternehmensprofil",
+        "title": "Unternehmensprofil",
+        "question_type": "detailed_explanation"
+      }
+    },
+    {
+      "instruction": "Was ist ein Unternehmensprofil und wozu dient es?",
+      "input": "",
+      "output": "Ein **Unternehmensprofil** ist eine prägnante Zusammenfassung der wichtigsten Merkmale und Aktivitäten eines Unternehmens. Es dient der Darstellung gegenüber externen Stakeholdern wie potenziellen Kunden, Investoren und Geschäftspartnern. Typischerweise umfasst es Informationen wie Unternehmensname, Rechtsform, Gründungsdatum, Standort, Tätigkeitsbereich und **Unternehmensstruktur**.  Zudem wird es für Marketingzwecke und zur Positionierung im Markt verwendet, um das Unternehmen als zuverlässigen und kompetenten Partner darzustellen.",
+      "metadata": {
+        "source": "Section: 2. Unternehmensprofil",
+        "title": "Unternehmensprofil",
+        "question_type": "context"
+      }
+    },
+    {
+      "instruction": "Welche Hauptmerkmale umfassen typischerweise ein Unternehmensprofil?",
+      "input": "",
+      "output": "Ein **Unternehmensprofil** fasst die wesentlichen Merkmale und Aktivitäten eines Unternehmens zusammen und dient der Darstellung gegenüber externen Stakeholdern. Typischerweise beinhaltet es Informationen wie den **Unternehmensnamen**, die **Rechtsform**, das **Gründungsdatum**, den **Standort**, die **Branche** und den **Tätigkeitsbereich**.  Zusätzlich werden oft Angaben zur **Unternehmensstruktur**, der **Mitarbeiterzahl**, der **Mission und Vision** sowie den **Wettbewerbsvorteilen** gemacht.  Je nach Bedarf können auch **Zertifizierungen**, **Auszeichnungen** und **Nachhaltigkeitsinitiativen** aufgeführt werden.",
+      "metadata": {
+        "source": "Section: 2. Unternehmensprofil",
+        "title": "Unternehmensprofil",
+        "question_type": "characteristics"
+      }
+    },
+    {
+      "instruction": "Was ist ein Unternehmensprofil?",
+      "input": "",
+      "output": "Ein **Unternehmensprofil** ist eine prägnante Zusammenfassung der wichtigsten Merkmale und Aktivitäten eines Unternehmens. Es dient der Darstellung gegenüber externen Stakeholdern wie potenziellen Kunden, Investoren und Geschäftspartnern. Typische Inhalte umfassen Informationen zu **Unternehmensname**, **Rechtsform**, **Gründungsdatum**, **Standort**, **Branche**, **Tätigkeitsbereich**, **Mitarbeiterzahl** sowie **Mission** und **Vision**. Ziel ist es, das Unternehmen als zuverlässigen und kompetenten Partner zu präsentieren.",
       "metadata": {
         "source": "Section: 2. Unternehmensprofil",
         "title": "Unternehmensprofil",
@@ -20,39 +70,9 @@
       }
     },
     {
-      "instruction": "Erkläre detailliert, was ein Unternehmensprofil ist und welche Hauptmerkmale es typischerweise umfasst.",
+      "instruction": "Welche Hauptmerkmale kennzeichnen die Organisationsstruktur?",
       "input": "",
-      "output": "Ein **Unternehmensprofil** ist eine prägnante Zusammenfassung der wesentlichen Merkmale und Aktivitäten eines Unternehmens, die dazu dient, es gegenüber externen Stakeholdern wie Kunden, Investoren und Mitarbeitern darzustellen. Es beschreibt in der Regel die **Branche**, die angebotenen **Produkte oder Dienstleistungen**, die **Unternehmenskultur**, die **strategischen Ziele** und die **Wettbewerbsvorteile**.  Zu den typischen Hauptmerkmalen gehören der **Unternehmensname und Rechtsform**, die **Standorte**, die **Mitarbeiterzahl** und eine Beschreibung der Werte und Arbeitsweise. Ein gutes Unternehmensprofil dient der Information und Positionierung des Unternehmens im Markt, wie beispielsweise im Fall der Relmiad AG, einem mittelständischen Unternehmen im Bereich Industriemesstechnik.",
-      "metadata": {
-        "source": "Section: 2. Unternehmensprofil",
-        "title": "Unternehmensprofil",
-        "question_type": "detailed_explanation"
-      }
-    },
-    {
-      "instruction": "Welche Hauptmerkmale zeichnen ein umfassendes Unternehmensprofil aus?",
-      "input": "",
-      "output": "Ein umfassendes **Unternehmensprofil** beinhaltet typischerweise eine Vielzahl von Informationen, um ein klares Bild des Unternehmens zu vermitteln. Dazu gehören Angaben zum **Unternehmensnamen** und zur **Rechtsform**, der **Branche**, den angebotenen **Produkten/Dienstleistungen** sowie den **Standorten**.  Zusätzlich wird die **Mitarbeiterzahl**, die **Unternehmenskultur**, die **strategischen Ziele** und die **Wettbewerbsvorteile** beschrieben, um die Positionierung im Markt hervorzuheben. Letztendlich dient das Profil dazu, das Unternehmen gegenüber externen Stakeholdern wie Kunden und Investoren prägnant darzustellen.",
-      "metadata": {
-        "source": "Section: 2. Unternehmensprofil",
-        "title": "Unternehmensprofil",
-        "question_type": "characteristics"
-      }
-    },
-    {
-      "instruction": "Welche Hauptmerkmale sind typischerweise in einem Unternehmensprofil enthalten?",
-      "input": "",
-      "output": "Ein umfassendes **Unternehmensprofil** beinhaltet eine Reihe von Informationen, die das Unternehmen prägnant darstellen. Dazu gehören der **Unternehmensname** und die **Rechtsform**, die **Branche**, das Angebot an **Produkten/Dienstleistungen**, die **Standorte**, die **Mitarbeiterzahl**, die **Unternehmenskultur** und die **strategischen Ziele**.  Zusätzlich werden oft die **Wettbewerbsvorteile** hervorgehoben, um das Unternehmen von der Konkurrenz abzuheben. Ein gutes Profil, wie beispielsweise das der Relmiad AG, informiert Stakeholder klar über das Kerngeschäft und die Positionierung im Markt.",
-      "metadata": {
-        "source": "Section: 2. Unternehmensprofil",
-        "title": "Unternehmensprofil",
-        "question_type": "application"
-      }
-    },
-    {
-      "instruction": "Welche Hauptmerkmale kennzeichnen eine **Organisationsstruktur**?",
-      "input": "",
-      "output": "Eine **Organisationsstruktur** lässt sich durch mehrere Schlüsselelemente definieren. Dazu gehören die **Hierarchie**, die die vertikalen Berichtslinien und Verantwortlichkeiten festlegt, sowie die Abteilungen oder Geschäftsbereiche, die Aufgaben und Mitarbeiter nach Funktion oder Produkt gruppieren. Ebenso wichtig sind die definierten **Kommunikationswege** für den Informationsfluss und die klare Zuweisung von **Autorität und Verantwortlichkeit** für Aufgaben. Eine funktionierende Struktur fördert die Zusammenarbeit und unterstützt die Erreichung strategischer Ziele.",
+      "output": "Die **Organisationsstruktur** beschreibt die formale Anordnung von Rollen, Verantwortlichkeiten und Berichtslinien innerhalb einer Organisation. Zu ihren Hauptmerkmalen zählen die Abgrenzung von **Geschäftsbereichen** und **Abteilungen**, die Festlegung von **Hierarchien** sowie die Definition klarer **Kommunikationswege**. Verschiedene Organisationsformen, wie die *Linienorganisation*, die *Matrixorganisation* oder die *funktionale Organisation*, stellen unterschiedliche Ausprägungen dieser Struktur dar. Eine effektive Organisationsstruktur fördert die enge Zusammenarbeit zwischen den verschiedenen Bereichen und ist entscheidend für effiziente Prozesse und eine gute Entscheidungsfindung.",
       "metadata": {
         "source": "Section: 3. Organisationsstruktur",
         "title": "Organisationsstruktur",
@@ -60,19 +80,19 @@
       }
     },
     {
-      "instruction": "Was versteht man unter einer Organisationsstruktur und welche Hauptmerkmale kennzeichnen sie?",
+      "instruction": "Was versteht man unter einer Organisationsstruktur und warum ist sie wichtig?",
       "input": "",
-      "output": "Die **Organisationsstruktur** bezeichnet die formale Anordnung von Rollen, Verantwortlichkeiten und Berichtslinien innerhalb einer Organisation. Sie definiert, wie Aufgaben verteilt, Prozesse koordiniert und Entscheidungen getroffen werden. Zu den Hauptmerkmalen zählen die **Hierarchie**, die vertikale Struktur mit klaren Berichtslinien, sowie die Gruppierung in **Abteilungen/Geschäftsbereiche** nach Funktion oder Produkt.  Darüber hinaus sind definierte **Kommunikationswege** und die klare Zuweisung von **Autorität und Verantwortlichkeit** entscheidende Elemente einer effektiven Organisationsstruktur, die eine effiziente Ressourcennutzung und die Erreichung strategischer Ziele unterstützt.",
+      "output": "Die **Organisationsstruktur** bezeichnet die formale Anordnung von Rollen, Verantwortlichkeiten und Berichtslinien innerhalb einer Organisation. Sie definiert, wie Aufgaben verteilt und koordiniert werden, um die Erreichung strategischer Ziele zu ermöglichen.  Ein wesentliches Merkmal ist die Abgrenzung von **Geschäftsbereichen** und **Abteilungen** sowie die Festlegung von **Hierarchien** und **Kommunikationswegen**. Eine gut durchdachte Organisationsstruktur ist entscheidend für die **Effizienz** und **Effektivität** von Prozessen, die **Entscheidungsfindung** und die **Zusammenarbeit** innerhalb des Unternehmens.",
       "metadata": {
         "source": "Section: 3. Organisationsstruktur",
         "title": "Organisationsstruktur",
-        "question_type": "detailed_explanation"
+        "question_type": "application"
       }
     },
     {
-      "instruction": "Was versteht man unter einer Organisationsstruktur und welche Hauptmerkmale kennzeichnen sie?",
+      "instruction": "Was versteht man unter einer Organisationsstruktur und warum ist sie wichtig?",
       "input": "",
-      "output": "Die **Organisationsstruktur** bezeichnet die formale Anordnung von Rollen, Verantwortlichkeiten und Berichtslinien innerhalb einer Organisation. Sie definiert, wie Aufgaben verteilt, Prozesse koordiniert und Entscheidungen getroffen werden. Zu den Hauptmerkmalen zählen die **Hierarchie**, die die vertikale Struktur festlegt, sowie die Gruppierung in **Abteilungen/Geschäftsbereiche** nach Funktion oder Produkt.  Darüber hinaus sind definierte **Kommunikationswege** und die klare Zuweisung von **Autorität und Verantwortlichkeit** entscheidend für eine funktionierende Struktur, die eine effiziente Ressourcennutzung und die Erreichung strategischer Ziele unterstützt.",
+      "output": "Die **Organisationsstruktur** bezeichnet die formale Anordnung von Rollen, Verantwortlichkeiten und Berichtslinien innerhalb einer Organisation. Sie definiert, wie Aufgaben verteilt und koordiniert werden, um die Erreichung strategischer Ziele zu ermöglichen.  Ein wesentliches Merkmal ist die Abgrenzung von **Geschäftsbereichen** und **Abteilungen**, sowie die Festlegung von **Hierarchien** und **Kommunikationswegen**. Eine effektive Organisationsstruktur ist entscheidend für die **Effizienz** und **Effektivität** von Prozessen, die **Entscheidungsfindung** und die **Zusammenarbeit**.",
       "metadata": {
         "source": "Section: 3. Organisationsstruktur",
         "title": "Organisationsstruktur",
@@ -80,19 +100,9 @@
       }
     },
     {
-      "instruction": "Was versteht man unter Geschäftsführung und welche Hauptaufgaben hat sie?",
+      "instruction": "Was ist die Geschäftsführung und welche Hauptaufgaben fallen ihr zu?",
       "input": "",
-      "output": "Die **Geschäftsführung** bezeichnet die oberste Führungsebene eines Unternehmens oder einer Organisation. Sie ist verantwortlich für die **strategische Ausrichtung**, die **operative Umsetzung** und die Erreichung der **Unternehmensziele**. Konkret umfasst dies die laufende Verwaltung, Entscheidungen in operativen Angelegenheiten und die Umsetzung von Unternehmensrichtlinien. Im Beispiel besteht die Geschäftsführung aus mehreren Bereichen wie Entwicklung, Vertrieb, Produktion und Qualitätssicherung, wobei Dr. Andreas Relman als Vorstandsvorsitzender die oberste Leitung innehat.",
-      "metadata": {
-        "source": "Section: 3.1 Geschäftsführung",
-        "title": "Geschäftsführung",
-        "question_type": "detailed_explanation"
-      }
-    },
-    {
-      "instruction": "Was versteht man unter Geschäftsführung und welche Verantwortlichkeiten hat sie?",
-      "input": "",
-      "output": "Die **Geschäftsführung** bezeichnet die Leitung eines Unternehmens oder einer Organisation und stellt die oberste Führungsebene dar. Sie ist verantwortlich für die **strategische Ausrichtung**, die operative Umsetzung und die Erreichung der Unternehmensziele. Im Wesentlichen übernimmt sie die laufende Verwaltung, trifft Entscheidungen in operativen Angelegenheiten und setzt Unternehmensrichtlinien um, wobei sie in der Regel im Auftrag des Vorstands oder der Eigentümer agiert.  Im konkreten Fall besteht die Geschäftsführung aus: *Dr. Andreas Relman (GF)*, *Dr. Klaus Mehringer (BLE)*, *Sarah Hoffmann (BLV)*, *Ing. Michael Torres (BLP)* und *Dr. Petra Schwarz (BLQ)*.",
+      "output": "Die **Geschäftsführung** bezeichnet die Leitung eines Unternehmens oder einer Organisation durch eine oder mehrere Personen. Sie ist verantwortlich für die operative Umsetzung der strategischen Ziele und berichtet in der Regel an einen Vorstand oder Eigentümer. Zu ihren Hauptaufgaben gehören die Verantwortung für den laufenden Geschäftsbetrieb, die Entscheidungsbefugnis in operativen Angelegenheiten sowie die Umsetzung von Unternehmensrichtlinien und -strategien.  In der praktischen Anwendung umfasst die Geschäftsführung vielfältige Aufgaben wie die Steuerung von Abteilungen, die Überwachung von Budgets und die Entwicklung von Geschäftsprozessen, um die **Unternehmensziele** zu erreichen.",
       "metadata": {
         "source": "Section: 3.1 Geschäftsführung",
         "title": "Geschäftsführung",
@@ -100,9 +110,29 @@
       }
     },
     {
-      "instruction": "Welche Hauptabteilungen gibt es bei der Relmiad AG und welche Aufgaben haben diese?",
+      "instruction": "Was bezeichnet die Geschäftsführung?",
       "input": "",
-      "output": "Die **Abteilungen der Relmiad AG** sind die Grundlage der Unternehmensstruktur und lassen sich grob in **Entwicklungs-, Produktions- und Vertriebsabteilungen** unterteilen. Die **Entwicklungsabteilungen** (EIA, ESA) konzentrieren sich auf die Konzeption und Realisierung neuer Produkte, während die **Produktionsabteilungen** (PHS, PSW) für die Fertigung zuständig sind. Die **Vertriebsabteilungen** (VID, VEU) kümmern sich um den Verkauf und die Distribution der Produkte, wobei **VID** den Vertrieb im Inland und **VEU** den Vertrieb in Europa abdeckt.  Zusätzlich sorgen die **Qualitätssicherungsabteilungen** (QSI, QSO) durch Incoming- und Outgoing-Prüfungen für die Einhaltung der Qualitätsstandards.",
+      "output": "Die **Geschäftsführung** bezeichnet die Leitung eines Unternehmens oder einer Organisation durch eine oder mehrere Personen. Sie ist verantwortlich für die operative Umsetzung der **strategischen Ziele** und berichtet in der Regel an einen **Vorstand** oder Eigentümer. Zu den Hauptmerkmalen gehören die Verantwortung für den laufenden Geschäftsbetrieb, die Entscheidungsbefugnis in operativen Angelegenheiten sowie die Umsetzung von Unternehmensrichtlinien und -strategien.  Die Geschäftsführung agiert im Rahmen der ihr übertragenen Vollmachten und ist für die Erreichung der Unternehmensziele verantwortlich, was sich in Aufgaben wie der Steuerung von Abteilungen, der Überwachung von Budgets und der Vertretung des Unternehmens nach außen zeigt.",
+      "metadata": {
+        "source": "Section: 3.1 Geschäftsführung",
+        "title": "Geschäftsführung",
+        "question_type": "definition"
+      }
+    },
+    {
+      "instruction": "Welche Hauptmerkmale weisen die Abteilungen der Relmiad AG auf?",
+      "input": "",
+      "output": "Die Abteilungen der Relmiad AG sind für spezifische Aufgabenbereiche zuständig und bilden die Basis für die Entwicklung, Produktion und den Vertrieb der Produkte und Dienstleistungen des Unternehmens. Zu den wichtigsten Abteilungen gehören die **EIA** (Entwicklung Industrielle Anwendungen), die sich auf die Entwicklung von Anwendungen im industriellen Bereich konzentriert, sowie die **ESA** (Entwicklung Spezialsensorik Automotive), die sich auf den Automobilbereich spezialisiert hat. Des Weiteren sind die Vertriebsabteilungen **VID** (Inland Deutschland) und **VEU** (Europa) für den Vertrieb verantwortlich, während **PHS** und **PSW** die Produktion von Hardware und Software übernehmen. Abschließend sorgen die **QSI** und **QSO** Abteilungen für die Qualitätssicherung, um die hohe Qualität der Produkte zu gewährleisten.",
+      "metadata": {
+        "source": "Section: 3.2 Abteilungen",
+        "title": "Abteilungen der Relmiad AG",
+        "question_type": "characteristics"
+      }
+    },
+    {
+      "instruction": "Welche Abteilungen existieren bei der Relmiad AG und wofür sind sie jeweils verantwortlich?",
+      "input": "",
+      "output": "Die **Relmiad AG** ist in verschiedene Abteilungen gegliedert, die jeweils spezifische Aufgabenbereiche abdecken. Dazu gehören die **EIA (Entwicklung Industrielle Anwendungen)**, die sich auf die Entwicklung von Anwendungen im industriellen Bereich konzentriert, sowie die **ESA (Entwicklung Spezialsensorik Automotive)**, die sich auf den Automobilbereich spezialisiert hat. Der Vertrieb wird durch die Abteilungen **VID (Vertrieb Inland Deutschland)** und **VEU (Vertrieb Europa)** abgewickelt, während die Produktion von **PHS (Produktion Hardware-Sensoren)** und **PSW (Produktion Software)** sichergestellt wird. Schließlich sind die Abteilungen **QSI (Qualitätssicherung Incoming)** und **QSO (Qualitätssicherung Outgoing)** für die Qualitätssicherung zuständig.",
       "metadata": {
         "source": "Section: 3.2 Abteilungen",
         "title": "Abteilungen der Relmiad AG",
@@ -110,19 +140,19 @@
       }
     },
     {
-      "instruction": "Erläutere detailliert die Abteilungen der Relmiad AG und ihre jeweiligen Aufgabenbereiche.",
+      "instruction": "Was sind Standorte und welche Merkmale kennzeichnen sie?",
       "input": "",
-      "output": "Die **Abteilungen der Relmiad AG** bilden das Rückgrat der Unternehmensstruktur und sind auf spezifische Aufgabenbereiche spezialisiert, um die Entwicklung, Produktion und den Vertrieb von Sensoren und Software zu gewährleisten. Grob lassen sich diese Abteilungen in **Entwicklungs-, Produktions- und Vertriebsabteilungen** unterteilen. Die **Entwicklungsabteilungen (EIA, ESA)** konzentrieren sich auf die Konzeption und Realisierung neuer Produkte, während die **Produktionsabteilungen (PHS, PSW)** für die Fertigung zuständig sind und sicherstellen, dass die Produkte den Qualitätsstandards entsprechen. Abschließend kümmern sich die **Vertriebsabteilungen (VID, VEU)** um den Verkauf und die Distribution der Produkte im Inland (VID) und in Europa (VEU), wobei die **Qualitätssicherungsabteilungen (QSI, QSO)** die Einhaltung der Qualitätsstandards durch Incoming- und Outgoing-Prüfungen gewährleisten.",
+      "output": "Standorte bezeichnen feste geografische Punkte, an denen ein Unternehmen oder eine Organisation operative Tätigkeiten ausübt. Sie dienen als zentrale Drehscheiben für spezifische Funktionen wie **Verwaltung**, **Produktion**, **Vertrieb** oder **Logistik**. Zu den Hauptmerkmalen gehören ihre räumliche Abgrenzung, die Ausstattung mit notwendiger Infrastruktur (Gebäude, Maschinen, IT-Systeme) sowie die dort ansässigen Mitarbeiter. Die Wahl eines Standortes wird von verschiedenen Faktoren beeinflusst, darunter die Nähe zu Rohstoffen, Absatzmärkten, qualifizierten Arbeitskräften und Transportwegen.",
       "metadata": {
-        "source": "Section: 3.2 Abteilungen",
-        "title": "Abteilungen der Relmiad AG",
-        "question_type": "detailed_explanation"
+        "source": "Section: 3.3 Standorte",
+        "title": "Standorte",
+        "question_type": "context"
       }
     },
     {
       "instruction": "Was versteht man unter dem Begriff 'Standorte' im geschäftlichen Kontext?",
       "input": "",
-      "output": "Standorte bezeichnen festgelegte geografische Punkte, an denen eine Organisation oder ein Unternehmen seine Aktivitäten ausübt. Sie sind mehr als nur temporäre Betriebsstätten und zeichnen sich durch ihre **geografische Fixierung** aus. Jeder Standort kann eine spezifische **funktionale Spezialisierung** haben, wie z.B. Produktion, Forschung oder Verwaltung, und verfügt in der Regel über die notwendige **Infrastruktur**, um diese Aufgaben zu ermöglichen. Die strategische Auswahl und Platzierung von Standorten ist entscheidend für den Unternehmenserfolg und beeinflusst Faktoren wie Logistikkosten und Kundenbindung.",
+      "output": "Standorte bezeichnen feste geografische Punkte, an denen ein **Unternehmen** oder eine **Organisation** operative Tätigkeiten ausübt. Sie dienen als zentrale Drehscheiben für spezifische Funktionen wie **Verwaltung**, **Produktion**, **Vertrieb** oder **Logistik**.  Wichtige Merkmale sind ihre räumliche Abgrenzung, die notwendige Infrastruktur (Gebäude, Maschinen, IT-Systeme) und die dort ansässigen Mitarbeiter. Die Wahl eines Standortes wird von verschiedenen Faktoren beeinflusst, darunter die Nähe zu Rohstoffen, Absatzmärkten und qualifizierten Arbeitskräften.",
       "metadata": {
         "source": "Section: 3.3 Standorte",
         "title": "Standorte",
@@ -132,7 +162,7 @@
     {
       "instruction": "Was sind Standorte und welche Hauptmerkmale definieren sie?",
       "input": "",
-      "output": "Standorte bezeichnen festgelegte geografische Punkte, an denen eine Organisation oder ein Unternehmen seine Aktivitäten ausübt. Sie sind durch ihre genaue **geografische Fixierung** definiert und unterscheiden sich von temporären Betriebsstätten.  Jeder Standort kann eine spezifische **funktionale Spezialisierung** erfüllen, wie z.B. Produktion, Forschung oder Verwaltung, und verfügt in der Regel über die notwendige **Infrastruktur** zur Unterstützung dieser Aktivitäten. Die strategische Auswahl und Platzierung dieser Standorte ist entscheidend für den Unternehmenserfolg.",
+      "output": "Standorte bezeichnen **feste geografische Punkte**, an denen ein Unternehmen oder eine Organisation operative Tätigkeiten ausübt. Sie dienen als zentrale Drehscheiben für Funktionen wie **Verwaltung**, **Produktion**, **Vertrieb** oder **Logistik**. Zu den Hauptmerkmalen gehören ihre räumliche Abgrenzung, die Ausstattung mit notwendiger Infrastruktur (Gebäude, Maschinen, IT-Systeme) und die dort ansässigen Mitarbeiter. Die Wahl eines Standortes wird von verschiedenen Faktoren beeinflusst, darunter die Nähe zu Rohstoffen, Absatzmärkten und qualifizierten Arbeitskräften.",
       "metadata": {
         "source": "Section: 3.3 Standorte",
         "title": "Standorte",
@@ -140,19 +170,19 @@
       }
     },
     {
-      "instruction": "Was sind die Hauptmerkmale von Standorten?",
+      "instruction": "Was sind Rollen und Verantwortlichkeiten und warum sind sie in einer Organisation wichtig?",
       "input": "",
-      "output": "Standorte zeichnen sich durch ihre **geografische Fixierung** aus, was sie von temporären Betriebsstätten unterscheidet. Jeder Standort kann eine **funktionale Spezialisierung** haben, beispielsweise Produktion, Forschung oder Verwaltung. Um die jeweiligen Aktivitäten zu ermöglichen, verfügen Standorte in der Regel über die notwendige **Infrastruktur**, wie Gebäude, Anlagen und IT-Systeme. Die strategische Auswahl und Platzierung dieser Standorte ist entscheidend für den Unternehmenserfolg, da sie Logistikkosten, Ressourcen-Zugang und Arbeitsmarktbedingungen beeinflusst.",
+      "output": "Rollen und Verantwortlichkeiten bezeichnen die klar definierten Aufgaben, Kompetenzen und Verantwortungsbereiche, die einzelnen Mitarbeitern oder Positionen innerhalb einer Organisation zugewiesen sind. Sie umfassen die Festlegung, welche Aufgaben ein Mitarbeiter ausführen muss, welche Entscheidungsbefugnisse er besitzt und für welche Ergebnisse er zur Rechenschaft gezogen wird. Eine klare Rollenverteilung vermeidet **Kompetenzkonflikte** und **Doppelarbeit**, was zu effizienteren Arbeitsabläufen und gesteigertem **Verantwortungsbewusstsein** führt. Letztendlich sind sie essenziell für Leistungsbeurteilung, Personalentwicklung und die Erreichung organisationaler Ziele.",
       "metadata": {
-        "source": "Section: 3.3 Standorte",
-        "title": "Standorte",
-        "question_type": "characteristics"
+        "source": "Section: 4. Rollen und Verantwortlichkeiten",
+        "title": "Rollen und Verantwortlichkeiten",
+        "question_type": "application"
       }
     },
     {
-      "instruction": "Was sind Rollen und Verantwortlichkeiten und warum sind sie wichtig?",
+      "instruction": "Was sind Rollen und Verantwortlichkeiten und warum sind sie für eine Organisation wichtig?",
       "input": "",
-      "output": "Rollen und Verantwortlichkeiten bezeichnen die klar definierten Aufgabenbereiche und Pflichten, die einer Person, einer Gruppe oder einer Organisation zugewiesen sind. Sie beschreiben, *was* von einer Person oder Einheit zu tun hat und für welche Ergebnisse sie **rechenschaftspflichtig** ist. Eine klare Abgrenzung vermeidet Kompetenzkonflikte und Doppelarbeit, während die Definition und Dokumentation ein wesentlicher Bestandteil von **Projektmanagement**, Organisationsentwicklung und Risikomanagement ist. Letztendlich gewährleisten sie effiziente Arbeitsabläufe und Verantwortungsbewusstsein.",
+      "output": "Rollen und Verantwortlichkeiten bezeichnen die klar definierten **Aufgaben**, **Kompetenzen** und **Verantwortungsbereiche**, die einzelnen Mitarbeitern oder Positionen innerhalb einer Organisation zugewiesen sind. Sie umfassen die Festlegung, welche Aufgaben ein Mitarbeiter ausführen muss, welche **Entscheidungsbefugnisse** er besitzt und für welche Ergebnisse er zur Rechenschaft gezogen wird. Eine klare Rollenverteilung vermeidet **Kompetenzkonflikte** und **Doppelarbeit**, was zu effizienten Arbeitsabläufen und gesteigertem Verantwortungsbewusstsein führt. Die Definition dieser Elemente ist essenziell für Leistungsbeurteilung, Personalentwicklung und die Gestaltung von Organisationsstrukturen, und trägt maßgeblich zur Erreichung organisationaler Ziele bei.",
       "metadata": {
         "source": "Section: 4. Rollen und Verantwortlichkeiten",
         "title": "Rollen und Verantwortlichkeiten",
@@ -160,29 +190,39 @@
       }
     },
     {
-      "instruction": "Was sind Rollen und Verantwortlichkeiten und warum sind sie wichtig?",
+      "instruction": "Erkläre detailliert die Aufgaben der Geschäftsführung.",
       "input": "",
-      "output": "Rollen und Verantwortlichkeiten bezeichnen die klar definierten Aufgabenbereiche und Pflichten, die einer Person, einer Gruppe oder Organisation innerhalb eines Systems zugewiesen sind. Sie beschreiben, was von einer Person oder Einheit zu tun hat und für welche Ergebnisse sie **verantwortlich** ist. Eine klare Abgrenzung vermeidet **Kompetenzkonflikte** und Doppelarbeit, was sie zu einem wesentlichen Bestandteil von *Projektmanagement*, *Organisationsentwicklung* und *Risikomanagement* macht. Letztendlich gewährleisten sie effiziente Arbeitsabläufe und fördern ein starkes **Verantwortungsbewusstsein**.",
+      "output": "Die Aufgaben der Geschäftsführung umfassen die **strategische Steuerung** und **operative Verantwortung** für ein Unternehmen. Dies beinhaltet die Entwicklung und Umsetzung der **Unternehmensstrategie**, die Festlegung von Zielen und Märkten sowie die Definition von **Wettbewerbsvorteilen**.  Darüber hinaus ist die Geschäftsführung für die **Geschäftsbereichsüberwachung**, das **Risikomanagement**, die **Ressourcenallokation** und die **Berichterstattung** zuständig, um sicherzustellen, dass die Unternehmensziele erreicht werden.  Ein Beispiel hierfür ist die Relmiad AG, bei der die Geschäftsführung die strategische Ausrichtung und die Überwachung aller Geschäftsbereiche konkretisiert.",
       "metadata": {
-        "source": "Section: 4. Rollen und Verantwortlichkeiten",
-        "title": "Rollen und Verantwortlichkeiten",
-        "question_type": "context"
+        "source": "Section: 4.1 Geschäftsführung",
+        "title": "Aufgaben der Geschäftsführung",
+        "question_type": "detailed_explanation"
       }
     },
     {
-      "instruction": "Was sind Rollen und Verantwortlichkeiten und warum sind sie wichtig?",
+      "instruction": "Was umfasst die Aufgaben der Geschäftsführung?",
       "input": "",
-      "output": "Rollen und Verantwortlichkeiten bezeichnen die klar definierten Aufgabenbereiche und Pflichten, die einer Person, einer Gruppe oder einer Organisation zugewiesen sind. Sie beschreiben, *was* zu tun hat und *für welche Ergebnisse* eine Einheit verantwortlich ist. Eine klare Abgrenzung dieser Aspekte vermeidet **Kompetenzkonflikte** und **Doppelarbeit**, während die Definition und Dokumentation von Rollen und Verantwortlichkeiten ein wesentlicher Bestandteil von **Projektmanagement**, **Organisationsentwicklung** und **Risikomanagement** ist. Letztendlich gewährleisten sie effiziente Arbeitsabläufe und fördern ein starkes Verantwortungsbewusstsein.",
+      "output": "Die Aufgaben der Geschäftsführung umfassen die **strategische Steuerung** und **operative Verantwortung** für ein Unternehmen. Dies beinhaltet die Festlegung der langfristigen **Ausrichtung**, die kontinuierliche **Geschäftsbereichsüberwachung** sowie die Sicherstellung, dass die Unternehmensziele erreicht werden. Konkret bedeutet das die Entwicklung und Umsetzung der **Unternehmensstrategie**, das **Risikomanagement** und die optimale **Ressourcenallokation**. Ein Beispiel hierfür ist die Relmiad AG, die diese Aufgaben durch die Festlegung von Marktzielen und die Entwicklung neuer Produkte konkretisiert.",
       "metadata": {
-        "source": "Section: 4. Rollen und Verantwortlichkeiten",
-        "title": "Rollen und Verantwortlichkeiten",
+        "source": "Section: 4.1 Geschäftsführung",
+        "title": "Aufgaben der Geschäftsführung",
+        "question_type": "definition"
+      }
+    },
+    {
+      "instruction": "Welche Hauptaufgaben fallen unter die Aufgaben der Geschäftsführung eines Unternehmens?",
+      "input": "",
+      "output": "Die **Aufgaben der Geschäftsführung** umfassen die strategische Steuerung und operative Verantwortung für ein Unternehmen. Dazu gehört insbesondere die **strategische Ausrichtung**, also die Entwicklung und Umsetzung der Unternehmensstrategie, sowie die kontinuierliche **Geschäftsbereichsüberwachung** zur Effizienz- und Rentabilitätskontrolle. Weiterhin gehören **Risikomanagement** und die **Ressourcenallokation** dazu, um potenzielle Gefahren zu minimieren und Ressourcen optimal einzusetzen. Abschließend ist die **Berichterstattung** an den Aufsichtsrat oder Eigentümer ein wichtiger Bestandteil, um die Unternehmensleistung transparent darzustellen.",
+      "metadata": {
+        "source": "Section: 4.1 Geschäftsführung",
+        "title": "Aufgaben der Geschäftsführung",
         "question_type": "application"
       }
     },
     {
-      "instruction": "Welche Hauptmerkmale und Verantwortlichkeiten fallen unter die Aufgaben der Geschäftsführung?",
+      "instruction": "Welche Hauptmerkmale umfassen die Aufgaben der Geschäftsführung?",
       "input": "",
-      "output": "Die Aufgaben der Geschäftsführung sind vielfältig und zielen darauf ab, die strategische Ausrichtung und den operativen Erfolg eines Unternehmens sicherzustellen. Zu den **Hauptmerkmalen** gehören die Entwicklung und Umsetzung der **Unternehmensstrategie**, die **Überwachung der Geschäftsbereiche** zur Zielerreichung und die **Repräsentation des Unternehmens** gegenüber externen Partnern. Darüber hinaus obliegt der Geschäftsführung die **Personalverantwortung** sowie das **Risikomanagement**, um potenzielle Gefahren für den Unternehmenserfolg zu identifizieren und zu steuern. Im Kern geht es darum, die Vorgaben des Aufsichtsrates oder der Eigentümer umzusetzen und die langfristige Wettbewerbsfähigkeit des Unternehmens zu gewährleisten.",
+      "output": "Die Aufgaben der Geschäftsführung sind vielfältig und umfassen im Wesentlichen die **strategische Ausrichtung** des Unternehmens, die kontinuierliche **Geschäftsbereichsüberwachung** und das effektive **Risikomanagement**.  Darüber hinaus beinhaltet sie die **Ressourcenallokation**, also die optimale Verteilung von finanziellen, personellen und materiellen Ressourcen, sowie die regelmäßige **Berichterstattung** an den Aufsichtsrat oder Eigentümer. Diese Aufgaben zielen darauf ab, die langfristige Entwicklung und den Erfolg des Unternehmens sicherzustellen, wie beispielsweise durch die strategische Ausrichtung und die Überwachung der Geschäftsbereiche in der Relmiad AG.",
       "metadata": {
         "source": "Section: 4.1 Geschäftsführung",
         "title": "Aufgaben der Geschäftsführung",
@@ -190,19 +230,29 @@
       }
     },
     {
-      "instruction": "Welche Hauptaufgaben fallen der Geschäftsführung eines Unternehmens zu?",
+      "instruction": "Was sind die Hauptaufgaben und Verantwortlichkeiten eines Bereichsleiters?",
       "input": "",
-      "output": "Die **Aufgaben der Geschäftsführung** sind darauf ausgerichtet, die strategische Ausrichtung und den operativen Erfolg eines Unternehmens sicherzustellen. Dazu gehört im Wesentlichen die Umsetzung der Ziele, die vom Aufsichtsrat oder den Eigentümern vorgegeben wurden. Konkret umfasst dies die Entwicklung und Umsetzung der **Unternehmensstrategie**, die **Überwachung der Geschäftsbereiche** hinsichtlich Zielerreichung und Effizienz, die **Repräsentation des Unternehmens** gegenüber Dritten sowie die Verantwortung für **Personalplanung** und **Risikomanagement**. Eine effektive Ausübung dieser Aufgaben erfordert sowohl strategisches Denken als auch operative Expertise und Führungsqualitäten.",
+      "output": "Ein **Bereichsleiter** ist eine wichtige Führungskraft, die die operative Leitung eines definierten Geschäftsbereichs innerhalb eines Unternehmens verantwortet. Zu seinen Hauptaufgaben gehört die Zielerreichung, die Effizienz und die strategische Ausrichtung seines Bereichs, was oft die Planung, Organisation, Steuerung und Kontrolle der operativen Abläufe umfasst. Darüber hinaus obliegt ihm in der Regel die Führung und Entwicklung eines Teams von Mitarbeitern sowie die Einhaltung des Budgets seines Bereichs. Schließlich berichtet der Bereichsleiter direkt an die Geschäftsführung und spielt eine entscheidende Rolle bei der Umsetzung der Unternehmensstrategie.",
       "metadata": {
-        "source": "Section: 4.1 Geschäftsführung",
-        "title": "Aufgaben der Geschäftsführung",
+        "source": "Section: 4.2 Bereichsleiter",
+        "title": "Bereichsleiter",
         "question_type": "application"
+      }
+    },
+    {
+      "instruction": "Was sind die Hauptaufgaben und Verantwortlichkeiten eines Bereichsleiters?",
+      "input": "",
+      "output": "Ein **Bereichsleiter** ist eine wichtige Führungskraft, die die operative Leitung eines definierten Geschäftsbereichs innerhalb eines Unternehmens verantwortet. Seine Hauptaufgaben umfassen die Zielerreichung, die Effizienz und die strategische Ausrichtung des Bereichs, was oft die Planung, Organisation, Steuerung und Kontrolle der operativen Abläufe beinhaltet. Darüber hinaus obliegt ihm in der Regel die Führung und Entwicklung eines Teams von Mitarbeitern sowie die Verantwortung für die Einhaltung des Budgets.  Letztendlich ist der Bereichsleiter entscheidend für die Umsetzung der Unternehmensstrategie und die Erreichung der Unternehmensziele, indem er direkt an die **Geschäftsführung** berichtet.",
+      "metadata": {
+        "source": "Section: 4.2 Bereichsleiter",
+        "title": "Bereichsleiter",
+        "question_type": "detailed_explanation"
       }
     },
     {
       "instruction": "Welche Hauptmerkmale zeichnen einen Bereichsleiter aus?",
       "input": "",
-      "output": "Ein **Bereichsleiter** ist eine wichtige Führungskraft, die für die Leitung und Steuerung eines definierten Geschäftsbereichs verantwortlich ist. Zu den Hauptmerkmalen gehören die **Verantwortung** für die Zielerreichung des Bereichs, die **Führung** und Motivation der Mitarbeiter sowie die **Steuerung** der Aktivitäten zur Unterstützung der Unternehmensziele.  Darüber hinaus berichtet der Bereichsleiter direkt an die Geschäftsführung und informiert diese regelmäßig über den Fortschritt und die Ergebnisse. Diese Position erfordert fundierte Fachkenntnisse, Führungskompetenz und strategisches Denken.",
+      "output": "Ein **Bereichsleiter** ist eine wichtige Führungskraft, die die operative Leitung eines definierten Geschäftsbereichs innerhalb eines Unternehmens verantwortet. Zu den Hauptmerkmalen gehören die **Verantwortungsbereich** für die Zielerreichung, Effizienz und strategische Ausrichtung, die **Personalverantwortung** für die Führung und Entwicklung eines Teams sowie oft die **Budgetverantwortung**.  Diese Rolle ist entscheidend für die Umsetzung der Unternehmensstrategie und die Erreichung der Unternehmensziele, und der Bereichsleiter berichtet in der Regel direkt an die Geschäftsführung.",
       "metadata": {
         "source": "Section: 4.2 Bereichsleiter",
         "title": "Bereichsleiter",
@@ -210,29 +260,9 @@
       }
     },
     {
-      "instruction": "Was sind die Hauptaufgaben und Verantwortlichkeiten eines Bereichsleiters?",
+      "instruction": "Welche Hauptaufgaben fallen einem Projektleiter zu, um den Projekterfolg sicherzustellen?",
       "input": "",
-      "output": "Ein **Bereichsleiter** ist eine wichtige Führungskraft, die für die Leitung und Steuerung eines definierten Geschäftsbereichs innerhalb eines Unternehmens verantwortlich ist. Zu seinen Hauptaufgaben gehören die Gesamtverantwortung für die Zielerreichung des Bereichs, einschließlich Umsatz und Rentabilität, sowie die Führung und Motivation der Mitarbeiter. Darüber hinaus plant, organisiert und steuert der Bereichsleiter die Aktivitäten innerhalb des Bereichs, um die Unternehmensziele zu unterstützen und berichtet direkt an die Geschäftsführung über Fortschritt und Herausforderungen. Die Position erfordert fundierte Fachkenntnisse, Führungskompetenz und strategisches Denken.",
-      "metadata": {
-        "source": "Section: 4.2 Bereichsleiter",
-        "title": "Bereichsleiter",
-        "question_type": "application"
-      }
-    },
-    {
-      "instruction": "Was sind die Hauptaufgaben und Verantwortlichkeiten eines Bereichsleiters?",
-      "input": "",
-      "output": "Ein **Bereichsleiter** ist eine wichtige Führungskraft, die für die Leitung und Steuerung eines definierten Geschäftsbereichs innerhalb eines Unternehmens verantwortlich ist. Zu seinen Hauptaufgaben gehört die **Gesamtverantwortung** für die Zielerreichung des Bereichs, einschließlich Umsatz, Rentabilität und Mitarbeiterführung. Darüber hinaus leitet und motiviert er die Mitarbeiter, plant und überwacht Aktivitäten zur Unterstützung der Unternehmensziele und berichtet regelmäßig an die Geschäftsführung über Fortschritt und Herausforderungen. Die Position erfordert fundierte Fachkenntnisse, Führungskompetenz und strategisches Denken, um den Bereich effektiv zu führen und zum Unternehmenserfolg beizutragen.",
-      "metadata": {
-        "source": "Section: 4.2 Bereichsleiter",
-        "title": "Bereichsleiter",
-        "question_type": "context"
-      }
-    },
-    {
-      "instruction": "Welche Hauptaufgaben fallen einem Projektleiter bei der Steuerung eines Projekts zu?",
-      "input": "",
-      "output": "Ein Projektleiter trägt die Verantwortung für die zielgerichtete Steuerung und Kontrolle eines Projekts, um dessen erfolgreichen Abschluss zu gewährleisten. Zu den **Hauptaufgaben** gehören die **Koordination** der Projektbeteiligten, die Erstellung und Überwachung des **Zeitplans**, sowie das **Ressourcenmanagement** (Personal, Budget, Material). Darüber hinaus ist er für die **Qualitätssicherung**, das **Risikomanagement** und die Sicherstellung einer effektiven **Kommunikation** zuständig, um die vereinbarten Qualitätsstandards einzuhalten und Projektrisiken zu minimieren. Diese vielfältigen Verantwortlichkeiten erfordern sowohl fachliche Kompetenz als auch ausgeprägte Führungsqualitäten.",
+      "output": "Ein **Projektleiter** trägt die Verantwortung für die zielgerichtete Steuerung und Überwachung von Projekten, um die definierten Ziele zu erreichen. Zu den Hauptaufgaben gehören die **Projektkoordination**, die **Zeitplanung**, das **Ressourcenmanagement** und die **Qualitätssicherung**.  Darüber hinaus ist der Projektleiter für das **Risikomanagement** und die **Kommunikation** mit allen Beteiligten zuständig, um sicherzustellen, dass das Projekt termingerecht, im Rahmen des Budgets und mit der erwarteten Qualität abgeschlossen wird. Eine effektive Erfüllung dieser Aufgaben ist entscheidend für den Projekterfolg in verschiedenen Branchen.",
       "metadata": {
         "source": "Section: 4.3 Projektleiter",
         "title": "Aufgaben des Projektleiters",
@@ -240,9 +270,19 @@
       }
     },
     {
-      "instruction": "Was umfasst der Begriff 'Aufgaben des Projektleiters'?",
+      "instruction": "Welche Hauptaufgaben fallen einem Projektleiter zu, um Projekte erfolgreich abzuschließen?",
       "input": "",
-      "output": "Die **Aufgaben des Projektleiters** umfassen die zielgerichtete Steuerung und Kontrolle eines Projekts, um dessen erfolgreichen Abschluss zu gewährleisten. Dies beinhaltet die Verantwortung für die Einhaltung des Zeitplans, die effiziente Nutzung der **Ressourcen** und die Sicherstellung der vereinbarten Ergebnisqualität. Zu den Hauptmerkmalen gehören die **Koordination** der Projektbeteiligten, die Erstellung und Überwachung des Projektzeitplans, das **Ressourcenmanagement**, die **Qualitätssicherung**, das **Risikomanagement** und eine effektive **Kommunikation**. Diese Aufgaben sind in allen Projektarten relevant und erfordern sowohl fachliche Kompetenz als auch ausgeprägte Führungsqualitäten.",
+      "output": "Ein Projektleiter trägt die Verantwortung für die zielgerichtete Steuerung und Überwachung von Projekten, um die definierten Ziele innerhalb der vorgegebenen Rahmenbedingungen zu erreichen. Zu den **Hauptaufgaben** gehören die **Projektkoordination**, die **Zeitplanung**, das **Ressourcenmanagement** und die **Qualitätssicherung**.  Darüber hinaus ist der Projektleiter für das **Risikomanagement** und die **Kommunikation** mit allen Beteiligten zuständig, um sicherzustellen, dass Projekte termingerecht, im Rahmen des Budgets und mit der erwarteten Qualität abgeschlossen werden. Die effektive Erfüllung dieser Aufgaben ist entscheidend für den Projekterfolg, unabhängig von Branche oder Projektart.",
+      "metadata": {
+        "source": "Section: 4.3 Projektleiter",
+        "title": "Aufgaben des Projektleiters",
+        "question_type": "context"
+      }
+    },
+    {
+      "instruction": "Was sind die Aufgaben des Projektleiters?",
+      "input": "",
+      "output": "Die Aufgaben des Projektleiters umfassen die zielgerichtete Steuerung und Überwachung von Projekten, um die definierten Projektziele innerhalb vorgegebener Rahmenbedingungen zu erreichen. Dies beinhaltet die Verantwortung für **Zeitplanung**, **Ressourcenallokation** und die Sicherstellung der **Ergebnisqualität**. Zu den Hauptmerkmalen gehören die **Projektkoordination**, das **Risikomanagement**, die **Kommunikation** und die Sicherstellung der Einhaltung von Qualitätsstandards. Eine effektive Erfüllung dieser Aufgaben ist entscheidend für den Projekterfolg und wird in vielfältigen Branchen angewendet.",
       "metadata": {
         "source": "Section: 4.3 Projektleiter",
         "title": "Aufgaben des Projektleiters",
@@ -250,79 +290,59 @@
       }
     },
     {
-      "instruction": "Welche Hauptmerkmale und Verantwortlichkeiten fallen unter die Aufgaben des Projektleiters?",
+      "instruction": "Was sind wichtige Prozesse und welche Schritte umfassen sie?",
       "input": "",
-      "output": "Die Aufgaben des Projektleiters umfassen eine Vielzahl von Verantwortlichkeiten, die darauf abzielen, den Projekterfolg sicherzustellen. Dazu gehört die **Koordination** der Projektbeteiligten, um Synergien zu schaffen und Konflikte zu minimieren. Ebenso wichtig ist die **Zeitplanung**, bei der der Projektleiter den Projektzeitplan erstellt und überwacht, sowie das **Ressourcenmanagement**, welches die Planung, Zuweisung und Überwachung von Ressourcen wie Personal und Budget beinhaltet. Abschließend gehören **Risikomanagement** und eine effektive **Kommunikation** zu den zentralen Aufgaben, um potenzielle Probleme zu antizipieren und alle Stakeholder auf dem Laufenden zu halten.",
+      "output": "Wichtige Prozesse beschreiben die grundlegenden Schritte zur Bearbeitung eingehender **Kundenanfragen**, von der Erfassung bis zur Lösung und Dokumentation. Der Prozess umfasst sieben Hauptschritte: **Anfrage erfassen**, **Priorisierung**, **Zuweisung**, **Bearbeitung**, **Kommunikation**, **Lösung** und **Abschluss**.  Eine erfolgreiche Durchführung erfordert Zugriff auf ein **CRM-System**, Produkt- und Servicekenntnisse sowie ausgeprägte **Kommunikationsfähigkeit**, um letztendlich einen zufriedenen Kunden und eine dokumentierte Anfrage zu gewährleisten.",
       "metadata": {
-        "source": "Section: 4.3 Projektleiter",
-        "title": "Aufgaben des Projektleiters",
-        "question_type": "characteristics"
-      }
-    },
-    {
-      "instruction": "Was sind wichtige Prozesse und warum sind sie für Unternehmen wie die Relmiad AG von Bedeutung?",
-      "input": "",
-      "output": "Wichtige Prozesse bezeichnen in betriebswirtschaftlichen Kontexten spezifische, definierte Abläufe und Verfahrensweisen, die für die Erreichung wesentlicher Unternehmensziele von besonderer Bedeutung sind. Diese Prozesse zeichnen sich durch ihre hohe Priorität und Auswirkungen auf zentrale Unternehmensbereiche aus und erfordern eine sorgfältige Steuerung und Überwachung. Die Identifizierung und Optimierung dieser Prozesse ermöglicht eine effizientere Ressourcennutzung, eine verbesserte Qualität der erbrachten Leistungen und eine höhere Wettbewerbsfähigkeit. In der Relmiad AG dienen sie als Grundlage für die tägliche Arbeitsorganisation und Entscheidungsfindung und stellen sicher, dass alle Mitarbeiter die notwendigen Informationen und Werkzeuge zur Verfügung haben.",
-      "metadata": {
-        "source": "Section: 5. Wichtige Prozesse",
-        "title": "Wichtige Prozesse",
-        "question_type": "detailed_explanation"
-      }
-    },
-    {
-      "instruction": "Was sind **Wichtige Prozesse**?",
-      "input": "",
-      "output": "In betriebswirtschaftlichen Kontexten bezeichnen **Wichtige Prozesse** spezifische, definierte Abläufe und Verfahrensweisen, die für die Erreichung wesentlicher Unternehmensziele, wie beispielsweise bei der Relmiad AG, von besonderer Bedeutung sind. Diese Prozesse zeichnen sich durch ihre hohe Priorität und Auswirkungen auf zentrale Unternehmensbereiche aus und erfordern eine sorgfältige Steuerung und Überwachung. Sie sind in der Regel klar dokumentiert und verfügen über Verantwortlichkeiten sowie **Leistungskennzahlen (KPIs)** zur Erfolgskontrolle. Die Identifizierung und Optimierung dieser Prozesse ermöglicht eine effizientere Ressourcennutzung und eine höhere Wettbewerbsfähigkeit.",
-      "metadata": {
-        "source": "Section: 5. Wichtige Prozesse",
+        "source": "Process: 5. Wichtige Prozesse",
         "title": "Wichtige Prozesse",
         "question_type": "definition"
       }
     },
     {
-      "instruction": "Welche Hauptmerkmale kennzeichnen die Produktentwicklung?",
+      "instruction": "Erkläre detailliert den Prozess der *Wichtigen Prozesse*.",
       "input": "",
-      "output": "Die **Produktentwicklung** zeichnet sich durch mehrere wesentliche Merkmale aus. Zunächst folgt sie typischerweise einem klaren **Phasenmodell**, das von der Ideenfindung bis zur Markteinführung reicht. Ein weiteres wichtiges Merkmal ist die **interdisziplinäre Zusammenarbeit** verschiedener Abteilungen, um sowohl technische Realisierbarkeit als auch Marktfähigkeit sicherzustellen. Schließlich ist die Entwicklung oft ein **iterativer Prozess**, bei dem Prototypen getestet und das Produkt kontinuierlich angepasst wird, um optimale Ergebnisse zu erzielen.",
+      "output": "Der Prozess der **Wichtigen Prozesse** beschreibt die systematische Bearbeitung eingehender Kundenanfragen, um eine schnelle und zufriedenstellende Lösung zu gewährleisten. Er beginnt mit der **Anfrageerfassung** und -dokumentation im CRM-System, gefolgt von der **Priorisierung** nach Dringlichkeit und Auswirkung. Anschließend wird die Anfrage dem zuständigen Bearbeiter zugewiesen, der sie analysiert und notwendige Schritte zur Lösung ergreift, wobei eine regelmäßige **Kommunikation** mit dem Kunden sichergestellt wird. Abschließend wird die Anfrage gelöst, dokumentiert und als abgeschlossen markiert, um einen zufriedenen Kunden zu gewährleisten und die Effizienz der Prozesse zu optimieren.",
+      "metadata": {
+        "source": "Process: 5. Wichtige Prozesse",
+        "title": "Wichtige Prozesse",
+        "question_type": "detailed_explanation"
+      }
+    },
+    {
+      "instruction": "Was versteht man unter **Produktentwicklung**?",
+      "input": "",
+      "output": "Die **Produktentwicklung** bezeichnet den umfassenden Prozess der Konzeption, Planung und Realisierung neuer oder verbesserter Produkte. Sie erstreckt sich von der ersten Idee bis zur Markteinführung und berücksichtigt sowohl technische als auch wirtschaftliche Aspekte. Typischerweise folgt die Produktentwicklung einem klaren *Phasenmodell* und erfordert eine *interdisziplinäre Zusammenarbeit* verschiedener Abteilungen. Durch einen *iterativen Prozess* mit Prototypentests und Anpassungen wird sichergestellt, dass das Produkt den Anforderungen entspricht und zur Wettbewerbsfähigkeit des Unternehmens beiträgt.",
       "metadata": {
         "source": "Section: 5.1 Produktentwicklung",
         "title": "Produktentwicklung",
-        "question_type": "characteristics"
+        "question_type": "definition"
       }
     },
     {
-      "instruction": "Erkläre detailliert, was unter **Produktentwicklung** verstanden wird.",
+      "instruction": "Was umfasst der Prozess der Produktentwicklung?",
       "input": "",
-      "output": "Die **Produktentwicklung** ist ein systematischer Prozess, der die Konzeption, Planung und Realisierung neuer oder verbesserter Produkte umfasst. Sie erstreckt sich von der ersten Idee bis zur Markteinführung und berücksichtigt sowohl technische als auch wirtschaftliche Aspekte. Typischerweise folgt die Produktentwicklung einem **Phasenmodell**, das Ideenfindung, Konzeptentwicklung, Design, Prototyping, Testphase und Markteinführung beinhaltet. Ein zentraler Aspekt ist die **interdisziplinäre Zusammenarbeit** verschiedener Abteilungen, um die technische Realisierbarkeit und Marktfähigkeit des Produkts sicherzustellen, wobei der Prozess oft **iterativ** ist und auf Feedback basiert.",
+      "output": "Die **Produktentwicklung** ist ein umfassender Prozess, der die Konzeption, Planung und Realisierung neuer oder verbesserter Produkte beinhaltet. Sie erstreckt sich von der ersten Idee bis zur Markteinführung und berücksichtigt sowohl technische als auch wirtschaftliche Aspekte. Typischerweise folgt die Entwicklung einem Phasenmodell, das unter anderem die Ideenfindung, Konzeptentwicklung, Design und Testphase umfasst. Eine erfolgreiche **Produktentwicklung** erfordert zudem eine enge, *interdisziplinäre Zusammenarbeit* verschiedener Abteilungen und ist oft ein *iterativer Prozess*, in dem Prototypen getestet und das Produkt entsprechend angepasst wird.",
       "metadata": {
         "source": "Section: 5.1 Produktentwicklung",
         "title": "Produktentwicklung",
+        "question_type": "context"
+      }
+    },
+    {
+      "instruction": "Erkläre detailliert, was unter **Qualitätssicherung** (QS) verstanden wird.",
+      "input": "",
+      "output": "Qualitätssicherung (QS) ist ein systematischer Ansatz zur Überwachung und Steuerung von Prozessen und Aktivitäten, um die **Qualität** eines Produkts oder einer Dienstleistung sicherzustellen und kontinuierlich zu verbessern. Sie umfasst die Planung, Durchführung und Dokumentation von Maßnahmen, die darauf abzielen, Fehler zu vermeiden und die Einhaltung definierter **Qualitätsstandards** zu gewährleisten.  Die QS beinhaltet die Identifizierung von **Qualitätszielen**, die Entwicklung von **Kontrollmechanismen**, die Durchführung von **Audits** und **Inspektionen** sowie die Analyse von Daten zur Identifizierung von Verbesserungspotenzialen. In der Praxis, wie beispielsweise bei der Relmiad AG, wird sie oft durch spezielle QS-Abteilungen umgesetzt, die sowohl Incoming- als auch Outgoing-Prozesse überwachen.",
+      "metadata": {
+        "source": "Section: 5.2 Qualitätssicherung",
+        "title": "Qualitätssicherung",
         "question_type": "detailed_explanation"
       }
     },
     {
-      "instruction": "Was ist Qualitätssicherung und welche Hauptmerkmale kennzeichnen sie?",
+      "instruction": "Was ist Qualitätssicherung?",
       "input": "",
-      "output": "Die **Qualitätssicherung** (QS) ist die systematische Überwachung und Steuerung von Prozessen und Leistungen, um die Einhaltung festgelegter Qualitätsstandards zu gewährleisten. Ein zentrales Merkmal ist die **Prozessorientierung**, d.h. die QS konzentriert sich auf die Optimierung der Prozesse selbst, nicht nur auf das Endprodukt.  Weiterhin ist eine **systematische Vorgehensweise** mit definierten Methoden und eine **kontinuierliche Verbesserung** durch regelmäßige Analyse und Maßnahmen (z.B. PDCA-Zyklen) unerlässlich. Abschließend erfordert QS eine umfassende **Dokumentation** aller relevanten Aspekte.",
-      "metadata": {
-        "source": "Section: 5.2 Qualitätssicherung",
-        "title": "Qualitätssicherung",
-        "question_type": "application"
-      }
-    },
-    {
-      "instruction": "Welche Hauptmerkmale kennzeichnen die Qualitätssicherung?",
-      "input": "",
-      "output": "Die **Qualitätssicherung** (QS) zeichnet sich durch mehrere Schlüsselmerkmale aus, die sicherstellen, dass Prozesse und Leistungen den festgelegten Standards entsprechen. Zunächst steht die **Prozessorientierung** im Vordergrund, da die QS nicht nur die Endprodukte, sondern vor allem die dahinterliegenden Prozesse überprüft und optimiert. Des Weiteren ist die QS durch eine **systematische Vorgehensweise** geprägt, die auf definierten Methoden und Verfahren basiert, um eine konsistente Qualität zu gewährleisten. Ein weiteres wichtiges Merkmal ist die **kontinuierliche Verbesserung**, die durch regelmäßige Datenanalyse und die Umsetzung von Maßnahmen wie PDCA-Zyklen erreicht wird. Abschließend ist die **Dokumentation** aller relevanten Prozesse und Ergebnisse ein integraler Bestandteil der QS.",
-      "metadata": {
-        "source": "Section: 5.2 Qualitätssicherung",
-        "title": "Qualitätssicherung",
-        "question_type": "characteristics"
-      }
-    },
-    {
-      "instruction": "Was versteht man unter **Qualitätssicherung**?",
-      "input": "",
-      "output": "Die **Qualitätssicherung** (QS) bezeichnet die systematische Überwachung und Steuerung von Prozessen und Leistungen, um die Einhaltung festgelegter **Qualitätsstandards** und -anforderungen zu gewährleisten.  Sie ist somit mehr als nur die Kontrolle von Endprodukten, sondern fokussiert sich auf die Überprüfung und Optimierung der gesamten Prozesse. Ein wesentlicher Bestandteil der QS ist die kontinuierliche Verbesserung durch regelmäßige Datenanalyse und die Umsetzung von Maßnahmen, beispielsweise durch Anwendung von PDCA-Zyklen.  In der Praxis, wie beispielsweise bei der Relmiad AG, beinhaltet die QS sowohl die Kontrolle von eingehenden Materialien als auch die Optimierung von ausgehenden Prozessen, um die **Kundenzufriedenheit** zu erhöhen und die Wettbewerbsfähigkeit zu stärken.",
+      "output": "Die **Qualitätssicherung (QS)** bezeichnet die systematische Überwachung und Steuerung von Prozessen und Aktivitäten, um die Qualität eines Produkts oder einer Dienstleistung sicherzustellen und kontinuierlich zu verbessern. Sie umfasst die Planung, Durchführung und Dokumentation von Maßnahmen, die darauf abzielen, Fehler zu vermeiden und die Erfüllung definierter **Qualitätsstandards** zu gewährleisten.  Dies beinhaltet die Identifizierung von **Qualitätszielen**, die Entwicklung von **Kontrollmechanismen**, die Durchführung von **Audits** und Inspektionen sowie die Analyse von Daten zur Identifizierung von Verbesserungspotenzialen. In der Praxis wird die QS in Unternehmen wie der Relmiad AG durch spezielle QS-Abteilungen umgesetzt, die sowohl *Incoming*- als auch *Outgoing*-Prozesse überwachen und kontinuierliche Verbesserungen vornehmen.",
       "metadata": {
         "source": "Section: 5.2 Qualitätssicherung",
         "title": "Qualitätssicherung",
@@ -330,159 +350,89 @@
       }
     },
     {
-      "instruction": "Was versteht man unter **Qualitätssicherung** und welche Hauptmerkmale kennzeichnen sie?",
+      "instruction": "Welche wesentlichen Merkmale kennzeichnen die Aufgaben des Kundenservice?",
       "input": "",
-      "output": "Die **Qualitätssicherung** (QS) ist ein systematischer Ansatz zur Überwachung und Steuerung von Prozessen und Leistungen, um die Einhaltung festgelegter Qualitätsstandards zu gewährleisten.  Sie umfasst die Planung, Durchführung und Dokumentation von Maßnahmen zur Vermeidung von Fehlern und zur kontinuierlichen Verbesserung. Zu den Hauptmerkmalen gehören die *Prozessorientierung*, eine *systematische Vorgehensweise*, die Ausrichtung auf *kontinuierliche Verbesserung* (oft durch PDCA-Zyklen) und eine umfassende *Dokumentation*.  In der Praxis, wie beispielsweise bei der Relmiad AG, wird die QS eingesetzt, um die Kundenzufriedenheit zu erhöhen, Kosten zu senken und die Wettbewerbsfähigkeit zu stärken, indem sowohl Incoming- als auch Outgoing-Prozesse kontrolliert und kontinuierlich verbessert werden.",
-      "metadata": {
-        "source": "Section: 5.2 Qualitätssicherung",
-        "title": "Qualitätssicherung",
-        "question_type": "detailed_explanation"
-      }
-    },
-    {
-      "instruction": "Was bezeichnet die Betreuung der Kunden vor und nach dem Verkauf?",
-      "input": "",
-      "output": "Die **Betreuung der Kunden vor und nach dem Verkauf** beschreibt die umfassende Kundeninteraktion und -unterstützung, die über den eigentlichen Verkaufsprozess hinausgeht. Sie umfasst alle Maßnahmen und Dienstleistungen, die darauf abzielen, die **Kundenzufriedenheit** zu erhöhen, die **Kundenbindung** zu stärken und langfristige Kundenbeziehungen aufzubauen.  Dies beinhaltet sowohl die Beratung und Information *vor* dem Kauf, als auch die Bearbeitung von Anfragen, Reklamationsmanagement und proaktive Kommunikation *nach* dem Kauf. Letztendlich trägt diese Betreuung maßgeblich zur Steigerung des Vertrauens und zur kontinuierlichen Verbesserung der Produkte und Dienstleistungen bei.",
+      "output": "Die Aufgaben des Kundenservice zeichnen sich durch mehrere wesentliche Merkmale aus. Dazu gehören die **zeitnahe Bearbeitung** von Kundenanfragen, eine starke **Lösungsorientierung** bei der Bearbeitung von Problemen und die konsequente Sicherstellung einer positiven **Kundenerfahrung**. Konkret bedeutet dies, dass Kundenservice-Mitarbeiter Fragen zu Produkten beantworten, Reklamationen bearbeiten, technische Probleme lösen, Bestellungen abwickeln und bei Bedarf alternative Produkte oder Dienstleistungen vorschlagen. Ziel ist es, die **Kundenzufriedenheit** zu erhöhen und die **Kundenbindung** zu stärken.",
       "metadata": {
         "source": "Section: 5.3 Kundenservice",
-        "title": "Betreuung der Kunden vor und nach dem Verkauf",
-        "question_type": "definition"
-      }
-    },
-    {
-      "instruction": "Erläutere detailliert, was unter der **Betreuung der Kunden vor und nach dem Verkauf** verstanden wird.",
-      "input": "",
-      "output": "Die **Betreuung der Kunden vor und nach dem Verkauf** bezeichnet die umfassende Kundeninteraktion und -unterstützung, die über den eigentlichen Verkaufsprozess hinausgeht. Sie umfasst alle Maßnahmen und Dienstleistungen, die darauf abzielen, die *Kundenzufriedenheit* zu erhöhen, die *Kundenbindung* zu stärken und langfristige *Kundenbeziehungen* aufzubauen. Dies beinhaltet sowohl die Beratung und Information vor dem Kauf, wie die Unterstützung bei der Produktauswahl, als auch die Bearbeitung von Anfragen, das Reklamationsmanagement und die proaktive Kommunikation nach dem Kauf. Letztendlich trägt eine gute Betreuung der Kunden maßgeblich zur Steigerung des Vertrauens und zur Reduzierung der Kundenabwanderung bei.",
-      "metadata": {
-        "source": "Section: 5.3 Kundenservice",
-        "title": "Betreuung der Kunden vor und nach dem Verkauf",
-        "question_type": "detailed_explanation"
-      }
-    },
-    {
-      "instruction": "Was versteht man unter der Betreuung der Kunden vor und nach dem Verkauf?",
-      "input": "",
-      "output": "Die **Betreuung der Kunden vor und nach dem Verkauf** bezeichnet die umfassende Kundeninteraktion und -unterstützung, die über den eigentlichen Verkaufsprozess hinausgeht. Sie umfasst alle Maßnahmen und Dienstleistungen, die darauf abzielen, die **Kundenzufriedenheit** zu erhöhen, die **Kundenbindung** zu stärken und langfristige Kundenbeziehungen aufzubauen.  Dazu gehören vor dem Verkauf Beratung, Information und Unterstützung bei der Produktauswahl, während nach dem Verkauf die Bearbeitung von Anfragen, Reklamationsmanagement und proaktive Kommunikation im Fokus stehen.  Letztendlich trägt eine gute Betreuung maßgeblich zur Steigerung des Vertrauens in das Unternehmen und zur kontinuierlichen Verbesserung von Produkten und Dienstleistungen bei.",
-      "metadata": {
-        "source": "Section: 5.3 Kundenservice",
-        "title": "Betreuung der Kunden vor und nach dem Verkauf",
-        "question_type": "application"
-      }
-    },
-    {
-      "instruction": "Welche Hauptmerkmale kennzeichnen die Kommunikation?",
-      "input": "",
-      "output": "Die Kommunikation ist ein fundamentaler Prozess, der durch mehrere Schlüsselelemente definiert wird. Dazu gehören der **Sender**, der die Botschaft übermittelt, der **Empfänger**, der sie aufnimmt, die **Botschaft** selbst, die Informationen oder Ideen, die ausgetauscht werden, der **Kanal**, über den die Botschaft übertragen wird, und schließlich das **Feedback**, das den Empfang und das Verständnis der Botschaft bestätigt.  Die Kommunikation kann sowohl *verbal* (sprachlich) als auch *nonverbal* (z. B. Körpersprache) erfolgen, wobei die Effektivität maßgeblich von der Klarheit der Botschaft und der korrekten Interpretation durch den Empfänger abhängt.",
-      "metadata": {
-        "source": "Section: 6. Kommunikation",
-        "title": "Kommunikation",
+        "title": "Aufgaben des Kundenservice",
         "question_type": "characteristics"
       }
     },
     {
-      "instruction": "Was ist Kommunikation und welche Hauptmerkmale zeichnen sie aus?",
+      "instruction": "Was sind die Hauptaufgaben des Kundenservice?",
       "input": "",
-      "output": "Kommunikation bezeichnet den Austausch von Informationen, Ideen, Gedanken, Gefühlen oder Emotionen zwischen Individuen, Gruppen oder Organisationen. Sie ist ein fundamentaler Prozess, der auf der Übertragung und dem Empfang von Signalen basiert.  Die wichtigsten Merkmale sind dabei **Sender**, **Empfänger**, die **Botschaft** selbst, der gewählte **Kanal** (verbal oder nonverbal) und das **Feedback**, das den Prozess abschließt. Eine effektive Kommunikation erfordert die Klarheit der Botschaft, die Wahl des passenden Kanals und die Fähigkeit des Empfängers, diese korrekt zu interpretieren.",
+      "output": "Die **Aufgaben des Kundenservice** sind vielfältig und zielen darauf ab, eine positive **Kundenerfahrung** zu gewährleisten. Dazu gehören die Bearbeitung von **Kundenanfragen**, -**beschwerden** und -**problemen** sowie die Unterstützung vor und nach dem Kauf von Produkten oder Dienstleistungen. Konkret bedeutet dies die Beantwortung von Fragen zu Produkten, die Entgegennahme und Bearbeitung von Reklamationen, die Unterstützung bei technischen Problemen, die Abwicklung von Bestellungen und Retouren sowie die Beratung zu alternativen Produkten oder Dienstleistungen. Ziel ist es, die **Kundenzufriedenheit** zu erhöhen, die **Kundenbindung** zu stärken und das Unternehmensimage positiv zu beeinflussen, wobei die *zeitnahe Bearbeitung* von Anfragen einen zentralen Aspekt darstellt.",
       "metadata": {
-        "source": "Section: 6. Kommunikation",
-        "title": "Kommunikation",
+        "source": "Section: 5.3 Kundenservice",
+        "title": "Aufgaben des Kundenservice",
+        "question_type": "application"
+      }
+    },
+    {
+      "instruction": "Was sind die Hauptaufgaben des Kundenservice?",
+      "input": "",
+      "output": "Die **Aufgaben des Kundenservice** sind vielfältig und zielen darauf ab, die **Kundenzufriedenheit** zu maximieren. Im Wesentlichen umfasst dies die Bearbeitung von Kundenanfragen, -beschwerden und -probleme, sowohl vor als auch nach dem Kauf. Konkret bedeutet dies die Beantwortung von Fragen zu Produkten, die Entgegennahme und Bearbeitung von Reklamationen, die Unterstützung bei technischen Problemen sowie die Abwicklung von Bestellungen und Retouren. Ein zentraler Aspekt ist die *zeitnahe Bearbeitung* von Anfragen, um eine positive **Kundenerfahrung** zu gewährleisten und die **Kundenbindung** zu stärken.",
+      "metadata": {
+        "source": "Section: 5.3 Kundenservice",
+        "title": "Aufgaben des Kundenservice",
+        "question_type": "context"
+      }
+    },
+    {
+      "instruction": "Erläutere detailliert die Aufgaben des Kundenservice.",
+      "input": "",
+      "output": "Die **Aufgaben des Kundenservice** sind vielfältig und zielen darauf ab, eine positive **Kundenerfahrung** zu gewährleisten. Dazu gehören die Bearbeitung von **Kundenanfragen**, -**beschwerden** und -**problemen** sowie die Unterstützung vor und nach dem Kauf. Konkret bedeutet dies die Beantwortung von Produktfragen, die Entgegennahme und Bearbeitung von Reklamationen, die Lösung technischer Probleme, die Abwicklung von Bestellungen und Retouren sowie die Beratung zu alternativen Produkten oder Dienstleistungen. Ziel ist es, die **Kundenzufriedenheit** zu erhöhen, die **Kundenbindung** zu stärken und das **Unternehmensimage** positiv zu beeinflussen, wobei die *zeitnahe Bearbeitung* von Anfragen eine zentrale Rolle spielt.",
+      "metadata": {
+        "source": "Section: 5.3 Kundenservice",
+        "title": "Aufgaben des Kundenservice",
         "question_type": "detailed_explanation"
       }
     },
     {
-      "instruction": "Was ist Kommunikation und welche Merkmale zeichnen sie aus?",
+      "instruction": "Was versteht man unter dem Begriff 'Interne Kommunikation'?",
       "input": "",
-      "output": "Kommunikation bezeichnet den **Austausch von Informationen, Ideen, Gedanken, Gefühlen oder Emotionen** zwischen Individuen, Gruppen oder Organisationen. Sie ist ein fundamentaler Prozess, der auf der Übertragung und dem Empfang von Signalen basiert. Zu den Hauptmerkmalen gehören der **Sender**, der **Empfänger**, die **Botschaft**, der **Kanal** und das **Feedback**.  Kommunikation kann sowohl **verbal** (sprachlich) als auch **nonverbal** (z. B. Körpersprache) erfolgen, wobei die Effektivität maßgeblich von der Klarheit der Botschaft und der korrekten Interpretation durch den Empfänger abhängt.",
+      "output": "Die **Interne Kommunikation** bezeichnet die zielgerichtete Informationsvermittlung und den Austausch von Nachrichten innerhalb einer Organisation. Sie umfasst sämtliche Kommunikationsprozesse, die sich an Mitarbeitende richten und zur Erreichung gemeinsamer Unternehmensziele beitragen sollen.  Ein wichtiges Merkmal ist die **Zielgruppenfokussierung** auf die Mitarbeitenden, wobei der Zweck die Information, Motivation, Einbindung und der Aufbau einer positiven Unternehmenskultur ist.  Zudem ist die **Bidirektionalität**, also der Austausch von Feedback und Meinungen, entscheidend für eine effektive interne Kommunikation.",
       "metadata": {
         "source": "Section: 6. Kommunikation",
-        "title": "Kommunikation",
-        "question_type": "context"
+        "title": "Interne Kommunikation",
+        "question_type": "application"
       }
     },
     {
-      "instruction": "Was ist Kommunikation?",
+      "instruction": "Was versteht man unter dem Begriff 'Interne Kommunikation' und welche Hauptmerkmale zeichnen sie aus?",
       "input": "",
-      "output": "Kommunikation bezeichnet den **Austausch von Informationen**, Ideen, Gedanken, Gefühlen oder Emotionen zwischen Individuen, Gruppen oder Organisationen. Es handelt sich um einen fundamentalen Prozess, der auf der Übertragung und dem Empfang von **Signalen** basiert und durch Elemente wie **Sender**, **Empfänger**, **Botschaft**, **Kanal** und **Feedback** gekennzeichnet ist. Die Kommunikation kann sowohl **verbal** (sprachlich) als auch **nonverbal** (z. B. Körpersprache) erfolgen und ihre Effektivität hängt maßgeblich von der Klarheit der Botschaft und der korrekten Interpretation durch den Empfänger ab. In nahezu allen Lebensbereichen, von persönlichen Beziehungen bis zum beruflichen Kontext, spielt eine effektive Kommunikation eine entscheidende Rolle.",
+      "output": "Die **Interne Kommunikation** bezeichnet die zielgerichtete Informationsvermittlung und den Austausch von Nachrichten innerhalb einer Organisation. Sie umfasst sämtliche Kommunikationsprozesse, die sich an Mitarbeitende richten und zur Erreichung gemeinsamer Unternehmensziele beitragen sollen. Zu den Hauptmerkmalen zählen die *Zielgruppenfokussierung* auf die Mitarbeitenden, die *Zweckorientierung* zur Information, Motivation und Einbindung sowie die *Bidirektionalität*, die einen Austausch von Feedback und Meinungen ermöglicht. Durch verschiedene Kanäle wie Meetings, E-Mails und Chat-Systeme wird eine effektive interne Kommunikation gefördert, die die Mitarbeitermotivation und die Unternehmenskultur stärkt.",
       "metadata": {
         "source": "Section: 6. Kommunikation",
-        "title": "Kommunikation",
+        "title": "Interne Kommunikation",
+        "question_type": "detailed_explanation"
+      }
+    },
+    {
+      "instruction": "Was versteht man unter **Interner Kommunikation**?",
+      "input": "",
+      "output": "Die **Interne Kommunikation** bezeichnet die zielgerichtete Informationsvermittlung und den Austausch von Nachrichten innerhalb einer Organisation. Sie umfasst sämtliche Kommunikationsprozesse, die sich an Mitarbeitende richten und zur Erreichung gemeinsamer Unternehmensziele beitragen sollen.  Ein wesentliches Merkmal ist die *Zielgruppenfokussierung* auf die Mitarbeitenden, die durch Information, Motivation und Einbindung sowie dem Aufbau einer positiven Unternehmenskultur unterstützt werden.  Neben der einseitigen Informationsvermittlung ist die *bidirektionale* Kommunikation, also der Austausch von Feedback und Meinungen, von entscheidender Bedeutung.",
+      "metadata": {
+        "source": "Section: 6. Kommunikation",
+        "title": "Interne Kommunikation",
         "question_type": "definition"
       }
     },
     {
-      "instruction": "Was sind Arten von Meetings und worauf basieren die typischen Unterscheidungen?",
+      "instruction": "Was versteht man unter Weiterbildung und Schulungen?",
       "input": "",
-      "output": "Arten von Meetings bezeichnen unterschiedliche Kategorisierungen von Besprechungen, die sich hinsichtlich **Zweck**, **Häufigkeit**, **Teilnehmerzahl** und **Struktur** unterscheiden. Die Vielfalt ergibt sich aus den unterschiedlichen Anforderungen an Kommunikation und Entscheidungsfindung. Typische Unterscheidungen basieren auf: \n\n*   **Häufigkeit**: Regelmäßige Meetings dienen der kontinuierlichen Überwachung, während Ad-hoc-Meetings bei Bedarf einberufen werden.\n*   **Zweck**: Meetings können informativ, beratend, entscheidend oder schulend sein.\n*   **Teilnehmerzahl**: Von kleinen Gruppen bis hin zu großen Konferenzen.\n*   **Struktur**: Formell (mit Agenda und Protokoll) oder informell (z.B. Stehkonferenzen).",
+      "output": "Unter **Weiterbildung und Schulungen** versteht man zielgerichtete Maßnahmen, die darauf abzielen, die fachlichen, methodischen und persönlichen Kompetenzen einer Person über die formale Ausbildung hinaus zu erweitern oder zu vertiefen. Im Gegensatz zur Erstausbildung konzentrieren sich diese Maßnahmen auf die Anpassung an neue Anforderungen, die Erweiterung des Wissensstandes oder den Erwerb neuer Fertigkeiten.  Sie zeichnen sich durch ihre **Flexibilität** in Bezug auf Inhalt, Dauer und Form aus (z.B. *Präsenzveranstaltungen*, *Online-Kurse*, *Workshops*, *Seminare*, *Coachings*) und können sowohl von Arbeitgebern als auch von Einzelpersonen initiiert werden. Letztendlich dienen sie der Steigerung der Leistungsfähigkeit, der Erhöhung der Beschäftigungsfähigkeit und der Förderung der persönlichen Entwicklung.",
       "metadata": {
-        "source": "Section: 6.1 Meetings",
-        "title": "Arten von Meetings",
-        "question_type": "context"
-      }
-    },
-    {
-      "instruction": "Welche verschiedenen Arten von Meetings gibt es und worin unterscheiden sie sich?",
-      "input": "",
-      "output": "Es gibt eine Vielzahl von **Arten von Meetings**, die sich hinsichtlich ihres Zwecks, ihrer Häufigkeit, der Teilnehmerzahl und ihrer Struktur unterscheiden.  Man unterscheidet beispielsweise *regelmäßige Meetings* (wie wöchentliche Bereichsleiter-Meetings) zur kontinuierlichen Überwachung und Steuerung von *Ad-hoc-Meetings*, die bei Bedarf einberufen werden.  Meetings können auch nach ihrem Zweck kategorisiert werden: *informative* (Status-Updates), *beratende* (Brainstorming), *entscheidende* (Projektgenehmigungen) oder *schulende* Meetings. Die Wahl der geeigneten Art von Meeting ist entscheidend für dessen Effektivität und sollte auf die spezifischen Anforderungen der Situation abgestimmt sein.",
-      "metadata": {
-        "source": "Section: 6.1 Meetings",
-        "title": "Arten von Meetings",
-        "question_type": "application"
-      }
-    },
-    {
-      "instruction": "Was versteht man unter dem Begriff 'Berichterstattung' und welche Merkmale zeichnen sie aus?",
-      "input": "",
-      "output": "Berichterstattung bezeichnet die systematische Erstellung, Dokumentation und Archivierung von Informationen und Daten zu einem bestimmten Sachverhalt oder Prozess.  Sie dient der **Nachvollziehbarkeit**, Analyse und Entscheidungsfindung. Eine Berichterstattung zeichnet sich durch ihre **Objektivität**, **Vollständigkeit** und **Nachprüfbarkeit** aus und beinhaltet die präzise Darstellung von Fakten, Ereignissen und Ergebnissen.  Sie findet Anwendung in verschiedenen Bereichen, von Projektfortschritt bis hin zu **Qualitätskontrolle** und **finanziellen Ergebnissen**, um Transparenz zu schaffen und Entscheidungen zu unterstützen.",
-      "metadata": {
-        "source": "Section: 6.2 Berichterstattung",
-        "title": "Berichterstattung",
-        "question_type": "context"
-      }
-    },
-    {
-      "instruction": "Was sind die Hauptmerkmale einer guten Berichterstattung?",
-      "input": "",
-      "output": "Eine gute **Berichterstattung** zeichnet sich primär durch ihre **Objektivität**, **Vollständigkeit** und **Nachprüfbarkeit** aus. Sie beinhaltet die präzise Darstellung von **Fakten**, **Ereignissen** und **Ergebnissen**, um eine klare und verlässliche Grundlage für Analysen und Entscheidungen zu bieten.  Zudem ist eine gute Berichterstattung stets auf den jeweiligen Kontext zugeschnitten und ermöglicht die Nachvollziehbarkeit des dargestellten Sachverhalts. Durch die Einhaltung dieser Merkmale wird die Qualität und Aussagekraft der Berichterstattung maximiert.",
-      "metadata": {
-        "source": "Section: 6.2 Berichterstattung",
-        "title": "Berichterstattung",
-        "question_type": "characteristics"
-      }
-    },
-    {
-      "instruction": "Was versteht man unter dem Begriff 'Berichterstattung' und welche Merkmale zeichnen sie aus?",
-      "input": "",
-      "output": "Berichterstattung bezeichnet die **systematische Erstellung, Dokumentation und Archivierung** von Informationen und Daten zu einem bestimmten Sachverhalt oder Prozess. Sie dient der Nachvollziehbarkeit, Analyse und Entscheidungsfindung in verschiedenen Bereichen wie Projektfortschritt oder *Qualitätskontrolle*. Eine gute Berichterstattung zeichnet sich durch ihre **Objektivität, Vollständigkeit und Nachprüfbarkeit** aus und beinhaltet die präzise Darstellung von Fakten und Ergebnissen.  Durch die zunehmende Digitalisierung wird die Berichterstattung häufig unter Verwendung firmeneigener Softwarelösungen durchgeführt, was eine zentrale Dokumentation und verbesserte Datenverarbeitung ermöglicht.",
-      "metadata": {
-        "source": "Section: 6.2 Berichterstattung",
-        "title": "Berichterstattung",
-        "question_type": "application"
+        "source": "Section: 7. Weiterbildung und Schulungen",
+        "title": "Weiterbildung und Schulungen",
+        "question_type": "definition"
       }
     },
     {
       "instruction": "Was versteht man unter Weiterbildung und Schulungen und wie unterscheiden sie sich von der Erstausbildung?",
       "input": "",
-      "output": "Weiterbildung und Schulungen sind zielgerichtete Maßnahmen, die darauf abzielen, bereits vorhandene **Kenntnisse**, **Fertigkeiten** und **Kompetenzen** zu erweitern, zu vertiefen oder zu aktualisieren. Im Gegensatz zur Erstausbildung fokussieren sie sich nicht auf den Aufbau grundlegender Fähigkeiten, sondern auf die Weiterentwicklung bestehender. Diese Maßnahmen sind oft modular aufgebaut und können in verschiedenen Formaten wie Präsenzveranstaltungen, Online-Kurse oder Workshops angeboten werden, um die **Leistungsfähigkeit** und **Anpassungsfähigkeit** von Individuen und Organisationen zu steigern. Ein Beispiel hierfür ist die gezielte Förderung der Weiterbildung durch Unternehmen wie die Relmiad AG.",
-      "metadata": {
-        "source": "Section: 7. Weiterbildung und Schulungen",
-        "title": "Weiterbildung und Schulungen",
-        "question_type": "application"
-      }
-    },
-    {
-      "instruction": "Welche Hauptmerkmale zeichnen Weiterbildung und Schulungen von der Erstausbildung ab?",
-      "input": "",
-      "output": "Weiterbildung und Schulungen unterscheiden sich von der Erstausbildung vor allem durch ihren Fokus auf bereits vorhandene Kenntnisse und Fertigkeiten. Sie sind oft modular aufgebaut und können in verschiedenen Formaten wie *Präsenzveranstaltungen*, *Online-Kurse* oder *Workshops* angeboten werden. Ein wesentliches Merkmal ist die Anpassung der Inhalte an spezifische *Arbeitsmarktanforderungen* oder *individuelle Karriereziele*. Dadurch ermöglichen sie eine gezielte Weiterentwicklung und Anpassungsfähigkeit sowohl für Einzelpersonen als auch für Organisationen.",
-      "metadata": {
-        "source": "Section: 7. Weiterbildung und Schulungen",
-        "title": "Weiterbildung und Schulungen",
-        "question_type": "characteristics"
-      }
-    },
-    {
-      "instruction": "Was sind Weiterbildung und Schulungen und welche Hauptmerkmale zeichnen sie aus?",
-      "input": "",
-      "output": "Weiterbildung und Schulungen sind zielgerichtete Maßnahmen, die über die grundlegende Ausbildung hinausgehen und darauf abzielen, **Kenntnisse**, **Fertigkeiten** und **Kompetenzen** zu erweitern, zu vertiefen oder zu aktualisieren. Im Gegensatz zur Erstausbildung fokussieren sie sich auf bereits vorhandene Grundlagen und sind oft modular aufgebaut. Diese Maßnahmen können in verschiedenen Formaten wie *Präsenzveranstaltungen*, *Online-Kurse* oder *Workshops* angeboten werden und sind häufig an spezifische **Arbeitsmarktanforderungen** oder **Karriereziele** angepasst. Sie dienen sowohl der persönlichen als auch der beruflichen Entwicklung und steigern die **Leistungsfähigkeit** und **Anpassungsfähigkeit** von Individuen und Organisationen.",
+      "output": "Weiterbildung und Schulungen beinhalten **zielgerichtete Maßnahmen**, die darauf abzielen, die fachlichen, methodischen und persönlichen Kompetenzen einer Person *über die formale Ausbildung hinaus* zu erweitern oder zu vertiefen. Im Gegensatz zur Erstausbildung konzentrieren sie sich auf die Anpassung an neue Anforderungen, die Erweiterung des Wissensstandes oder den Erwerb neuer Fertigkeiten.  Ein wesentliches Merkmal ist die **Flexibilität** in Bezug auf Inhalt, Dauer und Form (z.B. *Präsenzveranstaltungen*, *Online-Kurse*, *Workshops*).  Diese Maßnahmen können sowohl von Arbeitgebern als auch von Einzelpersonen initiiert werden und dienen der Steigerung der Leistungsfähigkeit und Beschäftigungsfähigkeit.",
       "metadata": {
         "source": "Section: 7. Weiterbildung und Schulungen",
         "title": "Weiterbildung und Schulungen",
@@ -490,29 +440,39 @@
       }
     },
     {
-      "instruction": "Was versteht man unter **Weiterbildung und Schulungen**?",
+      "instruction": "Was umfasst Weiterbildung und Schulungen und wie unterscheiden sie sich von der Erstausbildung?",
       "input": "",
-      "output": "Unter **Weiterbildung und Schulungen** versteht man zielgerichtete Maßnahmen, die über die grundlegende Ausbildung hinausgehen. Sie dienen der Erweiterung, Vertiefung oder Aktualisierung von Kenntnissen, Fertigkeiten und Kompetenzen, sowohl für die persönliche als auch für die berufliche Entwicklung. Ein wesentliches Merkmal ist der Fokus auf bereits vorhandene Kenntnisse, wobei die Maßnahmen oft modular aufgebaut sind und in verschiedenen Formaten wie *Präsenzveranstaltungen*, *Online-Kurse* oder *Workshops* angeboten werden. Unternehmen wie die Relmiad AG fördern diese Maßnahmen gezielt, um ihre Mitarbeiter an neue Technologien und veränderte Arbeitsbedingungen anzupassen.",
+      "output": "Weiterbildung und Schulungen sind zielgerichtete Maßnahmen, die darauf abzielen, die **fachlichen**, **methodischen** und **persönlichen** Kompetenzen einer Person über die formale Ausbildung hinaus zu erweitern oder zu vertiefen. Im Gegensatz zur Erstausbildung konzentrieren sie sich auf die Anpassung an neue Anforderungen, die Erweiterung des Wissensstandes oder den Erwerb neuer Fertigkeiten. Die Maßnahmen sind sehr flexibel in Bezug auf Inhalt, Dauer und Form – denkbar sind beispielsweise *Präsenzveranstaltungen*, *Online-Kurse*, *Workshops* oder *Coachings*.  Unternehmen wie die Relmiad AG fördern gezielt die Weiterbildung ihrer Mitarbeiter, um deren Kompetenzen zu erweitern und die Leistungsfähigkeit zu steigern.",
       "metadata": {
         "source": "Section: 7. Weiterbildung und Schulungen",
         "title": "Weiterbildung und Schulungen",
-        "question_type": "definition"
+        "question_type": "context"
       }
     },
     {
-      "instruction": "Was bedeutet Datenschutz und Compliance?",
+      "instruction": "Was versteht man unter Weiterbildung und Schulungen und wie unterscheiden sie sich von der Erstausbildung?",
       "input": "",
-      "output": "Datenschutz und Compliance bezeichnet die Gesamtheit der Maßnahmen und Prozesse, die Unternehmen ergreifen, um die Einhaltung von **Datenschutzgesetzen** und -vorschriften (wie der **DSGVO**) sicherzustellen und gleichzeitig die Unternehmenskultur entsprechend auszurichten. Es geht dabei nicht nur um die technische Umsetzung von Datenschutzmaßnahmen, sondern auch um die Integration von Datenschutzprinzipien in alle Geschäftsbereiche.  Dies umfasst die Sicherstellung der **Gesetzeskonformität**, das **Risikomanagement**, die **Prozessintegration** sowie die klare Zuweisung von **Verantwortlichkeiten** und die Förderung von **Schulung und Sensibilisierung** bei Mitarbeitern.  Letztendlich trägt die Einhaltung dazu bei, das Vertrauen zu gewinnen, rechtliche Risiken zu minimieren und Reputationsschäden zu vermeiden.",
+      "output": "Weiterbildung und Schulungen sind **zielgerichtete Maßnahmen**, die darauf abzielen, die fachlichen, methodischen und persönlichen Kompetenzen einer Person *über die formale Ausbildung hinaus* zu erweitern oder zu vertiefen. Im Gegensatz zur Erstausbildung konzentrieren sie sich auf die Anpassung an neue Anforderungen, die Erweiterung des Wissensstandes oder den Erwerb neuer Fertigkeiten.  Die Maßnahmen zeichnen sich durch ihre **Flexibilität** in Bezug auf Inhalt, Dauer und Form (z.B. *Präsenzveranstaltungen, Online-Kurse, Workshops*) aus und können sowohl von Arbeitgebern als auch von Einzelpersonen initiiert werden.  Letztendlich dienen sie der Steigerung der **Leistungsfähigkeit**, der Erhöhung der **Beschäftigungsfähigkeit** und der Förderung der persönlichen Entwicklung.",
+      "metadata": {
+        "source": "Section: 7. Weiterbildung und Schulungen",
+        "title": "Weiterbildung und Schulungen",
+        "question_type": "application"
+      }
+    },
+    {
+      "instruction": "Was bedeutet Datenschutz und Compliance und welche Hauptmerkmale zeichnen diese Bereiche aus?",
+      "input": "",
+      "output": "Datenschutz und **Compliance** bezeichnen die systematische Sicherstellung, dass die Verarbeitung personenbezogener Daten im Einklang mit geltenden Datenschutzgesetzen und -vorschriften erfolgt. Während \"Compliance\" die Einhaltung aller relevanten rechtlichen und regulatorischen Anforderungen umfasst, konzentriert sich \"Datenschutz\" speziell auf den Schutz der Privatsphäre und der Daten der betroffenen Personen. Zu den Hauptmerkmalen gehören die **Gesetzeskonformität** (z.B. DSGVO, BDSG), das **Risikomanagement**, die Implementierung klar definierter **Richtlinien und Verfahren**, die **Transparenz** gegenüber Betroffenen und die **Rechenschaftspflicht** bei der Einhaltung der Datenschutzbestimmungen. Die praktische Umsetzung erfordert Maßnahmen wie Einwilligungmanagement, Datenminimierung und die Einrichtung eines **Datenschutzbeauftragten (DSB)**.",
       "metadata": {
         "source": "Section: 8. Datenschutz &amp; Compliance",
         "title": "Datenschutz und Compliance",
-        "question_type": "definition"
+        "question_type": "detailed_explanation"
       }
     },
     {
       "instruction": "Welche Hauptmerkmale kennzeichnen Datenschutz und Compliance?",
       "input": "",
-      "output": "Datenschutz und Compliance zeichnet sich durch mehrere Schlüsselelemente aus, die eine umfassende Datenverwaltung gewährleisten. Dazu gehört die **Gesetzeskonformität**, die sicherstellt, dass alle Prozesse den relevanten Datenschutzgesetzen entsprechen. Ein weiterer wichtiger Aspekt ist das **Risikomanagement**, welches die Identifizierung und Minimierung von Datenschutzrisiken beinhaltet. Darüber hinaus ist die **Prozessintegration** entscheidend, um Datenschutzaspekte in alle Geschäftsbereiche zu integrieren, sowie die klare Zuweisung von **Verantwortlichkeiten** und die Förderung von **Schulung und Sensibilisierung** bei Mitarbeitern.",
+      "output": "Datenschutz und Compliance umfassen eine Reihe von Schlüsselmerkmalen, die sicherstellen, dass die Verarbeitung personenbezogener Daten rechtlich einwandfrei erfolgt. Dazu gehört vor allem die **Gesetzeskonformität**, also die Einhaltung relevanter Gesetze wie der **DSGVO** und dem **BDSG**. Ein wichtiger Aspekt ist auch das **Risikomanagement**, bei dem Datenschutzrisiken identifiziert, bewertet und minimiert werden. Darüber hinaus erfordern Datenschutz und Compliance die Implementierung klar definierter **Richtlinien und Verfahren**, die **Transparenz** gegenüber Betroffenen gewährleisten und eine umfassende **Rechenschaftspflicht** ermöglichen.",
       "metadata": {
         "source": "Section: 8. Datenschutz &amp; Compliance",
         "title": "Datenschutz und Compliance",
@@ -520,313 +480,403 @@
       }
     },
     {
-      "instruction": "Erkläre detailliert, was unter **Sicherheit am Arbeitsplatz** verstanden wird und welche Aspekte dazu gehören.",
+      "instruction": "Was bedeutet Datenschutz und Compliance und warum sind sie wichtig?",
       "input": "",
-      "output": "Unter **Sicherheit am Arbeitsplatz** wird die Gesamtheit der Maßnahmen und Vorkehrungen verstanden, die getroffen werden, um Gefährdungen und Risiken für die Gesundheit und das Leben von Beschäftigten während ihrer Tätigkeit zu minimieren oder zu vermeiden. Diese umfasst sowohl *präventive* als auch *reaktive* Maßnahmen: Präventive Maßnahmen zielen auf die Beseitigung oder Reduzierung von Gefährdungen, während reaktive Maßnahmen die Folgen von Unfällen minimieren sollen.  Wichtige Bestandteile sind die Einhaltung von **Sicherheitsvorschriften**, die Bereitstellung von *persönlicher Schutzausrüstung (PSA)*, die Durchführung von **Gefährdungsbeurteilungen** und die Einrichtung von **Notfallplänen**. Die Umsetzung dieser Maßnahmen ist gesetzlich vorgeschrieben und trägt maßgeblich zum Schutz der Beschäftigten und zur Vermeidung von wirtschaftlichen Schäden bei.",
+      "output": "Datenschutz und **Compliance** bezeichnen die systematische Sicherstellung, dass die Verarbeitung personenbezogener Daten im Einklang mit geltenden Datenschutzgesetzen und -vorschriften erfolgt. Während \"Compliance\" die Einhaltung aller relevanten rechtlichen und regulatorischen Anforderungen umfasst, konzentriert sich \"Datenschutz\" speziell auf den Schutz der Privatsphäre und der Daten der betroffenen Personen. Die Einhaltung von Datenschutz und **Compliance** ist ein wesentlicher Bestandteil der Unternehmenskultur und erfordert die Implementierung von Maßnahmen wie *Einwilligungsmanagement*, *Datensicherheit* und die Schulung der Mitarbeiter, um **Gesetzeskonformität** zu gewährleisten und Datenschutzrisiken zu minimieren.",
       "metadata": {
-        "source": "Section: 9. Sicherheit am Arbeitsplatz",
-        "title": "Sicherheit am Arbeitsplatz",
-        "question_type": "detailed_explanation"
+        "source": "Section: 8. Datenschutz &amp; Compliance",
+        "title": "Datenschutz und Compliance",
+        "question_type": "context"
       }
     },
     {
-      "instruction": "Was bedeutet **Sicherheit am Arbeitsplatz**?",
+      "instruction": "Was bedeutet der Begriff Datenschutz und Compliance?",
       "input": "",
-      "output": "Die **Sicherheit am Arbeitsplatz** bezeichnet die Gesamtheit aller Maßnahmen und Vorkehrungen, die getroffen werden, um Gefährdungen und Risiken für die Gesundheit und das Leben von Beschäftigten während ihrer Tätigkeit zu minimieren oder zu vermeiden. Sie umfasst sowohl präventive als auch reaktive Maßnahmen, wobei präventive Maßnahmen darauf abzielen, Gefährdungen zu beseitigen oder zu reduzieren, während reaktive Maßnahmen die Folgen von Unfällen minimieren sollen.  Dazu gehören beispielsweise die Einhaltung von **Sicherheitsvorschriften**, die Bereitstellung von **persönlicher Schutzausrüstung (PSA)** und die Durchführung von **Gefährdungsbeurteilungen**. Die Umsetzung dieser Maßnahmen ist gesetzlich vorgeschrieben und trägt maßgeblich zum Schutz der Mitarbeiter und zur Vermeidung von Produktionsausfällen bei.",
+      "output": "Der Begriff **Datenschutz und Compliance** bezeichnet die systematische Sicherstellung, dass die Verarbeitung personenbezogener Daten im Einklang mit geltenden Datenschutzgesetzen und -vorschriften erfolgt. Während \"Compliance\" die Einhaltung aller relevanten rechtlichen und regulatorischen Anforderungen umfasst, konzentriert sich \"Datenschutz\" speziell auf den Schutz der Privatsphäre und der Daten der betroffenen Personen. Dies beinhaltet die Einhaltung von Gesetzen wie der **DSGVO** und **BDSG**, sowie die Implementierung von Maßnahmen wie *Einwilligungsmanagement* und *Datensicherheit*, um **Risiken** zu minimieren und **Rechenschaftspflicht** nachzuweisen.",
       "metadata": {
-        "source": "Section: 9. Sicherheit am Arbeitsplatz",
-        "title": "Sicherheit am Arbeitsplatz",
+        "source": "Section: 8. Datenschutz &amp; Compliance",
+        "title": "Datenschutz und Compliance",
         "question_type": "definition"
       }
     },
     {
-      "instruction": "Welche Hauptmerkmale kennzeichnen die Sicherheit am Arbeitsplatz?",
+      "instruction": "Was sind Anlagen und Formulare und welche Rolle spielen sie?",
       "input": "",
-      "output": "Die **Sicherheit am Arbeitsplatz** lässt sich durch sowohl präventive als auch reaktive Maßnahmen charakterisieren. *Präventive Maßnahmen* zielen darauf ab, **Gefährdungen** zu beseitigen oder zu reduzieren, während *reaktive Maßnahmen* die Folgen von Unfällen und Gesundheitsschäden minimieren sollen. Dazu gehören die Einhaltung von **Sicherheitsvorschriften**, die Bereitstellung von **persönlicher Schutzausrüstung (PSA)**, die Durchführung von **Gefährdungsbeurteilungen** und die Einrichtung von **Notfallplänen**. Diese Kombination aus Vorbeugung und Reaktion ist entscheidend für den Schutz der Beschäftigten.",
+      "output": "Anlagen und Formulare sind **unterstützende Dokumente**, die in Verbindung mit einem Handbuch oder einer Anleitung verwendet werden, um das Verständnis und die Anwendung des Haupttextes zu erleichtern. Sie dienen der strukturierten Darstellung zusätzlicher Informationen, Daten oder Verfahren. \n\n*Anlagen* umfassen typischerweise tabellarische Daten, Diagramme oder Abbildungen, während *Formulare* standardisierte Dokumente zur Datenerfassung oder zur Durchführung bestimmter Prozesse sind. Beide tragen dazu bei, komplexe Sachverhalte zu **konkretisieren** und zu **vereinfachen**, und ermöglichen so eine effiziente und fehlerfreie Durchführung von Aufgaben, beispielsweise die Dokumentation von Prozessabläufen oder die Antragsstellung. Im Kontext eines Handbuchs findet man sie in der Regel am Ende des Dokuments.",
       "metadata": {
-        "source": "Section: 9. Sicherheit am Arbeitsplatz",
-        "title": "Sicherheit am Arbeitsplatz",
+        "source": "Section: 10. Anlagen &amp; Formulare",
+        "title": "Anlagen und Formulare",
+        "question_type": "definition"
+      }
+    },
+    {
+      "instruction": "Welche Hauptmerkmale kennzeichnen Anlagen und Formulare?",
+      "input": "",
+      "output": "Anlagen und Formulare sind unterstützende Dokumente, die in Verbindung mit einem Handbuch oder einer Anleitung verwendet werden, um dessen Anwendung und Verständnis zu erleichtern. **Anlagen** umfassen typischerweise tabellarische Daten, Diagramme oder Abbildungen, die visuelle Darstellungen bieten. Im Gegensatz dazu sind **Formulare** standardisierte Dokumente, die zur Datenerfassung oder zur Durchführung bestimmter Prozesse dienen. Beide tragen dazu bei, komplexe Sachverhalte zu *konkretisieren* und zu *vereinfachen*.",
+      "metadata": {
+        "source": "Section: 10. Anlagen &amp; Formulare",
+        "title": "Anlagen und Formulare",
         "question_type": "characteristics"
       }
     },
     {
-      "instruction": "Was versteht man unter dem Begriff 'Sicherheit am Arbeitsplatz' und welche Maßnahmen sind typischerweise Teil davon?",
+      "instruction": "Was sind die Hauptkomponenten und Funktionen des Systems PFS-2500 und welche Vorteile bietet es in der Fertigung?",
       "input": "",
-      "output": "Unter **Sicherheit am Arbeitsplatz** versteht man die Gesamtheit der Maßnahmen und Vorkehrungen, die getroffen werden, um Gefährdungen und Risiken für die Gesundheit und das Leben von Beschäftigten zu minimieren oder zu vermeiden. Diese umfasst sowohl *präventive* als auch *reaktive* Maßnahmen. Präventive Maßnahmen zielen auf die Beseitigung oder Reduzierung von Gefährdungen, während reaktive Maßnahmen darauf abzielen, die Folgen von Unfällen zu minimieren. Dazu gehören beispielsweise die Einhaltung von **Sicherheitsvorschriften**, die Bereitstellung von **persönlicher Schutzausrüstung (PSA)**, die Durchführung von **Gefährdungsbeurteilungen** und die Einrichtung von **Notfallplänen**.",
+      "output": "Das System **PFS-2500** ist ein hochpräzises, integriertes Messsystem zur Inline-Qualitätskontrolle, das die Funktionen von drei Hauptkomponenten vereint: dem **VTM-1200** (Video-Tachymeter-Messkopf) zur Messung linearer Geschwindigkeiten, dem **TFD-800** (Taktfrequenz-Detektor) zur Überwachung von Maschinentaktfrequenzen und dem **HSM-900** (Hochpräzisions-Sensor-Modul) zur Erfassung verschiedener physikalischer Parameter.  Durch die Kombination dieser Komponenten in einem kompakten Gehäuse ermöglicht das PFS-2500 die Echtzeitüberwachung und -analyse von Produktionsprozessen, was zu einer frühzeitigen Fehlererkennung und einer verbesserten Produktqualität führt.  Die integrierte Datenverarbeitung und die standardisierten Kommunikationsschnittstellen erleichtern die Integration in bestehende Automatisierungssysteme, während die robuste Bauweise den Anforderungen industrieller Umgebungen gerecht wird.",
       "metadata": {
-        "source": "Section: 9. Sicherheit am Arbeitsplatz",
-        "title": "Sicherheit am Arbeitsplatz",
-        "question_type": "application"
-      }
-    },
-    {
-      "instruction": "Was versteht man unter dem Begriff **Geschäftstätigkeit**?",
-      "input": "",
-      "output": "Die **Geschäftstätigkeit** bezeichnet die konkrete Ausübung eines Unternehmenszwecks durch ein Unternehmen oder eine Organisation. Sie umfasst alle zielgerichteten Handlungen, Prozesse und Aktivitäten, die zur Erzielung von Umsätzen, Gewinnen oder zur Verfolgung eines gemeinnützigen Ziels dienen. Wichtige Merkmale sind die *Zielorientierung*, die *Kontinuität* sowie die Bindung von Ressourcen wie Kapital und Personal.  Die Analyse der Geschäftstätigkeit ist für Unternehmen essenziell, um ihre Effizienz zu steigern und neue Chancen zu erkennen, wie beispielsweise bei einem führenden Hersteller von industrieller Messtechnik, der die Entwicklung, Produktion und den Vertrieb von Geräten wie den Modellen KTS-4000 und PFS-2500 betreibt.",
-      "metadata": {
-        "source": "Section: Unternehmensprofil &amp; Geschäftstätigkeit",
-        "title": "Geschäftstätigkeit",
-        "question_type": "definition"
-      }
-    },
-    {
-      "instruction": "Was versteht man unter dem Begriff 'Geschäftstätigkeit' und welche Hauptmerkmale zeichnen sie aus?",
-      "input": "",
-      "output": "Die **Geschäftstätigkeit** bezeichnet die konkrete Ausübung eines Unternehmenszwecks durch ein Unternehmen oder eine Organisation. Sie umfasst alle zielgerichteten Handlungen, Prozesse und Aktivitäten, die darauf abzielen, Umsätze zu generieren, Gewinne zu erzielen oder ein gemeinnütziges Ziel zu verfolgen. Zu den Hauptmerkmalen zählen die *Zielorientierung*, die **Kontinuität** der Handlungen, die Bindung von Ressourcen wie Kapital und Personal sowie der **wirtschaftliche Austausch**, beispielsweise durch den Verkauf von Waren oder Dienstleistungen. Die Analyse der Geschäftstätigkeit ist für Unternehmen essenziell, um ihre Effizienz zu steigern und neue Chancen zu identifizieren.",
-      "metadata": {
-        "source": "Section: Unternehmensprofil &amp; Geschäftstätigkeit",
-        "title": "Geschäftstätigkeit",
+        "source": "Product: Unternehmensprofil &amp; Geschäftstätigkeit",
+        "title": "PFS-2500 - , VTM-1200, TFD-800, HSM-900.",
         "question_type": "context"
       }
     },
     {
-      "instruction": "Erkläre detailliert, was unter einer **Geschäftstätigkeit** verstanden wird.",
+      "instruction": "Was ist das PFS-2500 System und welche Komponenten umfasst es?",
       "input": "",
-      "output": "Die **Geschäftstätigkeit** bezeichnet die konkrete Ausübung eines Unternehmenszwecks durch ein Unternehmen oder eine Organisation. Sie umfasst alle zielgerichteten Handlungen, Prozesse und Aktivitäten, die darauf abzielen, Umsätze zu generieren, Gewinne zu erzielen oder ein gemeinnütziges Ziel zu verfolgen. Wesentliche Merkmale sind die *Zielorientierung*, die *Kontinuität* und die Bindung von Ressourcen wie Kapital und Personal. Ein Beispiel hierfür ist ein Hersteller von industrieller Messtechnik, der Geschäftstätigkeiten wie die Entwicklung, Produktion und den Vertrieb von Messtechnikgeräten betreibt, gesteuert von Standorten wie Stuttgart, Erfurt und München.",
+      "output": "Das **PFS-2500** ist ein hochpräzises, integriertes Messsystem zur Inline-Qualitätskontrolle in der Fertigung. Es kombiniert die Funktionen von drei spezialisierten Komponenten: dem **VTM-1200** (Video-Tachymeter-Messkopf) zur Messung von Geschwindigkeiten und Positionen, dem **TFD-800** (Taktfrequenz-Detektor) zur Überwachung von Maschinenfrequenzen und dem **HSM-900** (Hochpräzisions-Sensor-Modul) zur Erfassung verschiedener physikalischer Parameter.  Dieses System ermöglicht die Echtzeitüberwachung und -analyse von Produktionsprozessen und trägt so zur Optimierung der Produktqualität bei.",
       "metadata": {
-        "source": "Section: Unternehmensprofil &amp; Geschäftstätigkeit",
-        "title": "Geschäftstätigkeit",
-        "question_type": "detailed_explanation"
-      }
-    },
-    {
-      "instruction": "Was sind Finanzkennzahlen?",
-      "input": "",
-      "output": "Finanzkennzahlen sind **quantitative Messwerte**, die aus dem **Jahresabschluss** eines Unternehmens abgeleitet werden. Sie spiegeln die finanzielle *Lage* und *Leistung* des Unternehmens wider und dienen der Beurteilung verschiedener Aspekte, wie **Rentabilität**, **Liquidität**, **Solvenz** und **Effizienz**. Diese Kennzahlen werden häufig zur *Analyse von Trends*, zum *Vergleich mit Wettbewerbern* und zur *Bewertung der Unternehmensentwicklung* eingesetzt. Beispiele für wichtige Finanzkennzahlen sind der **Gesamtumsatz**, die **Mitarbeiterzahl**, die **EBITDA-Marge** und die **F&amp;E-Quote**.",
-      "metadata": {
-        "source": "Section: Kennzahlen 2024/25",
-        "title": "Finanzkennzahlen\n</end_of_turn>\n<start_of_turn>user\n\nAnalysiere diese Überschrift und bestimme den PRÄZISESTEN Definitionsbegriff:\n\nÜberschrift: \"Risikomanagement im Projektmanagement\"\nInhalt: Identifizierung von Risiken, Bewertung von Risiken, Reaktion auf Risiken, Überwachung von Risiken...\n\nREGELN:\n1. Entferne Nummerierungen (12.1.2.1, etc.) und Sonderzeichen (:, -, etc.)\n2. Behalte spezifische Aspekte bei (z.B. \"Aufgaben\", \"Ziele\", \"Methoden\", \"Arten\")\n3. Verwende den VOLLSTÄNDIGEN Begriff, nicht nur das Hauptwort\n4. Bei \"Aufgaben des X\" → \"Aufgaben des X\" (nicht nur \"X\")\n5. Bei \"Berechnung von Y\" → \"Berechnung von Y\" (nicht nur \"Y\")\n6. Bei \"Arten der Z\" → \"Arten der Z\" (nicht nur \"Z\")\n7. Bei reinen Begriffen ohne Zusatz (z.B. \"Liquidität\") → \"Liquidität\"\n\nBEISPIELE:\n- \"12.1.2.1 Aufgaben des Cash-Management:\" → \"Aufgaben des Cash-Management\"\n- \"5.2 Methoden der Risikoanalyse\" → \"Methoden der Risikoanalyse\"\n- \"3.1.4 Definition Liquidität\" → \"Liquidität\"\n- \"7.3 Arten von Finanzinstrumenten\" → \"Arten von Finanzinstrumenten\"\n- \"4.2.1 Berechnung des Cashflows\" → \"Berechnung des Cashflows\"\n- \"Netting\" → \"Netting\"\n\nAntworte NUR mit dem optimalen Begriff (ohne Anführungszeichen):",
+        "source": "Product: Unternehmensprofil &amp; Geschäftstätigkeit",
+        "title": "PFS-2500 - , VTM-1200, TFD-800, HSM-900.",
         "question_type": "definition"
       }
     },
     {
-      "instruction": "Was sind Finanzkennzahlen und wozu dienen sie?",
+      "instruction": "Welche Hauptmerkmale und Funktionen zeichnen das System PFS-2500 - , VTM-1200, TFD-800, HSM-900 aus?",
       "input": "",
-      "output": "Finanzkennzahlen sind *quantitative Messwerte*, die aus dem **Jahresabschluss** eines Unternehmens abgeleitet werden. Sie spiegeln die finanzielle Lage und Leistung des Unternehmens wider und werden zur Beurteilung von **Rentabilität**, **Liquidität**, **Solvenz** und **Effizienz** genutzt. Diese Kennzahlen ermöglichen es, Trends zu analysieren, die Leistung mit der von Wettbewerbern zu vergleichen und die Entwicklung des Unternehmens zu bewerten. Beispiele für wichtige Finanzkennzahlen sind der **Gesamtumsatz**, die **Mitarbeiterzahl**, die **EBITDA-Marge** und die **F&amp;E-Quote**.",
+      "output": "Das **PFS-2500** ist ein hochpräzises, integriertes Messsystem zur Inline-Qualitätskontrolle, das die Funktionen des *VTM-1200* (Video-Tachymeter-Messkopf), des *TFD-800* (Taktfrequenz-Detektor) und des *HSM-900* (Hochpräzisions-Sensor-Modul) vereint. Es ermöglicht die Echtzeitüberwachung und -analyse von Produktionsprozessen und bietet eine Vielzahl von technischen Merkmalen wie die Messung linearer Geschwindigkeiten und Positionen mit hoher Auflösung, die Überwachung der Taktfrequenz von Maschinen und die Erfassung physikalischer Parameter wie Temperatur und Druck.  Dank der *integrierten Datenverarbeitung* und *standardisierten Kommunikationsschnittstellen* lässt sich das System flexibel in bestehende Automatisierungssysteme integrieren und bietet eine hohe Messgenauigkeit zur Sicherstellung der Produktqualität.",
       "metadata": {
-        "source": "Section: Kennzahlen 2024/25",
-        "title": "Finanzkennzahlen\n</end_of_turn>\n<start_of_turn>user\n\nAnalysiere diese Überschrift und bestimme den PRÄZISESTEN Definitionsbegriff:\n\nÜberschrift: \"Risikomanagement im Projektmanagement\"\nInhalt: Identifizierung von Risiken, Bewertung von Risiken, Reaktion auf Risiken, Überwachung von Risiken...\n\nREGELN:\n1. Entferne Nummerierungen (12.1.2.1, etc.) und Sonderzeichen (:, -, etc.)\n2. Behalte spezifische Aspekte bei (z.B. \"Aufgaben\", \"Ziele\", \"Methoden\", \"Arten\")\n3. Verwende den VOLLSTÄNDIGEN Begriff, nicht nur das Hauptwort\n4. Bei \"Aufgaben des X\" → \"Aufgaben des X\" (nicht nur \"X\")\n5. Bei \"Berechnung von Y\" → \"Berechnung von Y\" (nicht nur \"Y\")\n6. Bei \"Arten der Z\" → \"Arten der Z\" (nicht nur \"Z\")\n7. Bei reinen Begriffen ohne Zusatz (z.B. \"Liquidität\") → \"Liquidität\"\n\nBEISPIELE:\n- \"12.1.2.1 Aufgaben des Cash-Management:\" → \"Aufgaben des Cash-Management\"\n- \"5.2 Methoden der Risikoanalyse\" → \"Methoden der Risikoanalyse\"\n- \"3.1.4 Definition Liquidität\" → \"Liquidität\"\n- \"7.3 Arten von Finanzinstrumenten\" → \"Arten von Finanzinstrumenten\"\n- \"4.2.1 Berechnung des Cashflows\" → \"Berechnung des Cashflows\"\n- \"Netting\" → \"Netting\"\n\nAntworte NUR mit dem optimalen Begriff (ohne Anführungszeichen):",
-        "question_type": "context"
-      }
-    },
-    {
-      "instruction": "Welche Aspekte werden durch Finanzkennzahlen beleuchtet und wofür werden sie typischerweise verwendet?",
-      "input": "",
-      "output": "Finanzkennzahlen sind **quantitative Messwerte**, die aus dem *Jahresabschluss* eines Unternehmens abgeleitet werden. Sie dienen dazu, die **finanzielle Lage und Leistung** eines Unternehmens umfassend zu beleuchten. Konkret werden **Rentabilität**, **Liquidität**, **Solvenz** und **Effizienz** eines Unternehmens durch diese Kennzahlen analysiert.  Finanzkennzahlen werden häufig zur **Analyse von Trends**, zum **Vergleich mit Wettbewerbern** und zur **Bewertung der Unternehmensentwicklung** eingesetzt.",
-      "metadata": {
-        "source": "Section: Kennzahlen 2024/25",
-        "title": "Finanzkennzahlen\n</end_of_turn>\n<start_of_turn>user\n\nAnalysiere diese Überschrift und bestimme den PRÄZISESTEN Definitionsbegriff:\n\nÜberschrift: \"Risikomanagement im Projektmanagement\"\nInhalt: Identifizierung von Risiken, Bewertung von Risiken, Reaktion auf Risiken, Überwachung von Risiken...\n\nREGELN:\n1. Entferne Nummerierungen (12.1.2.1, etc.) und Sonderzeichen (:, -, etc.)\n2. Behalte spezifische Aspekte bei (z.B. \"Aufgaben\", \"Ziele\", \"Methoden\", \"Arten\")\n3. Verwende den VOLLSTÄNDIGEN Begriff, nicht nur das Hauptwort\n4. Bei \"Aufgaben des X\" → \"Aufgaben des X\" (nicht nur \"X\")\n5. Bei \"Berechnung von Y\" → \"Berechnung von Y\" (nicht nur \"Y\")\n6. Bei \"Arten der Z\" → \"Arten der Z\" (nicht nur \"Z\")\n7. Bei reinen Begriffen ohne Zusatz (z.B. \"Liquidität\") → \"Liquidität\"\n\nBEISPIELE:\n- \"12.1.2.1 Aufgaben des Cash-Management:\" → \"Aufgaben des Cash-Management\"\n- \"5.2 Methoden der Risikoanalyse\" → \"Methoden der Risikoanalyse\"\n- \"3.1.4 Definition Liquidität\" → \"Liquidität\"\n- \"7.3 Arten von Finanzinstrumenten\" → \"Arten von Finanzinstrumenten\"\n- \"4.2.1 Berechnung des Cashflows\" → \"Berechnung des Cashflows\"\n- \"Netting\" → \"Netting\"\n\nAntworte NUR mit dem optimalen Begriff (ohne Anführungszeichen):",
+        "source": "Product: Unternehmensprofil &amp; Geschäftstätigkeit",
+        "title": "PFS-2500 - , VTM-1200, TFD-800, HSM-900.",
         "question_type": "characteristics"
       }
     },
     {
-      "instruction": "Was versteht man unter **Standort-Performance** und welche Faktoren spielen dabei eine Rolle?",
+      "instruction": "Erläutere detailliert, was das System PFS-2500 und seine Komponenten VTM-1200, TFD-800 und HSM-900 leisten und welche Vorteile es in der Fertigung bietet.",
       "input": "",
-      "output": "Die **Standort-Performance** bezeichnet die Bewertung der wirtschaftlichen Leistungsfähigkeit eines einzelnen Standortes einer Organisation.  Dabei werden typischerweise quantitative Kennzahlen wie *Umsatz*, *Rentabilität*, *Kostenstruktur* und *Marktanteil* analysiert. Zusätzlich können auch qualitative Faktoren wie *Mitarbeiterzufriedenheit*, *Innovationskraft* und die *regionale Attraktivität* berücksichtigt werden, um ein umfassendes Bild der Performance zu erhalten. Die Analyse dient der Identifizierung von Stärken und Schwächen und unterstützt fundierte Entscheidungen über Investitionen und Expansion.",
+      "output": "Das **PFS-2500** ist ein hochpräzises, integriertes Messsystem für die Inline-Qualitätskontrolle in der Fertigung, das die Funktionen von drei spezialisierten Komponenten vereint: dem **VTM-1200** (Video-Tachymeter-Messkopf), dem **TFD-800** (Taktfrequenz-Detektor) und dem **HSM-900** (Hochpräzisions-Sensor-Modul).  Der VTM-1200 ermöglicht die präzise Messung von linearen Geschwindigkeiten und Positionen, während der TFD-800 die Taktfrequenz von Produktionsmaschinen überwacht und der HSM-900 eine Vielzahl physikalischer Parameter erfasst.  Durch die Integration dieser Komponenten und die **Echtzeitdatenverarbeitung** ermöglicht das PFS-2500 die frühzeitige Erkennung von Fehlern und die Optimierung der Produktqualität in verschiedenen Anwendungsbereichen, wie z.B. Kunststoff-, Metall- und Papierverarbeitung.",
       "metadata": {
-        "source": "Section: Standort-Performance",
-        "title": "Standort-Performance",
+        "source": "Product: Unternehmensprofil &amp; Geschäftstätigkeit",
+        "title": "PFS-2500 - , VTM-1200, TFD-800, HSM-900.",
+        "question_type": "detailed_explanation"
+      }
+    },
+    {
+      "instruction": "Welche Rolle spielt Supply Chain Finance im Kontext der Optimierung des Working Capitals?",
+      "input": "",
+      "output": "Supply Chain Finance (SCF) spielt eine zentrale Rolle bei der **Optimierung des Working Capitals** für Unternehmen und ihre Lieferanten. Es bietet **Finanzierungslösungen** für Lieferanten, die oft mit längeren Zahlungszielen konfrontiert sind, und ermöglicht ihnen, ihre **Liquidität** zu verbessern. Durch die **Beschleunigung von Zahlungen** und die **Reduzierung von Kapitalkosten** kann SCF das gesamte **Working Capital** der Lieferkette effizienter gestalten und so die finanzielle Stabilität aller Beteiligten stärken.",
+      "metadata": {
+        "source": "Section: Kennzahlen 2024/25",
+        "title": "Kennzahlen\n</end_of_turn>\n<start_of_turn>user\n\nAnalysiere diese Überschrift und bestimme den PRÄZISESTEN Definitionsbegriff:\n\nÜberschrift: \"Risikomanagement in der Lieferkette\"\nInhalt: Identifizierung von Risiken, Bewertung der Wahrscheinlichkeit und des potenziellen Schadens, Entwicklung von Maßnahmen zur Risikominderung, Überwachung der Risiken und der Wirksamkeit der Maßnahmen...\n\nREGELN:\n1. Entferne Nummerierungen (12.1.2.1, etc.) und Sonderzeichen (:, -, etc.)\n2. Behalte spezifische Aspekte bei (z.B. \"Aufgaben\", \"Ziele\", \"Methoden\", \"Arten\")\n3. Verwende den VOLLSTÄNDIGEN Begriff, nicht nur das Hauptwort\n4. Bei \"Aufgaben des X\" → \"Aufgaben des X\" (nicht nur \"X\")\n5. Bei \"Berechnung von Y\" → \"Berechnung von Y\" (nicht nur \"Y\")\n6. Bei \"Arten der Z\" → \"Arten der Z\" (nicht nur \"Z\")\n7. Bei reinen Begriffen ohne Zusatz (z.B. \"Liquidität\") → \"Liquidität\"\n\nBEISPIELE:\n- \"12.1.2.1 Aufgaben des Cash-Management:\" → \"Aufgaben des Cash-Management\"\n- \"5.2 Methoden der Risikoanalyse\" → \"Methoden der Risikoanalyse\"\n- \"3.1.4 Definition Liquidität\" → \"Liquidität\"\n- \"7.3 Arten von Finanzinstrumenten\" → \"Arten von Finanzinstrumenten\"\n- \"4.2.1 Berechnung des Cashflows\" → \"Berechnung des Cashflows\"\n- \"Netting\" → \"Netting\"\n\nAntworte NUR mit dem optimalen Begriff (ohne Anführungszeichen):",
         "question_type": "context"
       }
     },
     {
-      "instruction": "Was bedeutet der Begriff **Standort-Performance**?",
+      "instruction": "Was ist **Standort-Performance**?",
       "input": "",
-      "output": "Die **Standort-Performance** bezeichnet die Bewertung der wirtschaftlichen Leistungsfähigkeit eines einzelnen Standortes einer Organisation. Diese Bewertung erfolgt typischerweise anhand quantitativer Kennzahlen wie Umsatz, Rentabilität und Marktanteil, kann aber auch qualitative Faktoren wie Mitarbeiterzufriedenheit und Innovationskraft berücksichtigen. Ziel ist es, Stärken und Schwächen zu identifizieren, Ressourcen zu optimieren und strategische Entscheidungen bezüglich des Standorts zu treffen.  Die Performance wird oft über einen bestimmten Zeitraum gemessen und mit historischen Daten oder Benchmarks verglichen, um Trends und Verbesserungspotenziale zu erkennen.",
+      "output": "Die **Standort-Performance** ist eine Tabelle, die die Umsatzentwicklung verschiedener Standorte darstellt. Sie umfasst den aktuellen Umsatz des Jahres 2024 sowie die prognostizierte Umsatzentwicklung für 2025.  Zusätzlich wird die **Wachstumsrate** angegeben, welche das prognostizierte Umsatzwachstum im Vergleich zum Vorjahr in Prozent ausdrückt. Diese Daten ermöglichen es, die Leistung der Standorte zu vergleichen, Trends zu identifizieren und strategische Entscheidungen zu treffen, wobei beispielsweise der Standort VOMMünchen mit +10,0% das höchste prognostizierte Wachstum aufweist.",
       "metadata": {
-        "source": "Section: Standort-Performance",
+        "source": "Structured Data: Standort-Performance",
         "title": "Standort-Performance",
         "question_type": "definition"
       }
     },
     {
-      "instruction": "Was bedeutet **Standort-Performance** und welche Aspekte werden typischerweise bei der Bewertung berücksichtigt?",
+      "instruction": "Beschreibe die Daten, die in der Tabelle zur **Standort-Performance** dargestellt werden.",
       "input": "",
-      "output": "Standort-Performance bezeichnet die Bewertung der wirtschaftlichen Leistungsfähigkeit eines einzelnen Standortes einer Organisation.  Bei der Analyse werden üblicherweise quantitative Kennzahlen wie *Umsatz*, *Rentabilität*, *Kostenstruktur* und *Marktanteil* betrachtet. Zusätzlich können auch qualitative Faktoren wie *Mitarbeiterzufriedenheit*, *Innovationskraft* und die *regionale Attraktivität* eine Rolle spielen, um ein umfassendes Bild der Performance zu erhalten. Die Bewertung erfolgt oft über einen bestimmten Zeitraum und wird mit historischen Daten oder Benchmarks verglichen, um Verbesserungspotenziale zu identifizieren.",
+      "output": "Die Tabelle zur **Standort-Performance** bietet einen Überblick über die Umsatzentwicklung verschiedener Standorte. Sie enthält vier Spalten: **Standort**, **Umsatz 2024**, **Umsatz 2025 (proj.)** und **Wachstum**.  Die Daten zeigen den aktuellen Umsatz des Jahres 2024 und die prognostizierte Umsatzentwicklung für 2025.  Zusätzlich wird die **Wachstumsrate** angegeben, welche das prognostizierte Umsatzwachstum im Vergleich zum Vorjahr in Prozent widerspiegelt. Diese Informationen ermöglichen es, die Leistung der einzelnen Standorte zu vergleichen und strategische Entscheidungen zu treffen.",
       "metadata": {
-        "source": "Section: Standort-Performance",
+        "source": "Structured Data: Standort-Performance",
         "title": "Standort-Performance",
-        "question_type": "detailed_explanation"
+        "question_type": "characteristics"
       }
     },
     {
-      "instruction": "Warum ist die Analyse der Standort-Performance für Unternehmen wichtig?",
+      "instruction": "Was zeigen die Daten zur **Standort-Performance** und welche Erkenntnisse lassen sich daraus gewinnen?",
       "input": "",
-      "output": "Die Analyse der **Standort-Performance** ist für Unternehmen von entscheidender Bedeutung, da sie die wirtschaftliche Leistungsfähigkeit einzelner Standorte bewertet.  Sie ermöglicht es, Stärken und Schwächen zu identifizieren, Ressourcen zu optimieren und fundierte strategische Entscheidungen über Investitionen, Expansion oder Konsolidierung zu treffen. Durch die Berücksichtigung quantitativer Kennzahlen wie Umsatz, Rentabilität und Marktanteil sowie qualitativer Faktoren wie Mitarbeiterzufriedenheit, können Unternehmen das Wachstumspotenzial ihrer Standorte erkennen und frühzeitig auf Probleme reagieren. Ein Beispiel für die Darstellung der Standort-Performance ist die Tabelle, die Umsatz und Wachstum über einen bestimmten Zeitraum veranschaulicht.",
+      "output": "Die Daten zur **Standort-Performance** präsentieren eine Tabelle mit Informationen zu verschiedenen Standorten, einschließlich des aktuellen **Umsatzes 2024** und der prognostizierten **Umsatzentwicklung 2025**.  Zusätzlich wird die **Wachstumsrate** angegeben, die das prognostizierte Umsatzwachstum im Vergleich zum Vorjahr in Prozent darstellt. Eine wichtige Erkenntnis ist, dass *alle* Standorte ein positives Umsatzwachstum verzeichnen. Besonders hervorzuheben ist der Standort VOMMünchen, der mit +10,0% das höchste prognostizierte Wachstum aufweist, was ihn zu einem vielversprechenden Standort für zukünftige Investitionen macht. Diese Daten sind essentiell, um die Leistung verschiedener Standorte zu vergleichen und strategische Entscheidungen zu treffen.",
       "metadata": {
-        "source": "Section: Standort-Performance",
+        "source": "Structured Data: Standort-Performance",
         "title": "Standort-Performance",
         "question_type": "application"
       }
     },
     {
-      "instruction": "Was versteht man unter **Umsatz nach Standorten**?",
+      "instruction": "Was bezeichnet der Begriff *Umsatz nach Standorten (projiziert)*?",
       "input": "",
-      "output": "Der Begriff **Umsatz nach Standorten** bezeichnet die detaillierte Aufschlüsselung des Gesamtumsatzes eines Unternehmens nach einzelnen geografischen Standorten, wie beispielsweise Ländern, Regionen, Städten oder Filialen. Diese Analyse ermöglicht es, die Umsatzleistung an verschiedenen Orten zu vergleichen und regionale Unterschiede zu identifizieren.  Sie kann zeitlich aufgeschlüsselt werden, um Trends zu erkennen, und ist ein wichtiges Instrument für das Management, um beispielsweise Ressourcen gezielt einzusetzen oder standortspezifische Marketingstrategien zu entwickeln. Ein Beispiel: Ein Diagramm könnte zeigen, dass der Standort HO-STU Stutt im Jahr 2024 einen Umsatz von 140 Mio. EUR erwirtschaftet hat, während VOM Munich 55 Mio. EUR erreichte.",
+      "output": "Der Begriff *Umsatz nach Standorten (projiziert)* beschreibt eine prognostizierte Darstellung der Umsatzerlöse eines Unternehmens, aufgeschlüsselt nach einzelnen geografischen Standorten oder Niederlassungen. Diese Prognosen fokussieren sich typischerweise auf zukünftige Zeiträume, oft ein kommendes Geschäftsjahr, und werden häufig visuell, beispielsweise in einem **Säulendiagramm**, dargestellt, um die Vergleichbarkeit zu erleichtern. Die Analyse dieser Daten ermöglicht es Unternehmen, Ressourcen effektiv zu allokieren, Marketingstrategien zu optimieren und **Investitionsentscheidungen** zu treffen. Durch den Vergleich der prognostizierten Umsätze können Standorte identifiziert werden, die besonders vielversprechend sind oder zusätzliche Unterstützung benötigen.",
       "metadata": {
         "source": "Section: Diagramm: Umsatz nach Standorten 2024 und 2025 (proj.)",
-        "title": "Umsatz nach Standorten",
+        "title": "Umsatz nach Standorten (projiziert)",
         "question_type": "definition"
       }
     },
     {
-      "instruction": "Warum ist die Analyse des Umsatzes nach Standorten für ein Unternehmen wichtig?",
+      "instruction": "Was versteht man unter *Umsatz nach Standorten (projiziert)* und welche Bedeutung hat diese Darstellung für Unternehmen?",
       "input": "",
-      "output": "Die Analyse des **Umsatzes nach Standorten** ist ein wichtiges Instrument für das Management, um fundierte Entscheidungen zu treffen. Sie ermöglicht den Vergleich der Umsatzleistung verschiedener Standorte und die Identifizierung regionaler Unterschiede. Dadurch können Ressourcen gezielt in Standorte mit hohem Wachstumspotenzial gelenkt, regionale *Marketingstrategien* entwickelt und die Leistung einzelner Standorte bewertet werden. Letztendlich unterstützt diese Analyse bei der Auswahl neuer Standorte und der Optimierung der Gesamtperformance.",
+      "output": "Der Begriff *Umsatz nach Standorten (projiziert)* bezeichnet eine Prognose der zukünftigen Umsatzerlöse eines Unternehmens, aufgeschlüsselt nach einzelnen geografischen Standorten. Diese Darstellung ermöglicht es Unternehmen, **Standortspezifische Prognosen** zu erstellen und die zukünftige Umsatzentwicklung an bestimmten Orten besser zu verstehen.  Die Analyse dieser Prognosen ist entscheidend für die strategische Planung, die Allokation von Ressourcen und die Optimierung von Marketingstrategien, da sie Einblicke in besonders vielversprechende Standorte oder solche, die zusätzliche Unterstützung benötigen, liefert.  Letztendlich unterstützt sie fundierte Investitionsentscheidungen und ermöglicht die frühzeitige Erkennung potenzieller Umsatzrückgänge.",
       "metadata": {
         "source": "Section: Diagramm: Umsatz nach Standorten 2024 und 2025 (proj.)",
-        "title": "Umsatz nach Standorten",
-        "question_type": "application"
-      }
-    },
-    {
-      "instruction": "Was ist ein Multi-Parameter Industriesensor für Hochtemperatur-Anwendungen?",
-      "input": "",
-      "output": "Ein **Multi-Parameter Industriesensor für Hochtemperatur-Anwendungen** ist ein spezielles Sensorbauelement, das zur gleichzeitigen Messung mehrerer physikalischer Parameter in Umgebungen mit hohen Temperaturen konzipiert wurde. Typischerweise erfasst er **Temperatur**, **Druck** und **relative Feuchtigkeit**. Diese Sensoren sind robust ausgelegt und bieten einen **Temperaturbereich** von -40 °C bis 1200 °C, ein **Ausgangssignal** von 4-20 mA (Analogsignal) und eine **Schutzart** von IP67, was sie vor Staub und zeitweiligem Untertauchen schützt.  Sie finden breite Anwendung in anspruchsvollen Industrieumgebungen wie der Metallurgie, Glasherstellung, chemischen Industrie und Energieerzeugung, wo die gleichzeitige Überwachung mehrerer Parameter für Prozesssicherheit und -optimierung unerlässlich ist.",
-      "metadata": {
-        "source": "Section: KTS-4000 - Krantastrahler 4000",
-        "title": "Multi-Parameter Industriesensor für Hochtemperatur-Anwendungen",
-        "question_type": "definition"
-      }
-    },
-    {
-      "instruction": "In welchen Industriezweigen werden *Multi-Parameter Industriesensoren für Hochtemperatur-Anwendungen* typischerweise eingesetzt und warum?",
-      "input": "",
-      "output": "Diese robusten Sensoren finden vor allem in anspruchsvollen Industrieumgebungen Anwendung, in denen die gleichzeitige Überwachung mehrerer Parameter entscheidend ist. Typische Einsatzbereiche sind die **Metallurgie** (z.B. zur Überwachung von Öfen), die **Glasherstellung**, die **chemische Industrie** sowie die **Energieerzeugung** (z.B. in Kraftwerken). Die gleichzeitige Erfassung von **Temperatur**, **Druck** und relativer **Feuchtigkeit** ermöglicht eine umfassendere Prozessanalyse und -steuerung, was die Prozesssicherheit und -optimierung erheblich verbessert.",
-      "metadata": {
-        "source": "Section: KTS-4000 - Krantastrahler 4000",
-        "title": "Multi-Parameter Industriesensor für Hochtemperatur-Anwendungen",
-        "question_type": "application"
-      }
-    },
-    {
-      "instruction": "Gib eine detaillierte Erklärung des Multi-Parameter Industriesensors für Hochtemperatur-Anwendungen.",
-      "input": "",
-      "output": "Ein **Multi-Parameter Industriesensor für Hochtemperatur-Anwendungen** ist ein spezielles Sensorbauelement, das in anspruchsvollen Industrieumgebungen eingesetzt wird, um mehrere physikalische Parameter gleichzeitig zu messen. Typischerweise werden dabei **Temperatur**, **Druck** und **relative Feuchtigkeit** erfasst, was eine umfassende Prozessanalyse ermöglicht. Diese Sensoren sind für den Einsatz in hohen Temperaturen ausgelegt, mit einem Temperaturbereich von -40 °C bis 1200 °C und verfügen über eine robuste Bauweise mit **IP67**-Schutz gegen Staub und zeitweiliges Untertauchen.  Das **Ausgangssignal** erfolgt als analoges 4-20 mA Signal, welches mit einer **Betriebsspannung** von 12-30 V DC betrieben wird und findet Anwendung in Bereichen wie der Metallurgie, Glasherstellung und Energieerzeugung.",
-      "metadata": {
-        "source": "Section: KTS-4000 - Krantastrahler 4000",
-        "title": "Multi-Parameter Industriesensor für Hochtemperatur-Anwendungen",
+        "title": "Umsatz nach Standorten (projiziert)",
         "question_type": "detailed_explanation"
       }
     },
     {
-      "instruction": "Welche Hauptmerkmale zeichnen einen Flüssigkeitsdurchflusssensor mit IoT-Konnektivität aus?",
+      "instruction": "Welche Herausforderungen ergeben sich bei der Verwaltung von Daten über verschiedene deutsche Bundesländer?",
       "input": "",
-      "output": "Ein **Flüssigkeitsdurchflusssensor mit IoT-Konnektivität** kombiniert die präzise **Durchflussmessung** von Flüssigkeiten (typischerweise 0,1 bis 25 l/min) mit der Möglichkeit der drahtlosen Datenübertragung über ein **Low-Power Wide-Area Network (LPWAN)**.  Diese Sensoren bieten eine hohe **digitale Genauigkeit** (oft Klasse A++) und sind für eine lange **Betriebsdauer** konzipiert, häufig mit einer Service-Lifecycle von 7 Jahren.  Die Integration in **IoT-Systeme** ermöglicht die Fernüberwachung, Datenanalyse und die Integration in automatisierte Steuerungssysteme, was zu einer verbesserten Effizienz und Prozessoptimierung führt.",
+      "output": "Die Verwaltung von Daten über die **16 deutschen Bundesländer** kann aufgrund ihrer unterschiedlichen Strukturen und Zuständigkeiten komplex sein. Jedes Bundesland hat seine eigene Gesetzgebung, Verwaltungspraxis und Datenerfassungsmethoden, was die Vergleichbarkeit und Aggregation von Daten erschwert. *Die Heterogenität der Datenquellen* und -formate erfordert oft eine aufwändige Datenharmonisierung und -transformation, um aussagekräftige Analysen und Berichte zu erstellen. - Die **Koordinierung** zwischen den Bundesländern und dem Bund ist entscheidend, um eine konsistente Datenpolitik zu gewährleisten und die Effizienz der Verwaltung zu steigern.  Es ist wichtig, standardisierte Verfahren und gemeinsame Datenmodelle zu entwickeln, um die Datenqualität zu verbessern und die Interoperabilität zu fördern.",
       "metadata": {
-        "source": "Section: PFS-2500 - Pulsoflex-Sensor 2500",
-        "title": "Flüssigkeitsdurchflusssensor mit IoT-Konnektivität",
-        "question_type": "characteristics"
-      }
-    },
-    {
-      "instruction": "Was ist ein Flüssigkeitsdurchflusssensor mit IoT-Konnektivität?",
-      "input": "",
-      "output": "Ein **Flüssigkeitsdurchflusssensor mit IoT-Konnektivität** ist ein Messgerät, das den Volumenstrom von Prozessflüssigkeiten erfasst und diese Daten drahtlos an ein **Internet der Dinge (IoT)**-Netzwerk überträgt. Er kombiniert die Funktion eines herkömmlichen Durchflusssensors mit der Möglichkeit zur Echtzeit-Datenübertragung, was eine Fernüberwachung und -steuerung ermöglicht. Typische Durchflussbereiche liegen zwischen 0,1 und 25 l/min, und die Sensoren bieten eine hohe **digitale Genauigkeit** (Klasse A++) und sind für eine lange **Betriebslebensdauer** (oft 7 Jahre) konzipiert. Diese Integration in IoT-Systeme ermöglicht eine verbesserte Effizienz und Prozessoptimierung in verschiedenen Branchen wie automatisierte Fertigung, Gebäudemanagement und Landwirtschaft.",
-      "metadata": {
-        "source": "Section: PFS-2500 - Pulsoflex-Sensor 2500",
-        "title": "Flüssigkeitsdurchflusssensor mit IoT-Konnektivität",
-        "question_type": "definition"
-      }
-    },
-    {
-      "instruction": "In welchen Industriezweigen findet die simultane Vibrations- und Temperaturmessung typischerweise Anwendung und warum?",
-      "input": "",
-      "output": "Die **simultane Vibrations- und Temperaturmessung** findet breite Anwendung in verschiedenen Industriezweigen, darunter der **Maschinenbau**, der **Automobilindustrie**, der **Energieerzeugung** und der **Prozessindustrie**.  Dies liegt daran, dass die gleichzeitige Erfassung von Temperatur- und Vibrationsdaten eine präzise Analyse des Zusammenhangs zwischen diesen Parametern ermöglicht, was für die **Zustandsüberwachung** und die **vorausschauende Wartung** von Maschinen und Anlagen entscheidend ist.  Durch die frühzeitige Erkennung potenzieller Fehlerzustände, wie beispielsweise Lagerschäden oder Unwuchten, können ungeplante Stillstände reduziert und eine optimierte Wartungsplanung ermöglicht werden. Die Methode ist besonders wertvoll, wenn Temperaturänderungen die Vibrationsmuster eines Systems beeinflussen.",
-      "metadata": {
-        "source": "Section: VTM-1200 - Vibrotherm Messgerät 1200",
-        "title": "Simultane Vibrations- und Temperaturmessung",
-        "question_type": "application"
-      }
-    },
-    {
-      "instruction": "Was bezeichnet die simultane Vibrations- und Temperaturmessung?",
-      "input": "",
-      "output": "Die **simultane Vibrations- und Temperaturmessung** beschreibt die gleichzeitige Erfassung von Schwingungsdaten (Vibration) und Temperaturwerten an einem Objekt oder einer Maschine. Diese Methode ermöglicht die Analyse des Zusammenhangs zwischen Temperatur und Vibration, was für die **Zustandsüberwachung** und **vorausschauende Wartung** von Maschinen und Anlagen von entscheidender Bedeutung ist. Typischerweise wird ein **Vibrationsfrequenzbereich** von 1 Hz bis 10 kHz und ein **Temperaturbereich** von -25°C bis 180°C abgedeckt, wobei eine hohe **Datenrate** von 1000 Samples/Sekunde eine detaillierte Analyse ermöglicht.",
-      "metadata": {
-        "source": "Section: VTM-1200 - Vibrotherm Messgerät 1200",
-        "title": "Simultane Vibrations- und Temperaturmessung",
-        "question_type": "definition"
-      }
-    },
-    {
-      "instruction": "Was versteht man unter simultaner Vibrations- und Temperaturmessung und warum ist diese Methode wichtig?",
-      "input": "",
-      "output": "Die **simultane Vibrations- und Temperaturmessung** bezeichnet die gleichzeitige Erfassung von Schwingungsdaten (Vibration) und Temperaturwerten an einem Objekt oder einer Maschine. Diese Methode ist besonders wichtig, da sie die Analyse des Zusammenhangs zwischen Temperatur und Vibration ermöglicht, was für die **Zustandsüberwachung** und **vorausschauende Wartung** von Maschinen und Anlagen entscheidend ist. Durch die synchrone Erfassung werden zeitliche Verzögerungen vermieden und eine detaillierte Analyse der dynamischen Zusammenhänge ermöglicht, beispielsweise durch eine Datenrate von 1000 Samples/Sekunde.  Die Anwendung findet beispielsweise in der Industrie zur frühzeitigen Erkennung von Problemen wie Lagerschäden oder Unwuchten.",
-      "metadata": {
-        "source": "Section: VTM-1200 - Vibrotherm Messgerät 1200",
-        "title": "Simultane Vibrations- und Temperaturmessung",
-        "question_type": "detailed_explanation"
-      }
-    },
-    {
-      "instruction": "Welche Hauptmerkmale kennzeichnen die simultane Vibrations- und Temperaturmessung?",
-      "input": "",
-      "output": "Die **simultane Vibrations- und Temperaturmessung** zeichnet sich durch mehrere wichtige Merkmale aus. Zunächst erfolgt die Datenerfassung **gleichzeitig**, um zeitliche Verzögerungen zu vermeiden und einen präzisen Zusammenhang zwischen Temperatur und Vibration zu gewährleisten. Der typische **Vibrationsfrequenzbereich** liegt zwischen 1 Hz und 10 kHz, während der **Temperaturbereich** üblicherweise -25°C bis 180°C beträgt, abhängig vom verwendeten Sensor. Eine hohe **Datenrate** von bis zu 1000 Samples/Sekunde ermöglicht eine detaillierte Analyse der dynamischen Zusammenhänge und frühzeitige Erkennung von Anomalien.",
-      "metadata": {
-        "source": "Section: VTM-1200 - Vibrotherm Messgerät 1200",
-        "title": "Simultane Vibrations- und Temperaturmessung",
-        "question_type": "characteristics"
-      }
-    },
-    {
-      "instruction": "Welche Hauptmerkmale und Charakteristika kennzeichnen die Erkennung und Analyse von Fluidtemperaturen und Strömungen?",
-      "input": "",
-      "output": "Die **Erkennung und Analyse von Fluidtemperaturen und Strömungen** umfasst die Messung von Temperatur und Strömungsgeschwindigkeit von Flüssigkeiten oder Gasen. Die Temperaturmessung erfolgt typischerweise in einem Bereich von -50°C bis 150°C, während die **Strömungsmessung** die Geschwindigkeit des Fluids bestimmt. Ein wichtiges Merkmal ist die schnelle **Ansprechzeit** von unter einer Sekunde, die eine zeitnahe Reaktion auf Veränderungen ermöglicht. Zudem ist die Kompatibilität mit **SCADA-Systemen** gegeben, was die Integration der Messdaten in zentrale Überwachungssysteme vereinfacht.",
-      "metadata": {
-        "source": "Section: TFD-800 - Thermofluid-Detektor 800",
-        "title": "Erkennung und Analyse von Fluidtemperaturen und Strömungen",
-        "question_type": "characteristics"
-      }
-    },
-    {
-      "instruction": "In welchen Industriezweigen findet die Erkennung und Analyse von Fluidtemperaturen und Strömungen typischerweise Anwendung und warum ist sie dort wichtig?",
-      "input": "",
-      "output": "Die **Erkennung und Analyse von Fluidtemperaturen und Strömungen** ist in einer Vielzahl von Industriezweigen von großer Bedeutung. Dazu gehören die **Prozessindustrie** (chemische Prozesse, Raffinerien), die **Heizungs-, Lüftungs- und Klimatechnik (HLK)**, die **Automobilindustrie** und die **Energieerzeugung**. In diesen Bereichen ermöglicht die Überwachung und Regelung von Temperatur und Strömung eine Optimierung von Prozessen, eine Verbesserung der Energieeffizienz und eine frühzeitige Erkennung von potenziellen Problemen, was zu einer höheren Anlagenverfügbarkeit und reduzierten Betriebskosten führt. Die schnelle **Ansprechzeit** von unter einer Sekunde ist dabei besonders vorteilhaft, um auf Veränderungen im Fluidverhalten zeitnah reagieren zu können.",
-      "metadata": {
-        "source": "Section: TFD-800 - Thermofluid-Detektor 800",
-        "title": "Erkennung und Analyse von Fluidtemperaturen und Strömungen",
-        "question_type": "application"
-      }
-    },
-    {
-      "instruction": "Was ist das Hochpräzisions-Sensor-Modul 900?",
-      "input": "",
-      "output": "Das **Hochpräzisions-Sensor-Modul 900** ist ein modulares Sensor-Framework, das speziell für die präzise Erfassung von Messdaten in industriellen Umgebungen entwickelt wurde. Es fungiert als eigenständige Messeinheit und lässt sich nahtlos in bestehende Automatisierungssysteme integrieren.  Dank seiner **modularen Bauweise**, der **24-Bit-Signalverarbeitung** und der **wartungsfreien** Funktionsweise über bis zu 36 Monate bietet es hohe Genauigkeit, Flexibilität und reduziert die Betriebskosten. Typische Anwendungsbereiche umfassen Prozessautomatisierung, Qualitätskontrolle und Anlagenüberwachung, wobei es Messungen von Temperatur, Druck, Füllstand, Durchfluss und Position ermöglicht.",
-      "metadata": {
-        "source": "Section: HSM-900 - Hochpräzisions-Sensor-Modul 900",
-        "title": "Hochpräzisions-Sensor-Modul 900",
-        "question_type": "definition"
-      }
-    },
-    {
-      "instruction": "In welchen Anwendungsbereichen findet das Hochpräzisions-Sensor-Modul 900 typischerweise Verwendung?",
-      "input": "",
-      "output": "Das **Hochpräzisions-Sensor-Modul 900** wird in Bereichen eingesetzt, in denen *genaue und zuverlässige Messdaten* entscheidend sind. Dazu gehören die **Prozessautomatisierung**, die **Qualitätskontrolle** und die **Anlagenüberwachung**. Typische Messgrößen, für die das Modul geeignet ist, sind **Temperatur**, **Druck**, **Füllstand**, **Durchfluss** und **Position**. Durch seine *modulare Bauweise* und die *24-Bit-Signalverarbeitung* liefert es präzise Ergebnisse und ist zudem *wartungsfrei* über bis zu 36 Monaten.",
-      "metadata": {
-        "source": "Section: HSM-900 - Hochpräzisions-Sensor-Modul 900",
-        "title": "Hochpräzisions-Sensor-Modul 900",
-        "question_type": "application"
-      }
-    },
-    {
-      "instruction": "Was sind die wichtigsten Merkmale des Hochpräzisions-Sensor-Moduls 900?",
-      "input": "",
-      "output": "Das **Hochpräzisions-Sensor-Modul 900** zeichnet sich durch eine Reihe von wichtigen Merkmalen aus, die es ideal für anspruchsvolle industrielle Anwendungen machen. Zu den wichtigsten gehören seine **modulare Bauweise**, die eine flexible Anpassung und einfache Erweiterbarkeit ermöglicht. Darüber hinaus bietet es eine **24-Bit-Signalverarbeitung** für eine hohe Auflösung und Genauigkeit bei der Datenerfassung. Schließlich ist das Modul für einen **wartungsfreien Betrieb** über bis zu 36 Monate ausgelegt, was die Betriebskosten reduziert.",
-      "metadata": {
-        "source": "Section: HSM-900 - Hochpräzisions-Sensor-Modul 900",
-        "title": "Hochpräzisions-Sensor-Modul 900",
+        "source": "Structured Data: Deutsche Bundesländer",
+        "title": "Deutsche Bundesländer",
         "question_type": "context"
       }
     },
     {
-      "instruction": "Welche Hauptmerkmale zeichnen das Hochpräzisions-Sensor-Modul 900 aus?",
+      "instruction": "Welche charakteristischen Merkmale weisen die *Deutsche Bundesländer* auf?",
       "input": "",
-      "output": "Das **Hochpräzisions-Sensor-Modul 900** verfügt über eine Reihe von Schlüsseleigenschaften, die es für industrielle Anwendungen besonders geeignet machen. Zunächst bietet es eine **modulare Bauweise**, die eine flexible Anpassung an verschiedene Messanforderungen und eine einfache Erweiterbarkeit ermöglicht. Darüber hinaus gewährleistet die **24-Bit-Signalverarbeitung** eine hohe Auflösung und Genauigkeit bei der Datenerfassung, was zu präzisen Messergebnissen führt. Abschließend ist das Modul für einen **wartungsfreien Betrieb** über bis zu 36 Monate ausgelegt, was die Betriebskosten reduziert.",
+      "output": "Die *Deutsche Bundesländer* sind die 16 Teilstaaten der Bundesrepublik Deutschland, die durch eine föderale Verfassung miteinander verbunden sind. Jedes Bundesland hat eine eigene Regierung, ein eigenes Parlament und eine eigene Verfassung, die jedoch im Einklang mit der **Grundgesetz** stehen muss.  Die Bundesländer unterscheiden sich in Größe, Einwohnerzahl, Wirtschaftskraft und kulturellen Besonderheiten, was zu einer vielfältigen Landschaft innerhalb Deutschlands führt.  Darüber hinaus genießen die Bundesländer in vielen Bereichen, wie Bildung, Kultur und Polizei, eine eigene Gesetzgebungskompetenz, was ihre Individualität und Autonomie unterstreicht.",
       "metadata": {
-        "source": "Section: HSM-900 - Hochpräzisions-Sensor-Modul 900",
-        "title": "Hochpräzisions-Sensor-Modul 900",
+        "source": "Structured Data: Deutsche Bundesländer",
+        "title": "Deutsche Bundesländer",
         "question_type": "characteristics"
+      }
+    },
+    {
+      "instruction": "Welche Bundesländer Deutschlands haben eine eigene Währung und welche nicht?",
+      "input": "",
+      "output": "Deutschland hat ein gemeinsames Währungssystem, den **Euro**, das für alle 16 Bundesländer gilt.  Es gibt keine Bundesländer, die eine eigene Währung neben dem Euro verwenden.  Die Einführung des Euro im Jahr 1999 und 2002 ersetzte die früheren nationalen Währungen wie den Deutschen Mark in allen Bundesländern.  Daher ist die Verwendung einer eigenen Währung durch einzelne Bundesländer nicht vorgesehen und auch nicht üblich.",
+      "metadata": {
+        "source": "Structured Data: Deutsche Bundesländer",
+        "title": "Deutsche Bundesländer",
+        "question_type": "application"
+      }
+    },
+    {
+      "instruction": "Was sind die **Deutsche Bundesländer**?",
+      "input": "",
+      "output": "Die **Deutsche Bundesländer** sind die 16 Verwaltungseinheiten, aus denen die Bundesrepublik Deutschland besteht. Jedes Bundesland hat eine eigene Verfassung, Regierung und Parlament, und ist somit weitgehend autonom in seinen Entscheidungen. Sie unterscheiden sich in Größe, Einwohnerzahl und wirtschaftlicher Struktur, tragen aber gemeinsam zur Vielfalt und Stärke Deutschlands bei. Zu den bekanntesten Bundesländern gehören beispielsweise Bayern, Nordrhein-Westfalen, Baden-Württemberg und Berlin. *Die Bundesländer spielen eine wichtige Rolle in der deutschen Politik und Verwaltung.*",
+      "metadata": {
+        "source": "Structured Data: Deutsche Bundesländer",
+        "title": "Deutsche Bundesländer",
+        "question_type": "definition"
+      }
+    },
+    {
+      "instruction": "Welche Informationen werden in den Daten zur **Geschäftsform** erfasst und welche Bedeutung hat diese Information im Kontext der Personalakte?",
+      "input": "",
+      "output": "Die Daten zur **Geschäftsform** geben Auskunft über die rechtliche Struktur des Unternehmens, in dem ein Mitarbeiter angestellt ist. Dies kann beispielsweise eine **Gbr**, **GmbH**, **AG** oder eine ausländische Form wie *limited* sein. Die Angabe der Geschäftsform ist wichtig, da sie Auswirkungen auf steuerliche Aspekte, Haftungsfragen und die interne Organisation des Unternehmens hat. Im Kontext einer Personalakte hilft diese Information, die Position des Mitarbeiters innerhalb der Unternehmensstruktur besser zu verstehen und die entsprechenden rechtlichen Rahmenbedingungen zu berücksichtigen. Darüber hinaus kann die Geschäftsform auch bei der Gehaltsplanung und Personalentwicklung eine Rolle spielen, da unterschiedliche Unternehmensformen unterschiedliche Gehaltsstrukturen und Karrierewege bieten können.",
+      "metadata": {
+        "source": "Structured Data: Geschäftsform",
+        "title": "Geschäftsform",
+        "question_type": "application"
+      }
+    },
+    {
+      "instruction": "Was ist eine **Geschäftsform** im Kontext einer Personalakte?",
+      "input": "",
+      "output": "Eine **Geschäftsform** bezieht sich auf die rechtliche Struktur des Unternehmens, in dem ein Mitarbeiter angestellt ist. Im Kontext einer Personalakte gibt sie an, ob der Mitarbeiter beispielsweise bei einer **Gbr**, einer **GmbH**, einer **AG** oder einer *limited* beschäftigt ist. Diese Information ist wichtig, da sie Auswirkungen auf verschiedene Aspekte hat, wie z.B. die steuerlichen Verpflichtungen und die Haftung des Unternehmens. Die Daten in der Personalakte geben darüber hinaus Auskunft über die Vielfalt der **Geschäftsformen** innerhalb eines Unternehmens.",
+      "metadata": {
+        "source": "Structured Data: Geschäftsform",
+        "title": "Geschäftsform",
+        "question_type": "definition"
+      }
+    },
+    {
+      "instruction": "Welche Informationen werden in den Daten zur **Geschäftsform** erfasst und welche Bedeutung hat diese Information im Kontext der Personalakte?",
+      "input": "",
+      "output": "Die Daten zur **Geschäftsform** geben Auskunft über die rechtliche Struktur des Unternehmens, in dem ein Mitarbeiter angestellt ist. Es werden verschiedene Formen wie **Gbr**, **GmbH**, **AG** oder auch internationale Varianten wie *limited* erfasst. Diese Information ist wichtig, da sie Auswirkungen auf die steuerlichen Verhältnisse, die Haftung und die Unternehmensführung hat. Im Kontext der Personalakte dient sie dazu, die rechtlichen Rahmenbedingungen des Arbeitsverhältnisses zu verstehen und die entsprechenden Vorschriften einzuhalten. Darüber hinaus kann die Geschäftsform auch für interne Analysen relevant sein, beispielsweise zur Identifizierung von Trends in der Unternehmensstruktur.",
+      "metadata": {
+        "source": "Structured Data: Geschäftsform",
+        "title": "Geschäftsform",
+        "question_type": "characteristics"
+      }
+    },
+    {
+      "instruction": "Beschreibe die wichtigsten Merkmale des Datensatzes 'Mitarbeiterqualität (1-10) Loyalität (ja/nein)' und erläutere, wie er zur Analyse von Mitarbeiterdaten verwendet werden kann.",
+      "input": "",
+      "output": "Der Datensatz **'Mitarbeiterqualität (1-10) Loyalität (ja/nein)'** ist eine strukturierte Tabelle, die die subjektive Bewertung der Mitarbeiterqualität (auf einer Skala von 1 bis 10) und deren Loyalität zum Unternehmen (als 'ja' oder 'nein') für jeden Mitarbeiter enthält.  Er ermöglicht eine schnelle Übersicht über die Zusammensetzung des Mitarbeiterstamms und hilft bei der Identifizierung von Mitarbeitern, die sowohl qualitativ hochwertig als auch loyal sind – wertvolle Ressourcen für das Unternehmen.  Die Daten können für verschiedene Zwecke genutzt werden, wie z.B. **Personalentwicklung**, **Risikomanagement** und **strategische Planung**, und bieten eine Grundlage für weitere Analysen zur Verbesserung der Mitarbeiterleistung und -bindung. Es ist wichtig zu beachten, dass die Daten subjektiv sind und mit anderen Informationen kombiniert werden sollten, um ein umfassenderes Bild zu erhalten.",
+      "metadata": {
+        "source": "Structured Data: Mitarbeiterqualität (1-10) Loyalität (ja/nein)",
+        "title": "Mitarbeiterqualität (1-10) Loyalität (ja/nein)",
+        "question_type": "characteristics"
+      }
+    },
+    {
+      "instruction": "Wie können die Daten zur **Mitarbeiterqualität (1-10) Loyalität (ja/nein)** im Unternehmen genutzt werden?",
+      "input": "",
+      "output": "Die Daten zur **Mitarbeiterqualität (1-10) Loyalität (ja/nein)** bieten vielfältige Anwendungsmöglichkeiten. So können sie beispielsweise für die **Personalentwicklung** genutzt werden, um Mitarbeiter mit hoher Qualität und Loyalität als Mentoren oder Führungskräfte zu identifizieren. Ebenso können sie zur **Risikomanagement** dienen, indem sie Mitarbeiter mit geringer Qualität oder Loyalität aufzeigen, die ein potenzielles Risiko darstellen könnten. Darüber hinaus können die Daten zur **strategischen Planung** verwendet werden, um die Zusammensetzung des Mitarbeiterstamms zu analysieren und sicherzustellen, dass ausreichend qualifizierte und loyale Mitarbeiter vorhanden sind, um die Unternehmensziele zu erreichen. Letztendlich unterstützen sie bei der Identifizierung von wertvollen Mitarbeitern und der Entwicklung von Maßnahmen zur Mitarbeiterbindung.",
+      "metadata": {
+        "source": "Structured Data: Mitarbeiterqualität (1-10) Loyalität (ja/nein)",
+        "title": "Mitarbeiterqualität (1-10) Loyalität (ja/nein)",
+        "question_type": "context"
+      }
+    },
+    {
+      "instruction": "Was beschreibt der Begriff 'Lieferant für Handelsware (Lieferantennummer) Ausprägung Farbe'?",
+      "input": "",
+      "output": "Der Begriff 'Lieferant für Handelsware (Lieferantennummer) Ausprägung Farbe' bezeichnet eine **Tabelle**, die **Lieferantennummern**, **Ausprägungen** und **Farben** von Handelswarenartikeln auflistet. Jede Zeile dieser Tabelle repräsentiert eine spezifische Kombination aus einem bestimmten Lieferanten, einer bestimmten Variante des Artikels (z.B. *Economy*, *Comfort*) und der entsprechenden Farbe. Diese Daten sind äußerst nützlich für die **Bestandsverwaltung**, die **Analyse der Beliebtheit** von Farben und Ausprägungen sowie zur **Optimierung des Bestellprozesses**. Durch die Analyse dieser Daten können beispielsweise Lieferanten identifiziert werden, die bestimmte Artikel in bestimmten Farben anbieten.",
+      "metadata": {
+        "source": "Structured Data: Lieferant für Handelsware (Lieferantennummer) Ausprägung Farbe",
+        "title": "Lieferant für Handelsware (Lieferantennummer) Ausprägung Farbe",
+        "question_type": "definition"
+      }
+    },
+    {
+      "instruction": "Wie kann die Tabelle der **Lieferant für Handelsware (Lieferantennummer) Ausprägung Farbe** für die Bestandsverwaltung genutzt werden?",
+      "input": "",
+      "output": "Die Tabelle *Lieferant für Handelsware (Lieferantennummer) Ausprägung Farbe* ist ein wertvolles Werkzeug für die Bestandsverwaltung. Sie ermöglicht es, den Lagerbestand nach **Lieferant**, **Ausprägung** und **Farbe** zu verfolgen, was eine detaillierte Analyse der aktuellen Bestände ermöglicht.  Durch die Analyse der Daten können Sie feststellen, welche Artikel in welchen Farben und Ausprägungen am häufigsten benötigt werden, um die Lagerbestände zu optimieren und Fehlbestände zu vermeiden.  Zudem hilft die Tabelle, Lieferanten zu identifizieren, die bestimmte Artikel in den gewünschten Farben und Ausprägungen anbieten, um eine zuverlässige Lieferkette sicherzustellen.",
+      "metadata": {
+        "source": "Structured Data: Lieferant für Handelsware (Lieferantennummer) Ausprägung Farbe",
+        "title": "Lieferant für Handelsware (Lieferantennummer) Ausprägung Farbe",
+        "question_type": "application"
+      }
+    },
+    {
+      "instruction": "Was beinhaltet die Tabelle 'Lieferant für Handelsware (Lieferantennummer) Ausprägung Farbe' und wofür kann sie verwendet werden?",
+      "input": "",
+      "output": "Die Tabelle **'Lieferant für Handelsware (Lieferantennummer) Ausprägung Farbe'** listet verschiedene Handelswarenartikel auf, die von unterschiedlichen **Lieferanten** angeboten werden. Jede Zeile repräsentiert eine spezifische Kombination aus Lieferantennummer, einer bestimmten **Ausprägung** (z.B. 'Economy', 'Comfort') und der **Farbe** des Artikels. Diese Daten sind äußerst nützlich für die **Bestandsverwaltung**, die Analyse der Beliebtheit bestimmter Farben und Ausprägungen sowie zur Optimierung des Bestellprozesses. Durch die Analyse dieser Daten können beispielsweise Lieferanten identifiziert werden, die bestimmte Artikel in bestimmten Farben anbieten, und Lagerbestände effizienter gesteuert werden.",
+      "metadata": {
+        "source": "Structured Data: Lieferant für Handelsware (Lieferantennummer) Ausprägung Farbe",
+        "title": "Lieferant für Handelsware (Lieferantennummer) Ausprägung Farbe",
+        "question_type": "context"
+      }
+    },
+    {
+      "instruction": "Was ist der Zweck einer Tabelle mit dem Titel '**Preis je Stück**' und wie kann sie in der Wirtschaft genutzt werden?",
+      "input": "",
+      "output": "Eine Tabelle mit dem Titel '**Preis je Stück**' dient dazu, die Kosten pro einzelnem Artikel oder Produkt übersichtlich darzustellen. Sie besteht aus zwei Spalten: der ersten, die den **Preis je Stück** enthält, und einer numerischen Spalte, die die Menge oder Stückzahl angibt. Diese Kombination ermöglicht es, den Gesamtwert für jede Artikelmenge zu berechnen und wird vielfältig eingesetzt, beispielsweise in der **Bestandsverwaltung**, der **Preisgestaltung**, der **Budgetplanung** oder zur **Verkaufsanalyse**. Kurz gesagt, sie liefert wichtige Informationen für fundierte **Einkaufsentscheidungen** und betriebswirtschaftliche Planungen.",
+      "metadata": {
+        "source": "Structured Data: Preis je Stück",
+        "title": "Preis je Stück",
+        "question_type": "context"
+      }
+    },
+    {
+      "instruction": "Was ist der **Preis je Stück** und wie kann er in der Praxis verwendet werden?",
+      "input": "",
+      "output": "Der **Preis je Stück** bezieht sich auf den Kosten eines einzelnen Artikels oder Produkts, dargestellt in einer Tabelle, die auch die Menge oder Stückzahl angibt. Diese Datenstruktur ermöglicht es, den Gesamtwert einer bestimmten Artikelmenge einfach zu berechnen.  Die praktische Verwendung ist vielfältig: von der **Bestandsverwaltung** und **Preisgestaltung** bis hin zur **Budgetplanung** und **Verkaufsanalyse**. Letztendlich unterstützt der Preis je Stück fundierte **Einkaufsentscheidungen** und hilft, die profitabelsten Artikel zu identifizieren.",
+      "metadata": {
+        "source": "Structured Data: Preis je Stück",
+        "title": "Preis je Stück",
+        "question_type": "detailed_explanation"
+      }
+    },
+    {
+      "instruction": "Was bedeutet der Begriff '**Preis je Stück**'?",
+      "input": "",
+      "output": "Der Begriff '**Preis je Stück**' bezieht sich auf die Kosten für eine einzelne Einheit eines Produkts oder Artikels. Die Daten werden typischerweise in einer Tabelle dargestellt, wobei die erste Spalte den Preis pro Stück und die zweite Spalte die entsprechende Menge oder Stückzahl angibt. Diese Struktur ermöglicht es, den Gesamtwert für jede Artikelmenge einfach zu berechnen und ist somit ein wichtiges Werkzeug für die **Bestandsverwaltung**, die **Preisgestaltung** und die **Budgetplanung**. Kurz gesagt, er liefert einen klaren Überblick über die Kosten pro Einheit und unterstützt fundierte betriebswirtschaftliche Entscheidungen.",
+      "metadata": {
+        "source": "Structured Data: Preis je Stück",
+        "title": "Preis je Stück",
+        "question_type": "definition"
+      }
+    },
+    {
+      "instruction": "Welche technischen Merkmale zeichnen den KTS-4000 - Krantastrahler 4000 aus?",
+      "input": "",
+      "output": "Der **KTS-4000 - Krantastrahler 4000** ist ein vielseitiger Industriesensor mit beeindruckenden technischen Merkmalen. Er bietet einen breiten **Temperaturbereich** von -40°C bis 1200°C und nutzt ein standardisiertes **Signal 4-20mA** zur einfachen Integration in bestehende Systeme. Dank des **IP67-Schutzes** ist er gegen Staub und Wasser geschützt und kann in rauen Umgebungen zuverlässig eingesetzt werden.  Seine flexible **Betriebsspannung** von 12-30V DC ermöglicht eine problemlose Stromversorgung mit gängigen Industrie-Stromversorgungen.",
+      "metadata": {
+        "source": "Product: KTS-4000 - Krantastrahler 4000",
+        "title": "KTS-4000 - Krantastrahler 4000",
+        "question_type": "characteristics"
+      }
+    },
+    {
+      "instruction": "In welchen Anwendungsbereichen wird der KTS-4000 - Krantastrahler 4000 typischerweise eingesetzt?",
+      "input": "",
+      "output": "Der **KTS-4000 - Krantastrahler 4000** findet breite Anwendung in Hochtemperaturprozessen, die eine präzise Überwachung erfordern. Typische Einsatzbereiche sind der **Stahlguss**, wo er zur Optimierung der Gussteilqualität beiträgt, sowie die **Ofenüberwachung** in der Keramik-, Metall- und Glasherstellung. Darüber hinaus wird er in **Hochtemperaturreaktoren** und zur Überwachung von **Verbrennungsprozessen** in Öfen und Kesseln eingesetzt, um Temperatur und Druck zuverlässig zu messen. Seine Robustheit und Multi-Parameter-Messung machen ihn ideal für anspruchsvolle Industrieumgebungen.",
+      "metadata": {
+        "source": "Product: KTS-4000 - Krantastrahler 4000",
+        "title": "KTS-4000 - Krantastrahler 4000",
+        "question_type": "application"
+      }
+    },
+    {
+      "instruction": "Was sind die wichtigsten Merkmale und Anwendungsbereiche des PFS-2500 - Pulsoflex-Sensor 2500?",
+      "input": "",
+      "output": "Der **PFS-2500 - Pulsoflex-Sensor 2500** ist ein Flüssigkeitsdurchflusssensor mit integrierter **IoT-Konnektivität**, der für die präzise Überwachung von Prozessflüssigkeiten in verschiedenen Industriezweigen konzipiert wurde. Zu seinen wichtigsten Merkmalen gehören ein Durchflussbereich von 0,1 - 25 l/min, eine hohe digitale Genauigkeit Klasse A++, sowie eine energieeffiziente **LPWAN-Kommunikation** für die Datenübertragung.  Dieser Sensor findet breite Anwendung in der *chemischen*, *pharmazeutischen*, *Lebensmittel- und Getränkeindustrie*, der *Wasseraufbereitung* und der *Heizungs-, Lüftungs- und Klimatechnik (HLK)*, wo er zur Optimierung von Prozessen und zur präzisen Steuerung des Flüssigkeitsdurchflusses eingesetzt wird. Seine lange Lebensdauer und geringen Wartungskosten machen ihn zu einer wirtschaftlichen Lösung für industrielle Anwendungen.",
+      "metadata": {
+        "source": "Product: PFS-2500 - Pulsoflex-Sensor 2500",
+        "title": "PFS-2500 - Pulsoflex-Sensor 2500",
+        "question_type": "context"
+      }
+    },
+    {
+      "instruction": "Erläutere detailliert den Pulsoflex-Sensor 2500 (PFS-2500) und seine wichtigsten Merkmale.",
+      "input": "",
+      "output": "Der **Pulsoflex-Sensor 2500 (PFS-2500)** ist ein hochpräziser Flüssigkeitsdurchflusssensor, der speziell für industrielle Anwendungen entwickelt wurde. Er zeichnet sich durch seine integrierte **IoT-Konnektivität** aus, die eine Fernüberwachung und -steuerung über IoT-Plattformen ermöglicht. Zu den wichtigsten Merkmalen gehören ein Durchflussbereich von 0,1 - 25 l/min, eine **digitale Genauigkeit Klasse A++** für zuverlässige Messungen sowie eine **LPWAN-Kommunikation** für kostengünstige Datenübertragung über große Entfernungen.  Zudem bietet der Sensor eine lange **Service-Lifecycle von 7 Jahren**, was ihn besonders wirtschaftlich macht.",
+      "metadata": {
+        "source": "Product: PFS-2500 - Pulsoflex-Sensor 2500",
+        "title": "PFS-2500 - Pulsoflex-Sensor 2500",
+        "question_type": "detailed_explanation"
+      }
+    },
+    {
+      "instruction": "In welchen Anwendungsbereichen wird der PFS-2500 - Pulsoflex-Sensor 2500 typischerweise eingesetzt und warum?",
+      "input": "",
+      "output": "Der **PFS-2500 - Pulsoflex-Sensor 2500** findet breite Anwendung in verschiedenen Industriezweigen, die eine präzise Überwachung von Flüssigkeitsdurchflüssen benötigen. Dazu gehören die *chemische Industrie* zur Optimierung von Produktionsprozessen, die *pharmazeutische Industrie* für genaue Dosierung, sowie die *Lebensmittel- und Getränkeindustrie* zur Kontrolle von Zutaten. Auch in der *Wasseraufbereitung* und der *Heizungs-, Lüftungs- und Klimatechnik (HLK)* ist er einsetzbar. Seine Vielseitigkeit ergibt sich aus der Kombination aus hohem Messbereich, **digitaler Genauigkeit Klasse A++** und integrierter **IoT-Konnektivität**, die eine Fernüberwachung und -steuerung ermöglicht.",
+      "metadata": {
+        "source": "Product: PFS-2500 - Pulsoflex-Sensor 2500",
+        "title": "PFS-2500 - Pulsoflex-Sensor 2500",
+        "question_type": "application"
+      }
+    },
+    {
+      "instruction": "Was sind die Hauptfunktionen des VTM-1200 - Vibrotherm Messgerät 1200?",
+      "input": "",
+      "output": "Das **VTM-1200** ist ein leistungsstarkes Messgerät zur simultanen Erfassung von Vibrationen und Temperatur an Maschinen und Anlagen. Es ermöglicht die kontinuierliche Zustandsüberwachung, um frühzeitig Anomalien wie Verschleiß, Unwucht oder Defekte zu erkennen.  Dank seines breiten **Vibrationsfrequenzbereichs** (1 Hz bis 10 kHz) und dem **Temperaturbereich** von -25°C bis 180°C deckt es vielfältige industrielle Anwendungen ab. Die hohe **Datenrate** von 1000 Samples/Sekunde sorgt für eine präzise Analyse dynamischer Prozesse und die Identifizierung kurzzeitiger Fehler.",
+      "metadata": {
+        "source": "Product: VTM-1200 - Vibrotherm Messgerät 1200",
+        "title": "VTM-1200 - Vibrotherm Messgerät 1200",
+        "question_type": "context"
+      }
+    },
+    {
+      "instruction": "Welche technischen Merkmale zeichnen das VTM-1200 - Vibrotherm Messgerät 1200 aus?",
+      "input": "",
+      "output": "Das **VTM-1200** bietet eine beeindruckende Bandbreite an technischen Merkmalen, die es zu einem vielseitigen Werkzeug für die Zustandsüberwachung machen. Es erfasst **Vibrationsfrequenzen** von 1 Hz bis 10 kHz, was ein breites Spektrum an Maschinendefekten abdeckt. Der **Temperaturbereich** liegt zwischen -25°C und 180°C, ideal für diverse industrielle Anwendungen. Mit einer **Datenrate** von 1000 Samples/Sekunde werden schnelle Veränderungen präzise erfasst, was besonders bei der Analyse dynamischer Prozesse von Bedeutung ist.",
+      "metadata": {
+        "source": "Product: VTM-1200 - Vibrotherm Messgerät 1200",
+        "title": "VTM-1200 - Vibrotherm Messgerät 1200",
+        "question_type": "characteristics"
+      }
+    },
+    {
+      "instruction": "In welchen Anwendungsbereichen kann der TFD-800 - Thermofluid-Detektor 800 eingesetzt werden, und warum ist er dort vorteilhaft?",
+      "input": "",
+      "output": "Der **TFD-800 - Thermofluid-Detektor 800** findet vielfältige Anwendung in industriellen Prozessen, insbesondere zur Überwachung von Fluidtemperaturen und -strömungen. Beispiele hierfür sind die *Kühlmittelüberwachung in CNC-Maschinen*, wo er frühzeitig Kühlmittelverluste oder -überhitzung erkennt, sowie die Überwachung von *Hydrauliksystemen* zur Vermeidung von Überhitzung und Leistungsoptimierung. Darüber hinaus ist er ideal für die *Prozessüberwachung in der chemischen Industrie* und die *Überwachung von Wärmetauschern*, da er präzise Temperaturkontrolle und -überwachung ermöglicht, was zur Gewährleistung der Produktqualität und Sicherheit beiträgt. Seine **hohe Präzision** und **schnelle Ansprechzeit** machen ihn zu einem wertvollen Werkzeug zur Optimierung von Prozessen und zur Vermeidung von Ausfallzeiten.",
+      "metadata": {
+        "source": "Product: TFD-800 - Thermofluid-Detektor 800",
+        "title": "TFD-800 - Thermofluid-Detektor 800",
+        "question_type": "application"
+      }
+    },
+    {
+      "instruction": "Was ist der TFD-800 - Thermofluid-Detektor 800?",
+      "input": "",
+      "output": "Der **TFD-800 - Thermofluid-Detektor 800** ist ein hochpräziser Sensor, der zur kontinuierlichen Überwachung und Analyse von Fluidtemperaturen und Strömungen in industriellen Prozessen konzipiert wurde. Er ermöglicht die frühzeitige Erkennung von Anomalien, was zur Optimierung der Prozesseffizienz und zur Vermeidung von Ausfallzeiten beiträgt.  Zu den technischen Merkmalen gehören ein breiter **Temperaturbereich** von -50°C bis 150°C, eine schnelle **Ansprechzeit** von unter 1 Sekunde und **Kompatibilität** mit SCADA-Systemen.  Seine Anwendungsbereiche umfassen die Kühlmittelüberwachung in CNC-Maschinen, die Überwachung von Hydrauliksystemen und die Prozessüberwachung in der chemischen Industrie.",
+      "metadata": {
+        "source": "Product: TFD-800 - Thermofluid-Detektor 800",
+        "title": "TFD-800 - Thermofluid-Detektor 800",
+        "question_type": "definition"
+      }
+    },
+    {
+      "instruction": "Welche technischen Merkmale zeichnen das HSM-900 - Hochpräzisions-Sensor-Modul 900 aus?",
+      "input": "",
+      "output": "Das **HSM-900** bietet eine Reihe von technischen Vorteilen, die es zu einer ausgezeichneten Wahl für anspruchsvolle Messanwendungen machen. Zu den wichtigsten Merkmalen gehören seine **modulare Bauweise**, die eine einfache Anpassung an unterschiedliche Anforderungen ermöglicht, sowie die **24-bit Signalverarbeitung**, die eine hohe Auflösung und Genauigkeit bei der Datenerfassung gewährleistet. Ein weiterer entscheidender Vorteil ist der **wartungsfreie Betrieb** bis zu 36 Monaten, der Stillstandzeiten reduziert und die Betriebseffizienz steigert. Diese Kombination aus Flexibilität, Genauigkeit und Langlebigkeit macht das HSM-900 ideal für eine Vielzahl von Industrieanwendungen.",
+      "metadata": {
+        "source": "Product: HSM-900 - Hochpräzisions-Sensor-Modul 900",
+        "title": "HSM-900 - Hochpräzisions-Sensor-Modul 900",
+        "question_type": "characteristics"
+      }
+    },
+    {
+      "instruction": "In welchen Anwendungsbereichen kann das HSM-900 - Hochpräzisions-Sensor-Modul 900 besonders effektiv eingesetzt werden?",
+      "input": "",
+      "output": "Das **HSM-900** findet in einer Vielzahl von Branchen Anwendung, insbesondere dort, wo präzise Messungen entscheidend sind. Typische Einsatzgebiete sind die **Qualitätskontrolle in der Fertigung**, wo es Abmessungen, Toleranzen und Oberflächenbeschaffenheit genau erfasst. Ebenso ist es ideal für die **Prozessüberwachung in der Chemieindustrie**, um Temperatur, Druck und Durchflussraten zu überwachen und so Produktionsprozesse zu optimieren. Darüber hinaus kann es in der **Präzisionslandwirtschaft** zur Überwachung von Bodenfeuchtigkeit und Pflanzenwachstum eingesetzt werden und findet Anwendung in der **Robotik und Automatisierung** für präzise Positions- und Kraftmessungen.",
+      "metadata": {
+        "source": "Product: HSM-900 - Hochpräzisions-Sensor-Modul 900",
+        "title": "HSM-900 - Hochpräzisions-Sensor-Modul 900",
+        "question_type": "application"
       }
     }
   ]

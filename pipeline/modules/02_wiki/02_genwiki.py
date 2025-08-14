@@ -4,6 +4,8 @@ import re
 import os
 import sys
 from pathlib import Path
+from typing import Dict, List, Optional, Any, Tuple
+from datetime import datetime
 
 # ========================================
 # ZENTRALE KONFIGURATION LADEN
@@ -31,6 +33,44 @@ print("📋 KONFIGURATION GELADEN (02_genwiki)")
 print("=" * 60)
 config_loader.print_config_summary()
 print("=" * 60)
+
+# ========================================
+# CONTENT-TYP DEFINITIONEN
+# ========================================
+
+class ContentType:
+    """Enum für verschiedene Content-Typen"""
+    PRODUCT = "product"           # Produktkatalog-Einträge mit Codes
+    LEXIKON = "lexikon"           # Wissensdefinitionen
+    STRUCTURED_DATA = "structured" # Tabellen/Listen aus Excel
+    TECHNICAL = "technical"        # Technische Dokumentation
+    PROCESS = "process"           # Prozessbeschreibungen
+    THEORY = "theory"             # Theoretische Konzepte
+    UNKNOWN = "unknown"
+
+# ========================================
+# PATTERN DEFINITIONEN
+# ========================================
+
+# Produktcode-Patterns (z.B. KTS-4000, PFS-2500, ABC-123)
+PRODUCT_CODE_PATTERN = r'\b[A-Z]{2,4}-\d{2,4}\b'
+
+# Technische Spezifikations-Keywords
+TECH_SPEC_KEYWORDS = [
+    'temperaturbereich', 'messbereich', 'genauigkeit', 'betriebsspannung',
+    'schutzart', 'ip\d{2}', 'durchfluss', 'frequenz', 'leistung',
+    'spannung', 'strom', 'datenrate', 'auflösung', 'gewicht', 'abmessungen'
+]
+
+# Strukturdaten-Indikatoren
+STRUCTURED_INDICATORS = [
+    'bundesland', 'bundesländer', 'lieferant', 'lieferantennummer',
+    'preis je stück', 'mitarbeiter', 'tabelle', 'liste', 'übersicht'
+]
+
+# ========================================
+# API-VERBINDUNG
+# ========================================
 
 def check_api_connection():
     """Überprüft API-Verbindung (OpenAI oder Ollama)."""
@@ -108,7 +148,87 @@ def check_ollama_connection():
         print(f"❌ Ollama-Verbindung fehlgeschlagen: {e}")
         return False
 
-def extract_sections_from_md(file_path):
+# ========================================
+# CONTENT-TYP ERKENNUNG
+# ========================================
+
+def detect_content_type(title: str, content: str) -> Tuple[ContentType, Optional[str]]:
+    """
+    Erkennt den Content-Typ und extrahiert ggf. Produktcode.
+    Returns: (ContentType, product_code or None)
+    """
+    title_lower = title.lower()
+    content_lower = content.lower()
+    
+    # 1. Prüfe auf Produktcode (höchste Priorität)
+    product_match = re.search(PRODUCT_CODE_PATTERN, title)
+    if product_match:
+        return ContentType.PRODUCT, product_match.group(0)
+    
+    # Prüfe auch im Content nach Produktcodes
+    if re.search(PRODUCT_CODE_PATTERN, content[:200]):  # Nur Anfang prüfen
+        product_match = re.search(PRODUCT_CODE_PATTERN, content[:200])
+        return ContentType.PRODUCT, product_match.group(0) if product_match else None
+    
+    # 2. Prüfe auf strukturierte Daten (aus Excel-Konvertierung)
+    if any(indicator in title_lower for indicator in STRUCTURED_INDICATORS):
+        return ContentType.STRUCTURED_DATA, None
+    
+    # Prüfe auf tabellarische Struktur im Content
+    if content.count('|') > 5 or content.count('\t') > 5:
+        return ContentType.STRUCTURED_DATA, None
+    
+    # 3. Prüfe auf technische Spezifikationen
+    tech_keyword_count = sum(1 for keyword in TECH_SPEC_KEYWORDS if keyword in content_lower)
+    if tech_keyword_count >= 3:
+        return ContentType.TECHNICAL, None
+    
+    # 4. Prüfe auf Prozessbeschreibungen
+    if any(keyword in title_lower for keyword in ['prozess', 'ablauf', 'verfahren', 'methode']):
+        return ContentType.PROCESS, None
+    
+    # 5. Prüfe auf theoretische Inhalte
+    if any(keyword in content_lower for keyword in ['definition', 'theorie', 'grundlagen', 'konzept']):
+        return ContentType.THEORY, None
+    
+    # 6. Standard-Lexikon für Wissensinhalte
+    if any(keyword in title_lower for keyword in ['aufgaben', 'ziele', 'arten', 'bedeutung', 'funktion']):
+        return ContentType.LEXIKON, None
+    
+    # Default
+    return ContentType.UNKNOWN, None
+
+def is_content_relevant(title: str, content: str) -> bool:
+    """Prüft, ob der Inhalt tatsächlich Wissen vermittelt."""
+    if not content.strip():
+        return False
+    
+    # Irrelevante Titel-Keywords
+    irrelevant_keywords = [
+        'inhaltsverzeichnis', 'impressum', 'literaturverzeichnis',
+        'anhang', 'index', 'glossar', 'danksagung', 'vorwort'
+    ]
+    
+    title_lower = title.lower()
+    if any(keyword in title_lower for keyword in irrelevant_keywords):
+        return False
+    
+    # Prüfe auf Mindestinhalt
+    word_count = len(content.split())
+    if word_count < 10:
+        return False
+    
+    # Prüfe auf reinen Verweis-Content
+    if 'siehe kapitel' in content.lower() and word_count < 30:
+        return False
+    
+    return True
+
+# ========================================
+# MARKDOWN EXTRAKTION
+# ========================================
+
+def extract_sections_from_md(file_path: str) -> List[Dict[str, Any]]:
     """Extrahiert Überschriften und zugehörigen Inhalt aus einer Markdown-Datei."""
     with open(file_path, 'r', encoding='utf-8') as file:
         content = file.read()
@@ -149,39 +269,398 @@ def extract_sections_from_md(file_path):
     
     return sections
 
-def is_content_relevant(title, content):
-    """Prüft, ob der Inhalt tatsächlich Wissen vermittelt."""
-    if not content.strip():
-        return False
+# ========================================
+# API KOMMUNIKATION
+# ========================================
+
+def submit_to_api(prompt: str, retries: int = 3) -> Optional[str]:
+    """Sendet eine Anfrage an die gewählte API und holt die Antwort."""
+    if USE_OPENAI_API:
+        return submit_to_openai_api(prompt, retries)
+    else:
+        return submit_to_ollama_api(prompt, retries)
+
+def submit_to_openai_api(prompt: str, retries: int = 3) -> Optional[str]:
+    """Sendet eine Anfrage an die OpenAI-API und holt die Antwort."""
+    headers = {
+        'Authorization': f'Bearer {OPENAI_API_KEY}',
+        'Content-Type': 'application/json'
+    }
+    
+    payload = {
+        "model": OPENAI_MODEL_NAME,
+        "messages": [
+            {"role": "system", "content": "Du bist ein Experte für das Erstellen von präzisen Lexikon- und Produkteinträgen. Antworte immer nur mit dem gewünschten Eintrag, ohne zusätzliche Erklärungen."},
+            {"role": "user", "content": prompt}
+        ],
+        "max_tokens": 1500,
+        "temperature": 0.3
+    }
+
+    for attempt in range(retries):
+        try:
+            response = requests.post(
+                f"{OPENAI_BASE_URL}/chat/completions", 
+                json=payload, 
+                headers=headers, 
+                timeout=60
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                content = result.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                return content
+            else:
+                print(f"❌ OpenAI-API-Fehler {response.status_code}: {response.text}")
+                
+        except requests.RequestException as e:
+            print(f"Fehler bei der OpenAI-API-Anfrage (Versuch {attempt + 1}): {e}")
+    
+    return None
+
+def submit_to_ollama_api(prompt: str, retries: int = 3) -> Optional[str]:
+    """Sendet eine Anfrage an die Ollama-API und holt die Antwort."""
+    headers = {
+        'Authorization': f'Bearer {OLLAMA_API_KEY}',
+        'Content-Type': 'application/json'
+    }
+    
+    payload = {
+        "model": OLLAMA_MODEL_NAME,
+        "temperature": 0.3,
+        "stream": False,
+        "messages": [
+            {"role": "system", "content": "Du bist ein Experte für das Erstellen von präzisen Lexikon- und Produkteinträgen. Antworte immer nur mit dem gewünschten Eintrag, ohne zusätzliche Erklärungen."},
+            {"role": "user", "content": prompt}
+        ]
+    }
+
+    for attempt in range(retries):
+        try:
+            response = requests.post(OLLAMA_CHAT_ENDPOINT, json=payload, headers=headers, timeout=60)
+            
+            if response.status_code == 200:
+                content = response.json().get("message", {}).get("content", "").strip()
+                return content
+            else:
+                print(f"❌ Ollama-API-Fehler {response.status_code}: {response.text}")
+                
+        except requests.RequestException as e:
+            print(f"Fehler bei der Ollama-API-Anfrage (Versuch {attempt + 1}): {e}")
+    
+    return None
+
+# ========================================
+# SPEZIALISIERTE VERARBEITUNGSFUNKTIONEN
+# ========================================
+
+def process_product_entry(section: Dict[str, Any], product_code: str) -> Optional[Dict[str, Any]]:
+    """Verarbeitet einen Produktkatalog-Eintrag mit Produktcode."""
+    title = section['title']
+    content = section['content']
+    
+    # Extrahiere Produktnamen (nach dem Code)
+    product_name_match = re.search(f'{re.escape(product_code)}\\s*[-–]?\\s*(.+?)(?:\\n|$)', title + '\n' + content)
+    product_name = product_name_match.group(1).strip() if product_name_match else title
+    
+    # Parse Beschreibung und Spezifikationen
+    desc_match = re.search(r'Beschreibung:\s*(.+?)(?=Technische|$)', content, re.DOTALL | re.IGNORECASE)
+    spec_match = re.search(r'Technische\s+Spezifikationen:\s*(.+)', content, re.DOTALL | re.IGNORECASE)
+    
+    description = desc_match.group(1).strip() if desc_match else ""
+    specifications = spec_match.group(1).strip() if spec_match else ""
     
     prompt = f"""
-Entscheide, ob dieser Abschnitt ECHTEN WISSENSINHALT enthält:
+Erstelle einen detaillierten Produktkatalog-Eintrag für folgendes Industrieprodukt:
 
-Titel: "{title}"
-Inhalt: {content[:500]}...
+PRODUKTCODE: {product_code}
+PRODUKTNAME: {product_name}
 
-IRRELEVANT sind:
-- Inhaltsverzeichnisse, Impressum, Titel, Vorwort
-- "Siehe Kapitel X", reine Verweise ohne Erklärung
-- Leere oder administrative Inhalte
-- Danksagungen, Literaturverzeichnisse
-- Reine Listen ohne Erklärungen
-- Einleitungen ohne Fachinhalt
+Beschreibung aus Originaldaten:
+{description}
 
-RELEVANT sind:
-- Definitionen, Erklärungen, Konzepte
-- Fakten, Prozesse, Methoden
-- Beispiele mit Lerninhalt
-- Theorien, Modelle, Frameworks
-- Praktische Anleitungen
+Technische Spezifikationen:
+{specifications}
 
-Antworte nur: JA oder NEIN
+WICHTIGE ANFORDERUNGEN:
+1. BEHALTE DEN EXAKTEN PRODUKTCODE {product_code} BEI
+2. BEHALTE DEN PRODUKTNAMEN "{product_name}" BEI
+3. Dies ist ein KONKRETES PRODUKT, keine allgemeine Definition
+4. Erkläre die technischen Eigenschaften im Kontext dieses spezifischen Produkts
+5. Beschreibe konkrete Anwendungsfälle für genau dieses Produkt
+
+FORMAT DES EINTRAGS:
+**{product_code} - {product_name}**
+
+[Detaillierte Produktbeschreibung - was macht dieses spezifische Produkt]
+
+**Technische Merkmale:**
+[Liste der technischen Eigenschaften mit Erklärungen ihrer Bedeutung]
+
+**Anwendungsbereiche:**
+[Konkrete Einsatzgebiete für dieses spezifische Produkt]
+
+**Besondere Eigenschaften:**
+[Was zeichnet dieses Produkt speziell aus]
+
+WICHTIG: Dies ist ein Produktkatalog-Eintrag für das konkrete Produkt {product_code}, NICHT eine allgemeine Definition!
 """
     
     response = submit_to_api(prompt)
-    return response and "JA" in response.upper()
+    
+    if response:
+        print(f"✅ Produkteintrag erstellt: {product_code} - {product_name}")
+        return {
+            'title': f"{product_code} - {product_name}",
+            'product_code': product_code,
+            'type': 'product',
+            'level': section['level'],
+            'original_title': section['title'],
+            'original_content': content,
+            'lexikon_entry': response,
+            'source': f"Product: {title}"
+        }
+    
+    return None
 
-def extract_definition_term(title, content):
+def process_structured_data_entry(section: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Verarbeitet strukturierte Daten (aus Excel-Konvertierung)."""
+    title = section['title']
+    content = section['content']
+    
+    # Bereinige Titel von Nummerierungen
+    clean_title = re.sub(r'^[\d\.\s\-:]+', '', title).strip()
+    
+    prompt = f"""
+Analysiere und beschreibe diese strukturierten Daten aus einer Tabelle/Liste:
+
+TITEL: {clean_title}
+
+DATENINHALT:
+{content}
+
+AUFGABE:
+1. Erkenne die Art der Daten (Tabelle, Liste, Struktur)
+2. Beschreibe die Datenstruktur und deren Bedeutung
+3. Erkläre den praktischen Nutzen dieser Informationen
+4. Fasse wichtige Erkenntnisse zusammen
+
+FORMAT:
+**{clean_title}**
+
+**Datentyp und Struktur:**
+[Beschreibung um welche Art von Daten es sich handelt]
+
+**Inhaltliche Bedeutung:**
+[Was bedeuten diese Daten im Kontext]
+
+**Praktische Verwendung:**
+[Wofür werden diese Daten genutzt]
+
+**Wichtige Erkenntnisse:**
+[Zusammenfassung der Kernpunkte]
+"""
+    
+    response = submit_to_api(prompt)
+    
+    if response:
+        print(f"✅ Strukturdaten-Eintrag erstellt: {clean_title}")
+        return {
+            'title': clean_title,
+            'type': 'structured_data',
+            'level': section['level'],
+            'original_title': section['title'],
+            'original_content': content,
+            'lexikon_entry': response,
+            'source': f"Structured Data: {title}"
+        }
+    
+    return None
+
+def process_technical_entry(section: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Verarbeitet technische Dokumentation."""
+    title = section['title']
+    content = section['content']
+    
+    # Bereinige Titel
+    clean_title = re.sub(r'^[\d\.\s\-:]+', '', title).strip()
+    
+    prompt = f"""
+Erstelle einen technischen Dokumentations-Eintrag für:
+
+THEMA: {clean_title}
+
+TECHNISCHER INHALT:
+{content}
+
+ANFORDERUNGEN:
+1. Erkläre technische Konzepte präzise und verständlich
+2. Behalte Fachterminologie bei, erkläre sie aber
+3. Strukturiere nach: Definition, Funktionsweise, Anwendung
+4. Nenne konkrete technische Parameter wenn vorhanden
+
+FORMAT:
+**{clean_title}**
+
+**Technische Definition:**
+[Präzise technische Beschreibung]
+
+**Funktionsweise:**
+[Wie funktioniert es technisch]
+
+**Technische Parameter:**
+[Wichtige Kennzahlen und Spezifikationen]
+
+**Praktische Anwendung:**
+[Wo und wie wird es eingesetzt]
+"""
+    
+    response = submit_to_api(prompt)
+    
+    if response:
+        print(f"✅ Technischer Eintrag erstellt: {clean_title}")
+        return {
+            'title': clean_title,
+            'type': 'technical',
+            'level': section['level'],
+            'original_title': section['title'],
+            'original_content': content,
+            'lexikon_entry': response,
+            'source': f"Technical: {title}"
+        }
+    
+    return None
+
+def process_process_entry(section: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Verarbeitet Prozessbeschreibungen."""
+    title = section['title']
+    content = section['content']
+    
+    # Bereinige Titel
+    clean_title = re.sub(r'^[\d\.\s\-:]+', '', title).strip()
+    
+    prompt = f"""
+Erstelle eine strukturierte Prozessbeschreibung für:
+
+PROZESS: {clean_title}
+
+PROZESSINHALT:
+{content}
+
+FORMAT:
+**{clean_title}**
+
+**Prozessübersicht:**
+[Kurze Zusammenfassung des Prozesses]
+
+**Ablaufschritte:**
+[Strukturierte Darstellung der Schritte]
+
+**Voraussetzungen:**
+[Was wird benötigt]
+
+**Ergebnis:**
+[Was ist das Ziel/Output]
+
+**Wichtige Hinweise:**
+[Besonderheiten, Best Practices]
+"""
+    
+    response = submit_to_api(prompt)
+    
+    if response:
+        print(f"✅ Prozess-Eintrag erstellt: {clean_title}")
+        return {
+            'title': clean_title,
+            'type': 'process',
+            'level': section['level'],
+            'original_title': section['title'],
+            'original_content': content,
+            'lexikon_entry': response,
+            'source': f"Process: {title}"
+        }
+    
+    return None
+
+def process_theory_entry(section: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Verarbeitet theoretische Konzepte."""
+    title = section['title']
+    content = section['content']
+    
+    # Extrahiere optimalen Begriff
+    clean_title = extract_definition_term(title, content)
+    
+    prompt = f"""
+Erstelle einen wissenschaftlichen Lexikon-Eintrag für:
+
+KONZEPT: {clean_title}
+
+ORIGINALINHALT:
+{content}
+
+ANFORDERUNGEN:
+1. Beginne mit einer präzisen wissenschaftlichen Definition
+2. Erkläre theoretische Grundlagen
+3. Nenne praktische Anwendungen
+4. Verwende akademische, neutrale Sprache
+
+FORMAT:
+**{clean_title}**
+
+[Wissenschaftliche Definition]
+
+**Theoretische Grundlagen:**
+[Erklärung der Theorie]
+
+**Praktische Bedeutung:**
+[Anwendung in der Praxis]
+
+**Verwandte Konzepte:**
+[Falls relevant]
+"""
+    
+    response = submit_to_api(prompt)
+    
+    if response:
+        print(f"✅ Theorie-Eintrag erstellt: {clean_title}")
+        return {
+            'title': clean_title,
+            'type': 'theory',
+            'level': section['level'],
+            'original_title': section['title'],
+            'original_content': content,
+            'lexikon_entry': response,
+            'source': f"Theory: {title}"
+        }
+    
+    return None
+
+def process_lexikon_entry(section: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Verarbeitet Standard-Lexikon-Einträge (bisherige Funktionalität)."""
+    title = section['title']
+    content = section['content']
+    
+    # Extrahiere optimalen Begriff
+    optimal_title = extract_definition_term(title, content)
+    
+    prompt = create_lexikon_prompt(optimal_title, content)
+    response = submit_to_api(prompt)
+    
+    if response:
+        print(f"✅ Lexikon-Eintrag erstellt: {optimal_title}")
+        return {
+            'title': optimal_title,
+            'type': 'lexikon',
+            'level': section['level'],
+            'original_title': section['title'],
+            'original_content': content,
+            'lexikon_entry': response,
+            'source': f"Section: {title}"
+        }
+    
+    return None
+
+def extract_definition_term(title: str, content: str) -> str:
     """Extrahiert den optimalen Definitionsbegriff."""
     prompt = f"""
 Analysiere diese Überschrift und bestimme den PRÄZISESTEN Definitionsbegriff:
@@ -215,8 +694,8 @@ Antworte NUR mit dem optimalen Begriff (ohne Anführungszeichen):
         return cleaned if cleaned else title
     return title
 
-def create_lexikon_prompt(optimal_title, content):
-    """Erstellt einen verbesserten Prompt für die Lexikon-Erstellung."""
+def create_lexikon_prompt(optimal_title: str, content: str) -> str:
+    """Erstellt einen Prompt für Standard-Lexikon-Einträge."""
     prompt = f"""
 Erstelle einen präzisen Wikipedia-ähnlichen Lexikon-Eintrag für: "{optimal_title}"
 
@@ -242,163 +721,120 @@ WICHTIG: Antworte NUR mit dem Lexikon-Eintrag, ohne zusätzliche Erklärungen od
 """
     return prompt
 
-def submit_to_api(prompt, retries=3):
-    """Sendet eine Anfrage an die gewählte API und holt die Antwort."""
-    if USE_OPENAI_API:
-        return submit_to_openai_api(prompt, retries)
-    else:
-        return submit_to_ollama_api(prompt, retries)
+# ========================================
+# HAUPTVERARBEITUNGSFUNKTION
+# ========================================
 
-def submit_to_openai_api(prompt, retries=3):
-    """Sendet eine Anfrage an die OpenAI-API und holt die Antwort."""
-    headers = {
-        'Authorization': f'Bearer {OPENAI_API_KEY}',
-        'Content-Type': 'application/json'
-    }
-    
-    payload = {
-        "model": OPENAI_MODEL_NAME,
-        "messages": [
-            {"role": "system", "content": "Du bist ein Experte für das Erstellen von Lexikon-Einträgen. Antworte immer nur mit dem gewünschten Lexikon-Eintrag, ohne zusätzliche Erklärungen."},
-            {"role": "user", "content": prompt}
-        ],
-        "max_tokens": 1000,
-        "temperature": 0.3
-    }
-
-    for attempt in range(retries):
-        try:
-            response = requests.post(
-                f"{OPENAI_BASE_URL}/chat/completions", 
-                json=payload, 
-                headers=headers, 
-                timeout=60
-            )
-            
-            if response.status_code == 200:
-                result = response.json()
-                content = result.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
-                return content
-            else:
-                print(f"❌ OpenAI-API-Fehler {response.status_code}: {response.text}")
-                
-        except requests.RequestException as e:
-            print(f"Fehler bei der OpenAI-API-Anfrage (Versuch {attempt + 1}): {e}")
-    
-    return None
-
-def submit_to_ollama_api(prompt, retries=3):
-    """Sendet eine Anfrage an die Ollama-API und holt die Antwort."""
-    headers = {
-        'Authorization': f'Bearer {OLLAMA_API_KEY}',
-        'Content-Type': 'application/json'
-    }
-    
-    payload = {
-        "model": OLLAMA_MODEL_NAME,
-        "temperature": 0.3,
-        "stream": False,
-        "messages": [
-            {"role": "system", "content": "Du bist ein Experte für das Erstellen von Lexikon-Einträgen. Antworte immer nur mit dem gewünschten Lexikon-Eintrag, ohne zusätzliche Erklärungen."},
-            {"role": "user", "content": prompt}
-        ]
-    }
-
-    for attempt in range(retries):
-        try:
-            response = requests.post(OLLAMA_CHAT_ENDPOINT, json=payload, headers=headers, timeout=60)
-            
-            if response.status_code == 200:
-                content = response.json().get("message", {}).get("content", "").strip()
-                return content
-            else:
-                print(f"❌ Ollama-API-Fehler {response.status_code}: {response.text}")
-                
-        except requests.RequestException as e:
-            print(f"Fehler bei der Ollama-API-Anfrage (Versuch {attempt + 1}): {e}")
-    
-    return None
-
-def process_section_to_lexikon(section, max_retries=3):
-    """Verbesserte Verarbeitung mit intelligenter Begriffserkennung."""
-    original_title = section['title']
+def process_section_to_entry(section: Dict[str, Any], max_retries: int = 3) -> Optional[Dict[str, Any]]:
+    """Intelligente Verarbeitung einer Sektion basierend auf Content-Typ."""
+    title = section['title']
     content = section['content']
     
-    print(f"🔍 Prüfe Relevanz von '{original_title}'...")
-    if not is_content_relevant(original_title, content):
-        print(f"⚠️ Sektion '{original_title}' ist nicht relevant, wird übersprungen.")
+    # Prüfe Relevanz
+    if not is_content_relevant(title, content):
+        print(f"⚠️ Sektion '{title}' ist nicht relevant, wird übersprungen.")
         return None
     
-    print(f"🔍 Extrahiere Definitionsbegriff für '{original_title}'...")
-    optimal_title = extract_definition_term(original_title, content)
-    print(f"✅ Definitionsbegriff: '{optimal_title}'")
+    # Erkenne Content-Typ
+    content_type, product_code = detect_content_type(title, content)
+    print(f"🔍 Erkannter Typ für '{title}': {content_type}" + (f" (Code: {product_code})" if product_code else ""))
     
-    print(f"📖 Erstelle Lexikon-Eintrag für: {optimal_title}")
-    prompt = create_lexikon_prompt(optimal_title, content)
+    # Verarbeite basierend auf Typ
+    entry = None
     
-    for attempt in range(max_retries):
-        response = submit_to_api(prompt)
-        
-        if response:
-            print(f"✅ Sektion '{original_title}' → Lexikon-Eintrag '{optimal_title}'")
-            return {
-                'title': optimal_title,
-                'original_title': original_title,
-                'level': section['level'],
-                'original_content': content,
-                'lexikon_entry': response,
-                'source': f"Section: {original_title}"
-            }
-        
-        print(f"❌ Fehler bei Sektion '{optimal_title}', Versuch {attempt + 1}/{max_retries}")
+    try:
+        if content_type == ContentType.PRODUCT:
+            entry = process_product_entry(section, product_code)
+        elif content_type == ContentType.STRUCTURED_DATA:
+            entry = process_structured_data_entry(section)
+        elif content_type == ContentType.TECHNICAL:
+            entry = process_technical_entry(section)
+        elif content_type == ContentType.PROCESS:
+            entry = process_process_entry(section)
+        elif content_type == ContentType.THEORY:
+            entry = process_theory_entry(section)
+        elif content_type == ContentType.LEXIKON:
+            entry = process_lexikon_entry(section)
+        else:
+            # Fallback auf Standard-Lexikon
+            entry = process_lexikon_entry(section)
     
-    print(f"⚠️ Sektion '{original_title}' konnte nicht verarbeitet werden.")
-    return None
+    except Exception as e:
+        print(f"❌ Fehler bei Verarbeitung von '{title}': {e}")
+    
+    return entry
 
-def process_markdown_to_lexikon(md_file_path, output_json):
+# ========================================
+# DATEIVERARBEITUNG
+# ========================================
+
+def process_markdown_to_lexikon(md_file_path: str, output_json: str):
     """Verarbeitet eine Markdown-Datei zu einem Lexikon."""
     print(f"🔄 Starte Verarbeitung von {md_file_path}...")
     
     sections = extract_sections_from_md(md_file_path)
     print(f"📋 Gefundene Sektionen: {len(sections)}")
     
+    # Zeige Übersicht
     for i, section in enumerate(sections, 1):
         indent = "  " * (section['level'] - 1)
-        print(f"{i:2d}. {indent}{section['title']} (Level {section['level']})")
+        # Erkenne Typ für Anzeige
+        content_type, product_code = detect_content_type(section['title'], section['content'])
+        type_indicator = f" [{content_type}]"
+        if product_code:
+            type_indicator += f" ({product_code})"
+        print(f"{i:2d}. {indent}{section['title']}{type_indicator}")
     
     os.makedirs(os.path.dirname(output_json), exist_ok=True)
     
-    lexikon_entries = []
+    entries = []
     skipped_sections = []
+    
+    # Statistik nach Typ
+    type_stats = {
+        'product': 0,
+        'structured_data': 0,
+        'technical': 0,
+        'process': 0,
+        'theory': 0,
+        'lexikon': 0,
+        'unknown': 0
+    }
     
     for idx, section in enumerate(sections, 1):
         print(f"\n🔄 Verarbeite Sektion {idx}/{len(sections)}: {section['title']}")
         
-        entry = process_section_to_lexikon(section)
+        entry = process_section_to_entry(section)
         
         if entry:
-            lexikon_entries.append(entry)
-            print(f"✅ Sektion '{section['title']}' erfolgreich verarbeitet")
+            entries.append(entry)
+            entry_type = entry.get('type', 'unknown')
+            type_stats[entry_type] = type_stats.get(entry_type, 0) + 1
+            print(f"✅ Erfolgreich verarbeitet als: {entry_type}")
         else:
             skipped_sections.append(section['title'])
-            print(f"⚠️ Sektion '{section['title']}' übersprungen")
+            print(f"⚠️ Sektion übersprungen")
     
+    # Erstelle Metadaten
     api_name = "OpenAI-API" if USE_OPENAI_API else "Ollama-API"
     model_name = OPENAI_MODEL_NAME if USE_OPENAI_API else OLLAMA_MODEL_NAME
     
     result = {
         'metadata': {
             'source_file': str(Path(md_file_path).name),
+            'processed_at': datetime.now().isoformat(),
             'total_sections': len(sections),
-            'processed_sections': len(lexikon_entries),
+            'processed_sections': len(entries),
             'skipped_sections': len(skipped_sections),
             'api_used': api_name,
             'model_used': model_name,
+            'entry_statistics': type_stats,
             'skipped_section_titles': skipped_sections
         },
-        'lexikon_entries': lexikon_entries
+        'lexikon_entries': entries
     }
     
+    # Speichere Ergebnis
     with open(output_json, 'w', encoding='utf-8') as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
     
@@ -407,12 +843,16 @@ def process_markdown_to_lexikon(md_file_path, output_json):
     print(f"   - API verwendet: {api_name}")
     print(f"   - Modell verwendet: {model_name}")
     print(f"   - Gefundene Sektionen: {len(sections)}")
-    print(f"   - Erfolgreich verarbeitet: {len(lexikon_entries)}")
+    print(f"   - Erfolgreich verarbeitet: {len(entries)}")
+    print(f"   - Eintragstypen:")
+    for entry_type, count in type_stats.items():
+        if count > 0:
+            print(f"     • {entry_type}: {count}")
     print(f"   - Übersprungen: {len(skipped_sections)}")
     print(f"   - Ergebnis gespeichert in: {output_json}")
 
-def preview_sections(md_file_path, limit=5):
-    """Zeigt eine Vorschau der ersten paar Sektionen an."""
+def preview_sections(md_file_path: str, limit: int = 5):
+    """Zeigt eine Vorschau der ersten Sektionen mit Typ-Erkennung."""
     sections = extract_sections_from_md(md_file_path)
     
     print(f"📋 Vorschau der ersten {min(limit, len(sections))} Sektionen:")
@@ -420,13 +860,16 @@ def preview_sections(md_file_path, limit=5):
     
     for i, section in enumerate(sections[:limit], 1):
         indent = "  " * (section['level'] - 1)
+        content_type, product_code = detect_content_type(section['title'], section['content'])
+        
         print(f"{i}. {indent}{section['title']} (Level {section['level']})")
+        print(f"   Typ: {content_type}" + (f" [Code: {product_code}]" if product_code else ""))
         
         content_preview = section['content'][:200] + "..." if len(section['content']) > 200 else section['content']
         print(f"   Inhalt: {content_preview}")
         print("-" * 30)
 
-def find_md_files(input_dir):
+def find_md_files(input_dir: str) -> List[Path]:
     """Findet alle Markdown-Dateien im Input-Verzeichnis."""
     input_path = Path(input_dir)
     if not input_path.exists():
@@ -440,7 +883,7 @@ def find_md_files(input_dir):
     
     return md_files
 
-def process_all_md_files(input_dir="INPUT", output_dir="OUTPUT"):
+def process_all_md_files(input_dir: str = "INPUT", output_dir: str = "OUTPUT"):
     """Verarbeitet alle Markdown-Dateien im Input-Verzeichnis."""
     api_name = "OpenAI-API" if USE_OPENAI_API else "Ollama-API"
     server_url = OPENAI_BASE_URL if USE_OPENAI_API else OLLAMA_SERVER_URL
@@ -467,6 +910,17 @@ def process_all_md_files(input_dir="INPUT", output_dir="OUTPUT"):
     print(f"Verarbeite {len(md_files)} Datei(en):")
     print(f"{'='*60}")
     
+    # Gesamtstatistik
+    total_stats = {
+        'product': 0,
+        'structured_data': 0,
+        'technical': 0,
+        'process': 0,
+        'theory': 0,
+        'lexikon': 0,
+        'unknown': 0
+    }
+    
     for idx, md_file in enumerate(md_files, 1):
         print(f"\n🔄 Datei {idx}/{len(md_files)}: {md_file.name}")
         print(f"{'─'*40}")
@@ -476,6 +930,14 @@ def process_all_md_files(input_dir="INPUT", output_dir="OUTPUT"):
         
         try:
             process_markdown_to_lexikon(str(md_file), str(output_path))
+            
+            # Lade Statistik für Gesamtübersicht
+            with open(output_path, 'r', encoding='utf-8') as f:
+                result = json.load(f)
+                stats = result.get('metadata', {}).get('entry_statistics', {})
+                for key, value in stats.items():
+                    total_stats[key] = total_stats.get(key, 0) + value
+            
             print(f"✅ Datei {md_file.name} erfolgreich verarbeitet → {output_filename}")
             
         except Exception as e:
@@ -483,8 +945,16 @@ def process_all_md_files(input_dir="INPUT", output_dir="OUTPUT"):
     
     print(f"\n{'='*60}")
     print(f"🎉 Verarbeitung aller Dateien abgeschlossen!")
-    print(f"📊 Ausgabe-Dateien im Verzeichnis: {output_dir}")
+    print(f"📊 Gesamtstatistik aller Einträge:")
+    for entry_type, count in total_stats.items():
+        if count > 0:
+            print(f"   • {entry_type}: {count}")
+    print(f"📂 Ausgabe-Dateien im Verzeichnis: {output_dir}")
     print(f"🔧 Verwendet: {api_name}")
+
+# ========================================
+# HAUPTPROGRAMM
+# ========================================
 
 if __name__ == "__main__":
     INPUT_DIR = "INPUT"
@@ -499,4 +969,8 @@ if __name__ == "__main__":
     print(f"   - Server: {server_url}")
     print(f"   - Modell: {model_name}")
     
+    # Optional: Vorschau für eine spezifische Datei
+    # preview_sections("INPUT/Produktkatalog Relmiad AG.md", limit=10)
+    
+    # Verarbeite alle Dateien
     process_all_md_files(INPUT_DIR, OUTPUT_DIR)
