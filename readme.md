@@ -26,12 +26,17 @@
 
 This project is part-funded by the **Ministry of Science, Research and Arts Baden-Württemberg (MWK)** and **Stifterverband Deutschland** as part of digital [Fellowship-Program](https://www.stifterverband.org/bwdigifellows/2024_engel_leiblein).
 
-> **Tip**   
-> **OpenTuneWeaver is free for personal and educational use, so try it now!**
-> **Looking for an [Enterprise Plan](mailto:sales@opentuneweaver.com)?** – **Speak with Our Sales Team Today!**  
-> > **Enterprise License**: One-time payment, including **1 year of updates**.  
-> After the first year, updates can optionally be extended for an additional fee.  
-
+> **🚀 Get Started with OpenTuneWeaver**
+> 
+> **✅ Free for Personal & Educational Use**  
+> Perfect for researchers, students, and personal projects
+> 
+> **💼 Commercial Use?** → **[Enterprise Plan Required](mailto:sales@opentuneweaver.com)**  
+> 🎯 One-time payment with **1 year of updates included**  
+> 🔄 Optional update extensions available after first year  
+> 📞 **[Contact Sales Team](mailto:sales@opentuneweaver.com)** for pricing & enterprise features
+> 
+> **🎓 Academic Institutions**: Free for research and teaching activities
 ***
 
 ![OpenTuneWeaver Viewer Demo](assets/OTW_viewer_demo.gif)
@@ -175,15 +180,15 @@ OpenTuneWeaver and our research on AI in education have gained significant media
 ### Recent Press Coverage
 
 **📰 [Stuttgarter Zeitung - "Wie künstliche Intelligenz beim Lernen hilft"](https://www.stuttgarter-zeitung.de/inhalt.wissenschaftler-aus-nuertingen-wie-kuenstliche-intelligenz-beim-lernen-hilft.016cc0c8-debb-46b5-9fb4-8e99815dfcdb.html)**  
-*Published: 2024*  
+*Published: 23.09.2024*  
 Article discussing how artificial intelligence assists in learning processes, featuring research from HfWU Nürtingen-Geislingen and addressing both opportunities and challenges that language models like ChatGPT present to academic teaching.
 
 **📰 [Nürtinger Zeitung - "Wie künstliche Intelligenz beim Studieren hilft"](https://www.ntz.de/nuertingen/artikel_hfwu-in-nuertingen-wie-kuenstliche-intelligenz-beim-studieren-hilft.html)**  
-*Published: 2024*  
+*Published: 03.12.2024*  
 Feature article on how AI supports university studies, highlighting the collaborative research between Tobias Leiblein and Prof. Dr. Mathias Engel on developing AI tutoring systems and their impact on future education methods.
 
 **📰 [VDI Nachrichten - "Professor Chatbot hilft den Studierenden"](https://www.vdi-nachrichten.com/karriere/studium/professor-chatbot/)**  
-*Published: January 2025*  
+*Published: 17.01.2025*  
 Technical magazine article exploring how universities increasingly deploy artificial intelligence to enhance teaching quality, discussing both the potential and limitations of AI-powered learning assistance systems.
 
 ---
