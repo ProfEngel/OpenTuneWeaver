@@ -30,13 +30,13 @@ This project is part-funded by the **Ministry of Science, Research and Arts Bade
 > 
 > **✅ Free for Personal & Educational Use**  
 > Perfect for researchers, students, and personal projects
-> 
+>  
+> **🎓 Academic Institutions**: Free for research and teaching activities
+>
 > **💼 Commercial Use?** → **[Enterprise Plan Required](mailto:sales@opentuneweaver.com)**  
 > 🎯 One-time payment with **1 year of updates included**  
 > 🔄 Optional update extensions available after first year  
 > 📞 **[Contact Sales Team](mailto:sales@opentuneweaver.com)** for pricing & enterprise features
-> 
-> **🎓 Academic Institutions**: Free for research and teaching activities
 ***
 
 ![OpenTuneWeaver Viewer Demo](assets/OTW_viewer_demo.gif)
