@@ -26,7 +26,8 @@
 
 This project is part-funded by the **Ministry of Science, Research and Arts Baden-Württemberg (MWK)** and **Stifterverband Deutschland** as part of digital [Fellowship-Program](https://www.stifterverband.org/bwdigifellows/2024_engel_leiblein).
 
-> **Tip**  OpenTuneWeaver is free for personal and educational use 
+> **Tip**   
+> **OpenTuneWeaver is free for personal and educational use, so try it now!**
 > **Looking for an [Enterprise Plan](mailto:sales@opentuneweaver.com)?** – **Speak with Our Sales Team Today!**  
 > > **Enterprise License**: One-time payment, including **1 year of updates**.  
 > After the first year, updates can optionally be extended for an additional fee.  
