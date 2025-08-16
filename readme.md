@@ -14,9 +14,6 @@
   <img src="assets/otw_logo_banner.png" alt="OpenTuneWeaver Logo" width="900">
 </div>
 
- 
-
-
 
 ![OpenTuneWeaver Demo](assets/OTW_demo.gif)
 
@@ -29,7 +26,7 @@
 
 This project is part-funded by the **Ministry of Science, Research and Arts Baden-Württemberg (MWK)** and **Stifterverband Deutschland** as part of digital [Fellowship-Program](https://www.stifterverband.org/bwdigifellows/2024_engel_leiblein).
 
-> **Tip**  
+> **Tip**  OpenTuneWeaver is free for personal and educational use 
 > **Looking for an [Enterprise Plan](mailto:sales@opentuneweaver.com)?** – **Speak with Our Sales Team Today!**  
 > > **Enterprise License**: One-time payment, including **1 year of updates**.  
 > After the first year, updates can optionally be extended for an additional fee.  
@@ -169,6 +166,32 @@ pip install --upgrade --no-cache-dir --no-deps git+https://github.com/unslothai/
 See our complete [Roadmap](docs/roadmap.md) for detailed information.
 
 ***
+
+## Media Coverage & Interviews 📰
+
+OpenTuneWeaver and our research on AI in education have gained significant media attention. Here are recent interviews and articles featuring Prof. Dr. Mathias Engel and the project:
+
+### Recent Press Coverage
+
+**📰 [Stuttgarter Zeitung - "Wie künstliche Intelligenz beim Lernen hilft"](https://www.stuttgarter-zeitung.de/inhalt.wissenschaftler-aus-nuertingen-wie-kuenstliche-intelligenz-beim-lernen-hilft.016cc0c8-debb-46b5-9fb4-8e99815dfcdb.html)**  
+*Published: 2024*  
+Article discussing how artificial intelligence assists in learning processes, featuring research from HfWU Nürtingen-Geislingen and addressing both opportunities and challenges that language models like ChatGPT present to academic teaching.
+
+**📰 [Nürtinger Zeitung - "Wie künstliche Intelligenz beim Studieren hilft"](https://www.ntz.de/nuertingen/artikel_hfwu-in-nuertingen-wie-kuenstliche-intelligenz-beim-studieren-hilft.html)**  
+*Published: 2024*  
+Feature article on how AI supports university studies, highlighting the collaborative research between Tobias Leiblein and Prof. Dr. Mathias Engel on developing AI tutoring systems and their impact on future education methods.
+
+**📰 [VDI Nachrichten - "Professor Chatbot hilft den Studierenden"](https://www.vdi-nachrichten.com/karriere/studium/professor-chatbot/)**  
+*Published: January 2025*  
+Technical magazine article exploring how universities increasingly deploy artificial intelligence to enhance teaching quality, discussing both the potential and limitations of AI-powered learning assistance systems.
+
+---
+
+**Academic Impact:**  
+These media appearances reflect the growing recognition of OpenTuneWeaver's innovative approach to democratizing AI fine-tuning for educational institutions and the broader implications of semantic chunking technology in knowledge management.
+
+**Press Contact:**  
+For additional interviews or press inquiries: [research@opentuneweaver.com](mailto:research@opentuneweaver.com)
 
 ## License 📜
 
