@@ -4,25 +4,25 @@ import sys
 from pathlib import Path
 
 # ========================================
-# LOAD CENTRAL CONFIGURATION
+# ZENTRALE KONFIGURATION LADEN
 # ========================================
-sys.path.append(str(Path(__file__).parent.parent.parent))  # To main directory
+sys.path.append(str(Path(__file__).parent.parent.parent))  # Zum Hauptverzeichnis
 from config_loader import PipelineConfigLoader
 
-# Load configuration (04_format doesn't need API config, but we load for consistency)
+# Lade Konfiguration (04_format benötigt keine API-Config, aber wir laden trotzdem für Konsistenz)
 config_loader = PipelineConfigLoader()
 pipeline_config = config_loader.get_pipeline_config()
 
-# Show loaded configuration
+# Zeige geladene Konfiguration
 print("=" * 60)
-print("📋 CONFIGURATION LOADED (04_format)")
+print("📋 KONFIGURATION GELADEN (04_format)")
 print("=" * 60)
-print("  📋 Format script - No API required")
-print("  ✅ Pipeline config loaded")
+print("  📋 Format-Skript - Keine API benötigt")
+print("  ✅ Pipeline-Config geladen")
 print("=" * 60)
 
 def create_gemma3_conversation(instruction, output):
-    """Creates a conversation in Gemma-3 format"""
+    """Erstellt eine Conversation im Gemma-3 Format"""
     conversation = [
         {
             "content": [
@@ -46,55 +46,54 @@ def create_gemma3_conversation(instruction, output):
     return conversation
 
 def create_gemma3_text(instruction, output):
-    """Creates the formatted text for Gemma-3 training"""
+    """Erstellt den formatierten Text für Gemma-3 Training"""
     text = f"<start_of_turn>user\n{instruction}<end_of_turn>\n<start_of_turn>model\n{output}<end_of_turn>\n"
     return text
 
 def process_qa_dataset():
-    """Processes QA datasets and converts them to Gemma-3 format"""
-    # Define directory paths
+    # Verzeichnispfade definieren
     input_dir = Path("INPUT")
     output_dir = Path("OUTPUT")
     
-    # Create OUTPUT directory if it doesn't exist
+    # OUTPUT-Verzeichnis erstellen, falls es nicht existiert
     output_dir.mkdir(exist_ok=True)
     
-    # Find all JSON files in INPUT folder
+    # Alle JSON-Dateien im INPUT-Ordner finden
     json_files = list(input_dir.glob("*.json"))
     
     if not json_files:
-        print("No JSON files found in INPUT folder.")
+        print("Keine JSON-Dateien im INPUT-Ordner gefunden.")
         return
     
-    # Collector for all datasets
+    # Sammler für alle Datensätze
     all_entries = []
     
-    # Process each JSON file
+    # Jede JSON-Datei verarbeiten
     for json_file in json_files:
-        print(f"Processing {json_file.name}...")
+        print(f"Verarbeite {json_file.name}...")
         
         try:
             with open(json_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
             
-            # Extract data from qa_instruct_dataset format
+            # Daten aus dem qa_instruct_dataset Format extrahieren
             if 'data' in data:
                 qa_pairs = data['data']
                 
-                # Convert each Q&A pair
+                # Jedes Q&A-Paar konvertieren
                 for qa in qa_pairs:
                     instruction = qa.get("instruction", "")
                     output = qa.get("output", "")
                     
-                    # Skip empty entries
+                    # Leere Einträge überspringen
                     if not instruction.strip() or not output.strip():
                         continue
                     
-                    # Create Gemma-3 format
+                    # Gemma-3 Format erstellen
                     conversations = create_gemma3_conversation(instruction, output)
                     text = create_gemma3_text(instruction, output)
                     
-                    # Entry in desired format
+                    # Eintrag im gewünschten Format
                     entry = {
                         "conversations": conversations,
                         "text": text
@@ -102,14 +101,14 @@ def process_qa_dataset():
                     
                     all_entries.append(entry)
                 
-                print(f"  {len(qa_pairs)} Q&A pairs processed from {json_file.name}")
+                print(f"  {len(qa_pairs)} Q&A-Paare aus {json_file.name} verarbeitet")
             
         except json.JSONDecodeError as e:
-            print(f"Error reading {json_file.name}: {e}")
+            print(f"Fehler beim Lesen von {json_file.name}: {e}")
         except Exception as e:
-            print(f"Unexpected error with {json_file.name}: {e}")
+            print(f"Unerwarteter Fehler bei {json_file.name}: {e}")
     
-    # Save dataset as JSONL (one JSON line per entry)
+    # Dataset als JSONL speichern (eine JSON-Zeile pro Eintrag)
     output_file = output_dir / "dataset.json"
     
     try:
@@ -118,22 +117,22 @@ def process_qa_dataset():
                 json.dump(entry, f, ensure_ascii=False)
                 f.write('\n')
         
-        print(f"\nSuccessfully saved: {output_file}")
-        print(f"Total {len(all_entries)} entries created in Gemma-3 format")
+        print(f"\nErfolgreich gespeichert: {output_file}")
+        print(f"Insgesamt {len(all_entries)} Einträge im Gemma-3 Format erstellt")
         
-        # Show example output
+        # Beispiel-Ausgabe zeigen
         if all_entries:
-            print("\nExample entry:")
+            print("\nBeispiel-Eintrag:")
             example = all_entries[0]
             print(f"Conversations: {json.dumps(example['conversations'], ensure_ascii=False, indent=2)}")
             print(f"Text: {repr(example['text'][:100])}...")
             
     except Exception as e:
-        print(f"Error saving: {e}")
+        print(f"Fehler beim Speichern: {e}")
 
 if __name__ == "__main__":
-    print("🚀 Starting dataset formatting (04_format)")
-    print("📝 Converting Q&A pairs to Gemma-3 format")
+    print("🚀 Starte Dataset-Formatierung (04_format)")
+    print("📝 Konvertiere QA-Paare zu Gemma-3 Format")
     print("📂 Input: INPUT/")
     print("📂 Output: OUTPUT/dataset.json")
     print("")

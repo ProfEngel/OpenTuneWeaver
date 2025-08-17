@@ -11,17 +11,17 @@ from PIL import Image, ImageEnhance
 import requests
 
 # ========================================
-# LOAD CENTRAL CONFIGURATION
+# ZENTRALE KONFIGURATION LADEN
 # ========================================
-sys.path.append(str(Path(__file__).parent.parent.parent))  # To main directory
+sys.path.append(str(Path(__file__).parent.parent.parent))  # Zum Hauptverzeichnis
 from config_loader import PipelineConfigLoader
 
-# Load configuration for this module
+# Lade Konfiguration für dieses Modul
 config_loader = PipelineConfigLoader("01_convert")
 config = config_loader.get_api_config()
 pipeline_config = config_loader.get_pipeline_config()
 
-# Extract configuration values
+# Extrahiere Konfigurationswerte
 CREATE_COMBINED_MD = config.get("create_combined_md", False)
 USE_OPENAI_API = config.get("use_openai_api", True)
 OPENAI_BASE_URL = config.get("openai_base_url", "http://localhost:11434/v1")
@@ -36,40 +36,40 @@ CONTRAST_FACTOR = config.get("contrast_factor", 2.0)
 IMAGE_DESCRIPTION_TIMEOUT = config.get("image_description_timeout", 60)
 MAX_RETRIES = config.get("max_retries", 3)
 
-# Show loaded configuration
+# Zeige geladene Konfiguration
 print("=" * 60)
-print("📋 CONFIGURATION LOADED (01_convert)")
+print("📋 KONFIGURATION GELADEN (01_convert)")
 print("=" * 60)
 config_loader.print_config_summary()
 print(f"  📄 Combined MD: {'✅' if CREATE_COMBINED_MD else '❌'}")
-print(f"  🖼️ Contrast Factor: {CONTRAST_FACTOR}")
+print(f"  🖼️ Kontrast-Faktor: {CONTRAST_FACTOR}")
 print("=" * 60)
 
-# Docling imports
+# Docling-Imports
 from docling.datamodel.base_models import InputFormat
 from docling.datamodel.pipeline_options import PdfPipelineOptions
 from docling.document_converter import DocumentConverter, PdfFormatOption
 from docling_core.types.doc import ImageRefMode
 
 # ========================================
-# HELPER FUNCTIONS
+# HILFSFUNKTIONEN
 # ========================================
 
 def setup_logging():
-    """Configures logging."""
+    """Konfiguriert das Logging."""
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
 
 def print_section(title):
-    """Prints a section header."""
+    """Druckt einen Abschnitt-Header."""
     print(f"\n{'='*60}")
     print(f"  {title}")
     print(f"{'='*60}")
 
 def get_pdf_page_count(pdf_path):
-    """Determines the page count of a PDF."""
+    """Ermittelt die Seitenzahl eines PDFs."""
     try:
         import PyPDF2
         with open(pdf_path, 'rb') as f:
@@ -79,33 +79,33 @@ def get_pdf_page_count(pdf_path):
         return 0
 
 # ========================================
-# 0. DIRECTORY SETUP
+# 0. ORDNER-SETUP
 # ========================================
 
 def setup_directories():
-    """Creates all necessary directories."""
+    """Erstellt alle notwendigen Ordner."""
     directories = ['UPLOAD', 'INPUT', 'OUTPUT']
     for directory in directories:
         os.makedirs(directory, exist_ok=True)
-        print(f"✅ Directory created/verified: {directory}")
+        print(f"✅ Ordner erstellt/überprüft: {directory}")
 
 # ========================================
-# 1. DOCUMENT CONVERSION TO PDF
+# 1. DOKUMENTKONVERTIERUNG ZU PDF
 # ========================================
 
 def convert_with_libreoffice(file_path, output_dir):
-    """Converts files with LibreOffice to PDF."""
+    """Konvertiert Dateien mit LibreOffice in PDF."""
     try:
         result = os.system(f'soffice --headless --convert-to pdf --outdir {output_dir} "{file_path}"')
         if result == 0:
-            print(f"✅ LibreOffice conversion successful: {file_path}")
+            print(f"✅ LibreOffice-Konvertierung erfolgreich: {file_path}")
         else:
-            print(f"❌ LibreOffice conversion failed: {file_path}")
+            print(f"❌ LibreOffice-Konvertierung fehlgeschlagen: {file_path}")
     except Exception as e:
-        print(f"❌ Error in LibreOffice conversion of {file_path}: {e}")
+        print(f"❌ Fehler bei LibreOffice-Konvertierung von {file_path}: {e}")
 
 def convert_txt_to_pdf(file_path, output_path):
-    """Converts TXT files to PDF."""
+    """Konvertiert TXT-Dateien in PDF."""
     try:
         pdf = FPDF()
         pdf.add_page()
@@ -119,30 +119,30 @@ def convert_txt_to_pdf(file_path, output_path):
                     pdf.cell(200, 10, txt=line.strip().encode('latin-1', 'ignore').decode('latin-1'), ln=True)
         
         pdf.output(str(output_path))
-        print(f"✅ TXT to PDF converted: {output_path}")
+        print(f"✅ TXT zu PDF konvertiert: {output_path}")
     except Exception as e:
-        print(f"❌ Error in TXT conversion of {file_path}: {e}")
+        print(f"❌ Fehler bei TXT-Konvertierung von {file_path}: {e}")
 
 def convert_html_to_pdf(file_path, output_path):
-    """Converts HTML files to PDF with wkhtmltopdf."""
+    """Konvertiert HTML-Dateien in PDF mit wkhtmltopdf."""
     try:
         result = os.system(f'wkhtmltopdf "{file_path}" "{output_path}"')
         if result == 0:
-            print(f"✅ HTML to PDF converted: {output_path}")
+            print(f"✅ HTML zu PDF konvertiert: {output_path}")
         else:
-            print(f"❌ HTML conversion failed: {file_path}")
+            print(f"❌ HTML-Konvertierung fehlgeschlagen: {file_path}")
     except Exception as e:
-        print(f"❌ Error in HTML conversion of {file_path}: {e}")
+        print(f"❌ Fehler bei HTML-Konvertierung von {file_path}: {e}")
 
 def convert_documents_to_pdf():
-    """Converts all documents in the UPLOAD directory to PDF."""
-    print_section("1. DOCUMENT CONVERSION TO PDF")
+    """Konvertiert alle Dokumente im UPLOAD-Ordner zu PDF."""
+    print_section("1. DOKUMENTKONVERTIERUNG ZU PDF")
     
     upload_dir = Path('UPLOAD')
     input_dir = Path('INPUT')
     
     if not upload_dir.exists() or not any(upload_dir.iterdir()):
-        print("⚠️ No files found in UPLOAD directory.")
+        print("⚠️ Keine Dateien im UPLOAD-Ordner gefunden.")
         return
     
     converted_count = 0
@@ -152,11 +152,11 @@ def convert_documents_to_pdf():
             ext = file_path.suffix.lower()
             output_file = input_dir / (file_path.stem + '.pdf')
             
-            print(f"🔄 Processing: {file_path.name}")
+            print(f"🔄 Verarbeite: {file_path.name}")
             
             if ext == '.pdf':
                 shutil.copy(file_path, output_file)
-                print(f"✅ PDF copied: {output_file}")
+                print(f"✅ PDF kopiert: {output_file}")
                 converted_count += 1
             elif ext in ['.docx', '.pptx', '.xlsx', '.xml']:
                 convert_with_libreoffice(file_path, input_dir)
@@ -168,16 +168,16 @@ def convert_documents_to_pdf():
                 convert_html_to_pdf(file_path, output_file)
                 converted_count += 1
             else:
-                print(f"⚠️ Format {ext} not supported: {file_path.name}")
+                print(f"⚠️ Format {ext} wird nicht unterstützt: {file_path.name}")
     
-    print(f"📊 Converted files: {converted_count}")
+    print(f"📊 Konvertierte Dateien: {converted_count}")
 
 # ========================================
-# 2. PDF TO MARKDOWN (WITHOUT VLM!)
+# 2. PDF ZU MARKDOWN (OHNE VLM!)
 # ========================================
 
 def setup_standard_converter():
-    """Configures the DocumentConverter for fast text extraction WITHOUT VLM."""
+    """Konfiguriert den DocumentConverter für schnelle Textextraktion OHNE VLM."""
     pipeline_options = PdfPipelineOptions()
     pipeline_options.do_ocr = True
     pipeline_options.do_table_structure = True
@@ -192,7 +192,7 @@ def setup_standard_converter():
     )
 
 def setup_basic_converter():
-    """Creates a minimal converter as fallback."""
+    """Erstellt einen minimalen Converter als Fallback."""
     return DocumentConverter(
         format_options={
             InputFormat.PDF: PdfFormatOption()
@@ -200,7 +200,7 @@ def setup_basic_converter():
     )
 
 def extract_images_from_result(result, pdf_file, output_dir):
-    """Extracts and saves images from the conversion result."""
+    """Extrahiert und speichert Bilder aus dem Konvertierungsergebnis."""
     try:
         artifacts_dir = output_dir / f"{pdf_file.stem}_artifacts"
         artifacts_dir.mkdir(exist_ok=True)
@@ -210,7 +210,7 @@ def extract_images_from_result(result, pdf_file, output_dir):
         if artifacts_dir.exists():
             existing_images = list(artifacts_dir.glob("*.png")) + list(artifacts_dir.glob("*.jpg"))
             if existing_images:
-                print(f"📁 {len(existing_images)} images already in artifacts directory")
+                print(f"📁 {len(existing_images)} Bilder bereits im Artifacts-Ordner")
                 return len(existing_images)
         
         if hasattr(result.document, 'pictures'):
@@ -220,23 +220,23 @@ def extract_images_from_result(result, pdf_file, output_dir):
                     with open(image_filename, 'wb') as f:
                         f.write(picture.data)
                     extracted_images += 1
-                    print(f"   🖼️ Image extracted: {image_filename.name}")
+                    print(f"   🖼️ Bild extrahiert: {image_filename.name}")
                 except Exception as e:
-                    print(f"   ⚠️ Error extracting image {idx}: {e}")
+                    print(f"   ⚠️ Fehler beim Extrahieren von Bild {idx}: {e}")
         
         return extracted_images
         
     except Exception as e:
-        print(f"❌ Error in image extraction: {e}")
+        print(f"❌ Fehler bei Bildextraktion: {e}")
         return 0
 
 def process_remaining_pdfs(pdf_files_to_process):
-    """Processes PDF files with optimized standard conversion."""
+    """Verarbeitet PDF-Dateien mit optimierter Standard-Konvertierung."""
     if not pdf_files_to_process:
-        print("✅ All PDFs already processed")
+        print("✅ Alle PDFs bereits verarbeitet")
         return True
     
-    print(f"🔄 Processing {len(pdf_files_to_process)} pending PDF files...")
+    print(f"🔄 Verarbeite {len(pdf_files_to_process)} ausstehende PDF-Dateien...")
     
     output_dir = Path("OUTPUT")
     successful_conversions = 0
@@ -246,14 +246,14 @@ def process_remaining_pdfs(pdf_files_to_process):
         start_time = time.time()
         page_count = get_pdf_page_count(pdf_file)
         
-        print(f"\n🔄 Converting: {pdf_file.name}")
+        print(f"\n🔄 Konvertiere: {pdf_file.name}")
         if page_count > 0:
-            print(f"📄 Page count: {page_count}")
+            print(f"📄 Seitenzahl: {page_count}")
         
         success = False
         
         try:
-            print("🚀 Using optimized standard conversion...")
+            print("🚀 Verwende optimierte Standard-Konvertierung...")
             doc_converter = setup_standard_converter()
             result = doc_converter.convert(pdf_file)
             
@@ -263,20 +263,20 @@ def process_remaining_pdfs(pdf_files_to_process):
             extracted_count = extract_images_from_result(result, pdf_file, output_dir)
             
             elapsed = time.time() - start_time
-            print(f"✅ Conversion successful: {md_filename}")
-            print(f"🖼️ Images extracted: {extracted_count}")
-            print(f"⏱️ Time: {elapsed:.1f}s")
+            print(f"✅ Konvertierung erfolgreich: {md_filename}")
+            print(f"🖼️ Bilder extrahiert: {extracted_count}")
+            print(f"⏱️ Zeit: {elapsed:.1f}s")
             if page_count > 0:
-                print(f"📊 Performance: {elapsed/page_count:.2f}s per page")
+                print(f"📊 Performance: {elapsed/page_count:.2f}s pro Seite")
             
             successful_conversions += 1
             success = True
             
         except Exception as e:
-            print(f"❌ Standard conversion failed: {e}")
+            print(f"❌ Standard-Konvertierung fehlgeschlagen: {e}")
             
             try:
-                print("🔄 Fallback: Basic conversion...")
+                print("🔄 Fallback: Basis-Konvertierung...")
                 basic_converter = setup_basic_converter()
                 result = basic_converter.convert(pdf_file)
                 
@@ -290,40 +290,40 @@ def process_remaining_pdfs(pdf_files_to_process):
                         f.write(markdown_content)
                 
                 elapsed = time.time() - start_time
-                print(f"✅ Basic conversion successful: {md_filename}")
-                print(f"⏱️ Time: {elapsed:.1f}s")
+                print(f"✅ Basis-Konvertierung erfolgreich: {md_filename}")
+                print(f"⏱️ Zeit: {elapsed:.1f}s")
                 
                 successful_conversions += 1
                 success = True
                 
             except Exception as basic_error:
-                print(f"❌ Basic conversion also failed: {basic_error}")
+                print(f"❌ Auch Basis-Konvertierung fehlgeschlagen: {basic_error}")
                 
                 error_md = output_dir / f"{pdf_file.stem}_error.md"
                 with open(error_md, 'w', encoding='utf-8') as f:
-                    f.write(f"# {pdf_file.stem}\n\n**Conversion Failed**\n\n")
-                    f.write(f"The PDF file could not be processed.\n")
-                    f.write(f"Error: {str(basic_error)}")
-                print(f"⚠️ Error markdown created: {error_md}")
+                    f.write(f"# {pdf_file.stem}\n\n**Konvertierung fehlgeschlagen**\n\n")
+                    f.write(f"Die PDF-Datei konnte nicht verarbeitet werden.\n")
+                    f.write(f"Fehler: {str(basic_error)}")
+                print(f"⚠️ Fehler-Markdown erstellt: {error_md}")
     
     total_elapsed = time.time() - total_start_time
-    print(f"\n📊 CONVERSION COMPLETED:")
-    print(f"   - Successful: {successful_conversions}/{len(pdf_files_to_process)}")
-    print(f"   - Total time: {total_elapsed:.1f}s")
-    print(f"   - Average: {total_elapsed/len(pdf_files_to_process):.1f}s per file")
+    print(f"\n📊 KONVERTIERUNG ABGESCHLOSSEN:")
+    print(f"   - Erfolgreich: {successful_conversions}/{len(pdf_files_to_process)}")
+    print(f"   - Gesamtzeit: {total_elapsed:.1f}s")
+    print(f"   - Durchschnitt: {total_elapsed/len(pdf_files_to_process):.1f}s pro Datei")
     
     gc.collect()
-    print("✅ Memory freed")
+    print("✅ Speicher freigegeben")
     
     return successful_conversions > 0
 
 # ========================================
-# 3. STATUS CHECK
+# 3. STATUS-ÜBERPRÜFUNG
 # ========================================
 
 def check_processing_status():
-    """Checks which processing steps are already completed."""
-    print_section("🔍 STATUS CHECK")
+    """Überprüft welche Verarbeitungsschritte bereits abgeschlossen sind."""
+    print_section("🔍 STATUS-ÜBERPRÜFUNG")
     
     upload_dir = Path('UPLOAD')
     input_dir = Path('INPUT')
@@ -340,14 +340,14 @@ def check_processing_status():
     if upload_dir.exists():
         upload_files = [f for f in upload_dir.iterdir() if f.is_file()]
         if upload_files:
-            print(f"📁 {len(upload_files)} files found in UPLOAD")
+            print(f"📁 {len(upload_files)} Dateien in UPLOAD gefunden")
             status['pdf_conversion_needed'] = True
         else:
-            print("✅ UPLOAD directory is empty")
+            print("✅ UPLOAD-Ordner ist leer")
     
     if input_dir.exists():
         pdf_files = list(input_dir.glob("*.pdf"))
-        print(f"📄 {len(pdf_files)} PDF files found in INPUT")
+        print(f"📄 {len(pdf_files)} PDF-Dateien in INPUT gefunden")
         
         for pdf_file in pdf_files:
             expected_md = output_dir / f"{pdf_file.stem}.md"
@@ -356,12 +356,12 @@ def check_processing_status():
             md_exists = expected_md.exists()
             
             if md_exists:
-                print(f"   ✅ {pdf_file.name} → already processed")
+                print(f"   ✅ {pdf_file.name} → bereits verarbeitet")
                 status['existing_md_files'].append(expected_md)
                 if expected_artifacts_dir.exists():
                     status['existing_artifacts_dirs'].append(expected_artifacts_dir)
             else:
-                print(f"   🔄 {pdf_file.name} → still to process")
+                print(f"   🔄 {pdf_file.name} → noch zu verarbeiten")
                 status['pdf_files_to_process'].append(pdf_file)
                 status['markdown_conversion_needed'] = True
     
@@ -370,24 +370,24 @@ def check_processing_status():
         existing_artifacts_dirs = [d for d in output_dir.iterdir() 
                                   if d.is_dir() and d.name.endswith('_artifacts')]
         
-        print(f"📝 {len(existing_md)} Markdown files found in OUTPUT")
-        print(f"🖼️ {len(existing_artifacts_dirs)} _artifacts directories found in OUTPUT")
+        print(f"📝 {len(existing_md)} Markdown-Dateien in OUTPUT gefunden")
+        print(f"🖼️ {len(existing_artifacts_dirs)} _artifacts Ordner in OUTPUT gefunden")
         
         json_path = output_dir / "image_descriptions.json"
         if json_path.exists():
-            print("✅ Image descriptions already available")
+            print("✅ Bildbeschreibungen bereits vorhanden")
         else:
-            print("🔄 Image descriptions missing")
+            print("🔄 Bildbeschreibungen fehlen")
     
     return status
 
 # ========================================
-# 4. IMAGE ENHANCEMENT
+# 4. BILDVERBESSERUNG
 # ========================================
 
 def enhance_images_contrast(directory="OUTPUT", contrast_factor=None):
-    """Improves the contrast of all images in _artifacts directories."""
-    print_section("4. IMAGE ENHANCEMENT")
+    """Verbessert den Kontrast aller Bilder in _artifacts Ordnern."""
+    print_section("4. BILDVERBESSERUNG")
     
     if contrast_factor is None:
         contrast_factor = CONTRAST_FACTOR
@@ -398,13 +398,13 @@ def enhance_images_contrast(directory="OUTPUT", contrast_factor=None):
                      if d.is_dir() and d.name.endswith('_artifacts')]
     
     if not artifacts_dirs:
-        print("⚠️ No _artifacts directories found")
+        print("⚠️ Keine _artifacts Ordner gefunden")
         return
     
-    print(f"🔍 Found _artifacts directories: {len(artifacts_dirs)}")
+    print(f"🔍 Gefundene _artifacts Ordner: {len(artifacts_dirs)}")
     
     for artifacts_dir in artifacts_dirs:
-        print(f"📁 Processing: {artifacts_dir.name}")
+        print(f"📁 Verarbeite: {artifacts_dir.name}")
         
         for file_path in artifacts_dir.rglob("*"):
             if file_path.suffix.lower() in ['.png', '.jpg', '.jpeg', '.bmp', '.gif']:
@@ -414,25 +414,25 @@ def enhance_images_contrast(directory="OUTPUT", contrast_factor=None):
                         enhanced_img = enhancer.enhance(contrast_factor)
                         enhanced_img.save(file_path)
                     enhanced_count += 1
-                    print(f"   ✅ Enhanced: {file_path.name}")
+                    print(f"   ✅ Verbessert: {file_path.name}")
                 except Exception as e:
-                    print(f"   ❌ Error with {file_path.name}: {e}")
+                    print(f"   ❌ Fehler bei {file_path.name}: {e}")
     
-    print(f"📊 Images enhanced: {enhanced_count}")
+    print(f"📊 Bilder verbessert: {enhanced_count}")
 
 # ========================================
-# 5. IMAGE DESCRIPTION WITH VLM
+# 5. BILDBESCHREIBUNG MIT VLM
 # ========================================
 
 def check_api_connection():
-    """Checks API connection for image descriptions."""
+    """Überprüft API-Verbindung für Bildbeschreibungen."""
     if USE_OPENAI_API:
         return check_openai_connection()
     else:
         return check_ollama_connection()
 
 def check_openai_connection():
-    """Checks OpenAI API connection."""
+    """Überprüft OpenAI-API-Verbindung."""
     try:
         headers = {
             'Authorization': f'Bearer {OPENAI_API_KEY}',
@@ -453,19 +453,19 @@ def check_openai_connection():
         )
         
         if response.status_code == 200:
-            print(f"✅ OpenAI API connection successful ({OPENAI_BASE_URL})")
-            print(f"✅ Model '{OPENAI_MODEL_NAME}' is available")
+            print(f"✅ OpenAI-API-Verbindung erfolgreich ({OPENAI_BASE_URL})")
+            print(f"✅ Modell '{OPENAI_MODEL_NAME}' ist verfügbar")
             return True
         else:
-            print(f"❌ OpenAI API not reachable (Status: {response.status_code})")
+            print(f"❌ OpenAI-API nicht erreichbar (Status: {response.status_code})")
             return False
             
     except requests.RequestException as e:
-        print(f"❌ OpenAI API connection failed: {e}")
+        print(f"❌ OpenAI-API-Verbindung fehlgeschlagen: {e}")
         return False
 
 def check_ollama_connection():
-    """Checks Ollama API connection."""
+    """Überprüft Ollama-API-Verbindung."""
     try:
         headers = {
             'Authorization': f'Bearer {OLLAMA_API_KEY}',
@@ -478,24 +478,24 @@ def check_ollama_connection():
             models = response.json()
             model_names = [model['name'] for model in models.get('models', [])]
             
-            print(f"✅ Ollama connection successful ({OLLAMA_SERVER_URL})")
+            print(f"✅ Ollama-Verbindung erfolgreich ({OLLAMA_SERVER_URL})")
             
             if OLLAMA_MODEL_NAME in model_names:
-                print(f"✅ Model '{OLLAMA_MODEL_NAME}' is available")
+                print(f"✅ Modell '{OLLAMA_MODEL_NAME}' ist verfügbar")
                 return True
             else:
-                print(f"❌ Model '{OLLAMA_MODEL_NAME}' not found!")
+                print(f"❌ Modell '{OLLAMA_MODEL_NAME}' nicht gefunden!")
                 return False
         else:
-            print(f"❌ Ollama not reachable (Status: {response.status_code})")
+            print(f"❌ Ollama nicht erreichbar (Status: {response.status_code})")
             return False
             
     except requests.RequestException as e:
-        print(f"❌ Ollama connection failed: {e}")
+        print(f"❌ Ollama-Verbindung fehlgeschlagen: {e}")
         return False
 
 def query_image_with_api(image_path, retries=None):
-    """Sends an API request with image for description."""
+    """Sendet eine API-Anfrage mit Bild für Beschreibung."""
     if retries is None:
         retries = MAX_RETRIES
         
@@ -505,18 +505,18 @@ def query_image_with_api(image_path, retries=None):
         return query_ollama_with_image(image_path, retries)
 
 def query_openai_with_image(image_path, retries):
-    """Sends an OpenAI API request with image - LANGUAGE AGNOSTIC."""
+    """Sendet eine OpenAI-API-Anfrage mit Bild."""
     import base64
     
     if not os.path.exists(image_path):
-        print(f"❌ Image not found: {image_path}")
+        print(f"❌ Bild nicht gefunden: {image_path}")
         return None
     
     try:
         with open(image_path, "rb") as image_file:
             image_base64 = base64.b64encode(image_file.read()).decode('utf-8')
     except Exception as e:
-        print(f"❌ Error reading image: {e}")
+        print(f"❌ Fehler beim Lesen des Bildes: {e}")
         return None
     
     headers = {
@@ -524,7 +524,6 @@ def query_openai_with_image(image_path, retries):
         'Content-Type': 'application/json'
     }
     
-    # LANGUAGE AGNOSTIC: Let the model respond in the same language as the document
     payload = {
         "model": OPENAI_MODEL_NAME,
         "messages": [
@@ -533,7 +532,7 @@ def query_openai_with_image(image_path, retries):
                 "content": [
                     {
                         "type": "text",
-                        "text": "Please describe the content of this image in great detail in the same language as the document being processed. If you detect German text or context, respond in German. If you detect English text or context, respond in English. If the language is unclear, use the language that best matches the content. Explain what can be seen, what texts or data are displayed, and what the meaning might be."
+                        "text": "Bitte beschreibe den Inhalt des Bildes sehr detailliert auf Deutsch. Erkläre was zu sehen ist, welche Texte oder Daten dargestellt werden und was die Bedeutung sein könnte."
                     },
                     {
                         "type": "image_url",
@@ -564,31 +563,31 @@ def query_openai_with_image(image_path, retries):
                     return content
                     
             elif response.status_code == 401:
-                print(f"   ❌ Authentication failed")
+                print(f"   ❌ Authentifizierung fehlgeschlagen")
                 break
             else:
-                print(f"   ❌ API error {response.status_code}")
+                print(f"   ❌ API-Fehler {response.status_code}")
                 
         except requests.RequestException as e:
-            print(f"   ❌ Network error (attempt {attempt + 1}): {e}")
+            print(f"   ❌ Netzwerk-Fehler (Versuch {attempt + 1}): {e}")
             if attempt < retries - 1:
                 time.sleep(2)
     
     return None
 
 def query_ollama_with_image(image_path, retries):
-    """Sends an Ollama API request with image - LANGUAGE AGNOSTIC."""
+    """Sendet eine Ollama-API-Anfrage mit Bild."""
     import base64
     
     if not os.path.exists(image_path):
-        print(f"❌ Image not found: {image_path}")
+        print(f"❌ Bild nicht gefunden: {image_path}")
         return None
     
     try:
         with open(image_path, "rb") as image_file:
             image_base64 = base64.b64encode(image_file.read()).decode('utf-8')
     except Exception as e:
-        print(f"❌ Error reading image: {e}")
+        print(f"❌ Fehler beim Lesen des Bildes: {e}")
         return None
     
     headers = {
@@ -596,13 +595,12 @@ def query_ollama_with_image(image_path, retries):
         'Content-Type': 'application/json'
     }
     
-    # LANGUAGE AGNOSTIC: Let the model respond in the same language as the document
     payload = {
         "model": OLLAMA_MODEL_NAME,
         "messages": [
             {
                 "role": "user",
-                "content": "Please describe the content of this image in great detail in the same language as the document being processed. If you detect German text or context, respond in German. If you detect English text or context, respond in English. If the language is unclear, use the language that best matches the content. Explain what can be seen, what texts or data are displayed, and what the meaning might be.",
+                "content": "Bitte beschreibe den Inhalt des Bildes sehr detailliert auf Deutsch. Erkläre was zu sehen ist, welche Texte oder Daten dargestellt werden und was die Bedeutung sein könnte.",
                 "images": [image_base64]
             }
         ],
@@ -626,21 +624,21 @@ def query_ollama_with_image(image_path, retries):
                     return content
                     
         except requests.RequestException as e:
-            print(f"   ❌ Network error (attempt {attempt + 1}): {e}")
+            print(f"   ❌ Netzwerk-Fehler (Versuch {attempt + 1}): {e}")
             if attempt < retries - 1:
                 time.sleep(2)
     
     return None
 
 def describe_images_with_api():
-    """Describes all images in _artifacts directories with VLM."""
-    api_name = "OpenAI API" if USE_OPENAI_API else "Ollama API"
-    print_section(f"5. IMAGE DESCRIPTION WITH {api_name.upper()}")
+    """Beschreibt alle Bilder in _artifacts Ordnern mit VLM."""
+    api_name = "OpenAI-API" if USE_OPENAI_API else "Ollama-API"
+    print_section(f"5. BILDBESCHREIBUNG MIT {api_name.upper()}")
     
-    print(f"🔧 Testing {api_name} connection...")
+    print(f"🔧 Teste {api_name}-Verbindung...")
     if not check_api_connection():
-        print(f"❌ {api_name} server not available")
-        print("💡 Image descriptions will be skipped")
+        print(f"❌ {api_name}-Server nicht verfügbar")
+        print("💡 Bildbeschreibungen werden übersprungen")
         return False
     
     output_dir = Path("OUTPUT")
@@ -653,7 +651,7 @@ def describe_images_with_api():
                 data = json.load(f)
                 for item in data:
                     existing_descriptions[item['image_name']] = item['description']
-            print(f"📄 {len(existing_descriptions)} existing descriptions loaded")
+            print(f"📄 {len(existing_descriptions)} existierende Beschreibungen geladen")
         except:
             pass
     
@@ -666,7 +664,7 @@ def describe_images_with_api():
                      if d.is_dir() and d.name.endswith('_artifacts')]
     
     if not artifacts_dirs:
-        print("⚠️ No _artifacts directories found")
+        print("⚠️ Keine _artifacts Ordner gefunden")
         return False
     
     total_images = 0
@@ -678,18 +676,17 @@ def describe_images_with_api():
                 image_files.append((file_path, relative_path))
                 total_images += 1
     
-    print(f"📊 Found images: {total_images} in {len(artifacts_dirs)} directories")
-    print(f"🌐 Using language-agnostic image descriptions")
+    print(f"📊 Gefundene Bilder: {total_images} in {len(artifacts_dirs)} Ordnern")
     
     if total_images == 0:
-        print("⚠️ No images found for description")
+        print("⚠️ Keine Bilder zur Beschreibung gefunden")
         return False
     
     start_time = time.time()
     
     for idx, (image_path, relative_path) in enumerate(image_files, 1):
         if relative_path in existing_descriptions:
-            print(f"⏭️ Image {idx}/{total_images}: {relative_path} (already described)")
+            print(f"⏭️ Bild {idx}/{total_images}: {relative_path} (bereits beschrieben)")
             image_descriptions.append({
                 "image_name": relative_path,
                 "description": existing_descriptions[relative_path]
@@ -697,7 +694,7 @@ def describe_images_with_api():
             skipped_count += 1
             continue
         
-        print(f"\n🔄 Describing image {idx}/{total_images}: {relative_path}")
+        print(f"\n🔄 Beschreibe Bild {idx}/{total_images}: {relative_path}")
         
         try:
             description = query_image_with_api(image_path)
@@ -708,13 +705,13 @@ def describe_images_with_api():
                     "description": description
                 })
                 processed_count += 1
-                print(f"   ✅ Description created ({len(description)} characters)")
+                print(f"   ✅ Beschreibung erstellt ({len(description)} Zeichen)")
             else:
-                print(f"   ❌ No description received")
+                print(f"   ❌ Keine Beschreibung erhalten")
                 failed_count += 1
             
         except Exception as e:
-            print(f"   ❌ Error: {e}")
+            print(f"   ❌ Fehler: {e}")
             failed_count += 1
             time.sleep(2)
     
@@ -723,39 +720,39 @@ def describe_images_with_api():
             json.dump(image_descriptions, f, ensure_ascii=False, indent=2)
         
         elapsed = time.time() - start_time
-        print(f"\n📊 IMAGE DESCRIPTION COMPLETED:")
-        print(f"   - Images found: {total_images}")
-        print(f"   - Newly described: {processed_count}")
-        print(f"   - Skipped: {skipped_count}")
-        print(f"   - Failed: {failed_count}")
-        print(f"   - Total time: {elapsed:.1f}s")
+        print(f"\n📊 BILDBESCHREIBUNG ABGESCHLOSSEN:")
+        print(f"   - Bilder gefunden: {total_images}")
+        print(f"   - Neu beschrieben: {processed_count}")
+        print(f"   - Übersprungen: {skipped_count}")
+        print(f"   - Fehlgeschlagen: {failed_count}")
+        print(f"   - Gesamtzeit: {elapsed:.1f}s")
         if processed_count > 0:
-            print(f"   - Average: {elapsed/processed_count:.1f}s per image")
-        print(f"💾 Saved to: {json_path}")
+            print(f"   - Durchschnitt: {elapsed/processed_count:.1f}s pro Bild")
+        print(f"💾 Gespeichert in: {json_path}")
         return True
     else:
-        print("\n❌ No new image descriptions created")
+        print("\n❌ Keine neuen Bildbeschreibungen erstellt")
         return False
 
 # ========================================
-# 6. MARKDOWN INTEGRATION
+# 6. MARKDOWN-INTEGRATION
 # ========================================
 
 def integrate_image_descriptions():
-    """Integrates image descriptions into Markdown files."""
-    print_section("6. INTEGRATION OF IMAGE DESCRIPTIONS")
+    """Integriert Bildbeschreibungen in Markdown-Dateien."""
+    print_section("6. INTEGRATION VON BILDBESCHREIBUNGEN")
     
     output_dir = Path("OUTPUT")
     json_path = output_dir / "image_descriptions.json"
     
     if not json_path.exists():
-        print("⚠️ No image descriptions found")
+        print("⚠️ Keine Bildbeschreibungen gefunden")
         return
     
     with open(json_path, 'r', encoding='utf-8') as f:
         descriptions = json.load(f)
     
-    print(f"📊 Loaded image descriptions: {len(descriptions)}")
+    print(f"📊 Geladene Bildbeschreibungen: {len(descriptions)}")
     
     description_dict = {}
     for desc in descriptions:
@@ -772,7 +769,7 @@ def integrate_image_descriptions():
     import re
     
     for md_file in md_files:
-        print(f"🔄 Integrating into: {md_file.name}")
+        print(f"🔄 Integriere in: {md_file.name}")
         
         with open(md_file, 'r', encoding='utf-8') as f:
             content = f.read()
@@ -798,85 +795,58 @@ def integrate_image_descriptions():
                         break
             
             if description:
-                # Language-agnostic header - detect language from description
-                if any(german_word in description.lower() for german_word in ['das', 'die', 'der', 'ist', 'sind', 'zeigt', 'abbildung']):
-                    header = "**Bildbeschreibung:**"
-                else:
-                    header = "**Image Description:**"
-                
-                if f"{header} {description}" not in content:
+                if f"**Bildbeschreibung:** {description}" not in content:
                     old_ref = f"![{alt_text}]({image_path})"
-                    new_ref = f"{old_ref}\n\n{header} {description}\n"
+                    new_ref = f"{old_ref}\n\n**Bildbeschreibung:** {description}\n"
                     content = content.replace(old_ref, new_ref)
                     integrated_count += 1
                     changes_made = True
-                    print(f"   ✅ Description integrated for: {image_path}")
+                    print(f"   ✅ Beschreibung integriert für: {image_path}")
         
         if changes_made:
             with open(md_file, 'w', encoding='utf-8') as f:
                 f.write(content)
-            print(f"   💾 File updated")
+            print(f"   💾 Datei aktualisiert")
         else:
-            print(f"   ⚠️ No new descriptions added")
+            print(f"   ⚠️ Keine neuen Beschreibungen hinzugefügt")
     
-    print(f"📊 Image descriptions integrated: {integrated_count}")
+    print(f"📊 Bildbeschreibungen integriert: {integrated_count}")
 
 # ========================================
-# 7. MARKDOWN COMBINATION
+# 7. MARKDOWN-KOMBINATION
 # ========================================
 
 def combine_markdown_files():
-    """Combines all Markdown files (optional)."""
-    print_section("7. MARKDOWN COMBINATION")
+    """Kombiniert alle Markdown-Dateien (optional)."""
+    print_section("7. MARKDOWN-KOMBINATION")
     
     if not CREATE_COMBINED_MD:
-        print("⚠️ Markdown combination is disabled (CREATE_COMBINED_MD = False)")
-        print("💡 All Markdown files remain separate in OUTPUT/")
+        print("⚠️ Markdown-Kombination ist deaktiviert (CREATE_COMBINED_MD = False)")
+        print("💡 Alle Markdown-Dateien bleiben einzeln in OUTPUT/")
         return
     
-    print("✅ Markdown combination is enabled")
+    print("✅ Markdown-Kombination ist aktiviert")
     
     output_dir = Path("OUTPUT")
     md_files = sorted([f for f in output_dir.glob("*.md") if f.name != "combined.md"])
     
     if not md_files:
-        print("⚠️ No Markdown files found to combine")
+        print("⚠️ Keine Markdown-Dateien zum Kombinieren gefunden")
         return
     
-    print(f"🔄 Combining {len(md_files)} Markdown files...")
+    print(f"🔄 Kombiniere {len(md_files)} Markdown-Dateien...")
     
-    # Auto-detect primary language from first file for headers
-    primary_language = "en"  # Default
-    if md_files:
-        try:
-            with open(md_files[0], 'r', encoding='utf-8') as f:
-                sample_content = f.read()[:1000].lower()
-                german_indicators = ['das', 'die', 'der', 'ist', 'sind', 'und', 'mit', 'von', 'zu', 'auf']
-                if any(word in sample_content for word in german_indicators):
-                    primary_language = "de"
-        except:
-            pass
+    combined_content = "# Kombinierte Dokumentsammlung\n\n"
+    combined_content += f"*Erstellt am: {time.strftime('%Y-%m-%d %H:%M:%S')}*\n\n"
+    combined_content += f"*Aus {len(md_files)} Einzeldokumenten zusammengestellt*\n\n"
     
-    # Language-specific headers
-    if primary_language == "de":
-        combined_content = "# Kombinierte Dokumentsammlung\n\n"
-        combined_content += f"*Erstellt am: {time.strftime('%Y-%m-%d %H:%M:%S')}*\n\n"
-        combined_content += f"*Aus {len(md_files)} Einzeldokumenten zusammengestellt*\n\n"
-        combined_content += "## Inhaltsverzeichnis\n\n"
-        source_text = "Quelle:"
-    else:
-        combined_content = "# Combined Document Collection\n\n"
-        combined_content += f"*Created on: {time.strftime('%Y-%m-%d %H:%M:%S')}*\n\n"
-        combined_content += f"*Compiled from {len(md_files)} individual documents*\n\n"
-        combined_content += "## Table of Contents\n\n"
-        source_text = "Source:"
-    
+    combined_content += "## Inhaltsverzeichnis\n\n"
     for i, md_file in enumerate(md_files, 1):
         combined_content += f"{i}. [{md_file.stem}](#{md_file.stem.lower().replace(' ', '-')})\n"
     combined_content += "\n---\n\n"
     
     for i, md_file in enumerate(md_files, 1):
-        print(f"   📄 Adding: {md_file.name}")
+        print(f"   📄 Füge hinzu: {md_file.name}")
         
         with open(md_file, 'r', encoding='utf-8') as f:
             content = f.read()
@@ -884,7 +854,7 @@ def combine_markdown_files():
         combined_content += f"\n\n{'='*80}\n"
         combined_content += f"## {i}. {md_file.stem}\n"
         combined_content += f"{'='*80}\n\n"
-        combined_content += f"*{source_text} {md_file.name}*\n\n"
+        combined_content += f"*Quelle: {md_file.name}*\n\n"
         combined_content += content
         
         if i < len(md_files):
@@ -894,29 +864,27 @@ def combine_markdown_files():
     with open(combined_path, 'w', encoding='utf-8') as f:
         f.write(combined_content)
     
-    print(f"✅ Combined file created: {combined_path}")
-    print(f"📊 Total length: {len(combined_content):,} characters")
-    print(f"🌐 Language detected: {primary_language}")
+    print(f"✅ Kombinierte Datei erstellt: {combined_path}")
+    print(f"📊 Gesamtlänge: {len(combined_content):,} Zeichen")
 
 # ========================================
-# MAIN PROGRAM
+# HAUPTPROGRAMM
 # ========================================
 
 def main():
-    """Main program with optimized processing."""
-    print_section("🚀 DOCUMENT PROCESSOR STARTED (WITH CENTRAL CONFIG)")
+    """Hauptprogramm mit optimierter Verarbeitung."""
+    print_section("🚀 DOKUMENTEN-PROCESSOR GESTARTET (MIT ZENTRALER CONFIG)")
     
-    api_name = "OpenAI API" if USE_OPENAI_API else "Ollama API"
+    api_name = "OpenAI-API" if USE_OPENAI_API else "Ollama-API"
     server_url = OPENAI_BASE_URL if USE_OPENAI_API else OLLAMA_SERVER_URL
     model_name = OPENAI_MODEL_NAME if USE_OPENAI_API else OLLAMA_MODEL_NAME
     
-    print(f"🔧 CONFIGURATION:")
-    print(f"   - Text extraction: Docling Standard (fast)")
-    print(f"   - Image description: {api_name}")
+    print(f"🔧 KONFIGURATION:")
+    print(f"   - Textextraktion: Docling Standard (schnell)")
+    print(f"   - Bildbeschreibung: {api_name}")
     print(f"   - Server: {server_url}")
-    print(f"   - Model: {model_name}")
-    print(f"   - Combined.md: {'YES' if CREATE_COMBINED_MD else 'NO'}")
-    print(f"   - Language handling: Agnostic (preserves document language)")
+    print(f"   - Modell: {model_name}")
+    print(f"   - Combined.md: {'JA' if CREATE_COMBINED_MD else 'NEIN'}")
     
     setup_logging()
     
@@ -929,9 +897,9 @@ def main():
             status = check_processing_status()
         
         if status['markdown_conversion_needed']:
-            print_section("3. PDF TO MARKDOWN (FAST EXTRACTION)")
+            print_section("3. PDF ZU MARKDOWN (SCHNELLE EXTRAKTION)")
             if not process_remaining_pdfs(status['pdf_files_to_process']):
-                print("❌ PDF conversion failed")
+                print("❌ PDF-Konvertierung fehlgeschlagen")
                 return
         
         output_dir = Path("OUTPUT")
@@ -951,21 +919,20 @@ def main():
         if CREATE_COMBINED_MD:
             combine_markdown_files()
         
-        print_section("🎉 PROCESSING COMPLETED")
+        print_section("🎉 VERARBEITUNG ABGESCHLOSSEN")
         
         md_files = len(list(output_dir.glob("*.md")))
         artifacts_count = len(artifacts_dirs)
         
-        print(f"📊 RESULT:")
-        print(f"   - Markdown files: {md_files}")
-        print(f"   - _artifacts directories: {artifacts_count}")
-        print(f"   - Image descriptions: {'✅' if json_path.exists() else '❌'}")
-        print(f"   - Combined.md: {'✅ created' if CREATE_COMBINED_MD else '❌ disabled'}")
-        print(f"   - Language preservation: ✅ Document language preserved")
+        print(f"📊 ERGEBNIS:")
+        print(f"   - Markdown-Dateien: {md_files}")
+        print(f"   - _artifacts Ordner: {artifacts_count}")
+        print(f"   - Bildbeschreibungen: {'✅' if json_path.exists() else '❌'}")
+        print(f"   - Combined.md: {'✅ erstellt' if CREATE_COMBINED_MD else '❌ deaktiviert'}")
         
     except Exception as e:
-        print(f"❌ Unexpected error: {e}")
-        logging.error(f"Main program error: {e}", exc_info=True)
+        print(f"❌ Unerwarteter Fehler: {e}")
+        logging.error(f"Hauptprogramm-Fehler: {e}", exc_info=True)
 
 if __name__ == "__main__":
     main()

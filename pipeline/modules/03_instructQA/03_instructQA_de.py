@@ -7,16 +7,16 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 
 # ========================================
-# LOAD CENTRAL CONFIGURATION
+# ZENTRALE KONFIGURATION LADEN
 # ========================================
-sys.path.append(str(Path(__file__).parent.parent.parent))  # To main directory
+sys.path.append(str(Path(__file__).parent.parent.parent))  # Zum Hauptverzeichnis
 from config_loader import PipelineConfigLoader
 
-# Load configuration for this module
+# Lade Konfiguration für dieses Modul
 config_loader = PipelineConfigLoader("03_instructQA")
 config = config_loader.get_api_config()
 
-# Extract configuration values
+# Extrahiere Konfigurationswerte
 USE_OPENAI_API = config.get("use_openai_api", True)
 OPENAI_BASE_URL = config.get("openai_base_url", "http://localhost:11434/v1")
 OPENAI_API_KEY = config.get("openai_api_key", "ollama")
@@ -27,138 +27,138 @@ OLLAMA_MODEL_NAME = config.get("ollama_model_name", "gemma3:12b-it-qat")
 OLLAMA_CHAT_ENDPOINT = f"{OLLAMA_SERVER_URL}/api/chat"
 OLLAMA_TAGS_ENDPOINT = f"{OLLAMA_SERVER_URL}/api/tags"
 
-# Directories
+# Verzeichnisse
 INPUT_DIR = "INPUT"
 OUTPUT_DIR = "OUTPUT"
 OUTPUT_FILENAME = "qa_instruct_dataset.json"
 
-# Show loaded configuration
+# Zeige geladene Konfiguration
 print("=" * 60)
-print("📋 CONFIGURATION LOADED (03_instructQA)")
+print("📋 KONFIGURATION GELADEN (03_instructQA)")
 print("=" * 60)
 config_loader.print_config_summary()
 print("=" * 60)
 
 # ========================================
-# EXTENDED QUESTION TYPES FOR BETTER COVERAGE
+# ERWEITERTE FRAGETYPEN FÜR BESSERE ABDECKUNG
 # ========================================
 
 QUESTION_TYPES = [
     {
         "type": "definition",
         "templates": [
-            "What is {title}?",
-            "Can you explain {title}?",
-            "Define {title}.",
-            "What is meant by {title}?",
-            "Explain the concept of {title}."
+            "Was ist {title}?",
+            "Können Sie {title} erklären?",
+            "Definieren Sie {title}.",
+            "Was versteht man unter {title}?",
+            "Erläutern Sie den Begriff {title}."
         ]
     },
     {
         "type": "detailed_explanation",
         "templates": [
-            "Describe {title} in detail.",
-            "Give a detailed explanation of {title}.",
-            "What should one know about {title}?",
-            "Explain {title} to me in more detail.",
-            "What are the important aspects of {title}?"
+            "Beschreiben Sie {title} ausführlich.",
+            "Geben Sie eine detaillierte Erklärung von {title}.",
+            "Was sollte man über {title} wissen?",
+            "Erklären Sie mir {title} genauer.",
+            "Welche wichtigen Aspekte hat {title}?"
         ]
     },
     {
         "type": "characteristics",
         "templates": [
-            "What characteristics does {title} have?",
-            "What are the main properties of {title}?",
-            "What characteristics distinguish {title}?",
-            "What are the essential properties of {title}?",
-            "What special features characterize {title}?"
+            "Welche Merkmale hat {title}?",
+            "Was sind die Haupteigenschaften von {title}?",
+            "Welche Charakteristika zeichnen {title} aus?",
+            "Was sind die wesentlichen Eigenschaften von {title}?",
+            "Durch welche Besonderheiten ist {title} gekennzeichnet?"
         ]
     },
     {
         "type": "application",
         "templates": [
-            "What is {title} used for?",
-            "What applications does {title} have?",
-            "In which areas does {title} play a role?",
-            "Where is {title} used?",
-            "What practical significance does {title} have?"
+            "Wofür wird {title} verwendet?",
+            "Welche Anwendungen hat {title}?",
+            "In welchen Bereichen spielt {title} eine Rolle?",
+            "Wo findet {title} Verwendung?",
+            "Welche praktische Bedeutung hat {title}?"
         ]
     },
     {
         "type": "context",
         "templates": [
-            "In what context is {title} relevant?",
-            "Why is {title} important?",
-            "What significance does {title} have?",
-            "In what connection does {title} stand?",
-            "What role does {title} play?"
+            "In welchem Kontext ist {title} relevant?",
+            "Warum ist {title} wichtig?",
+            "Welche Bedeutung hat {title}?",
+            "In welchem Zusammenhang steht {title}?",
+            "Welche Rolle spielt {title}?"
         ]
     },
     {
         "type": "technical_specs",
         "templates": [
-            "What technical data does {title} have?",
-            "List all technical specifications of {title}.",
-            "What metrics and parameters does {title} have?",
-            "List the technical details of {title}.",
-            "What are the technical properties of {title}?"
+            "Welche technischen Daten hat {title}?",
+            "Nennen Sie alle technischen Spezifikationen von {title}.",
+            "Welche Kennzahlen und Parameter hat {title}?",
+            "Listen Sie die technischen Details von {title} auf.",
+            "Was sind die technischen Eigenschaften von {title}?"
         ]
     },
     {
         "type": "complete_overview",
         "templates": [
-            "Give a complete overview of {title}.",
-            "Summarize all important information about {title}.",
-            "What are all the relevant details about {title}?",
-            "Describe {title} with all available information.",
-            "Explain {title} comprehensively with all details."
+            "Geben Sie eine vollständige Übersicht über {title}.",
+            "Fassen Sie alle wichtigen Informationen zu {title} zusammen.",
+            "Was sind alle relevanten Details zu {title}?",
+            "Beschreiben Sie {title} mit allen verfügbaren Informationen.",
+            "Erklären Sie {title} umfassend mit allen Details."
         ]
     },
     {
         "type": "data_and_facts",
         "templates": [
-            "What concrete data and facts exist about {title}?",
-            "List all numbers and measurements for {title}.",
-            "What quantitative information is available for {title}?",
-            "List all factual information about {title}.",
-            "What are the measurable properties of {title}?"
+            "Welche konkreten Daten und Fakten gibt es zu {title}?",
+            "Nennen Sie alle Zahlen und Messwerte zu {title}.",
+            "Welche quantitativen Informationen liegen zu {title} vor?",
+            "Listen Sie alle faktischen Angaben zu {title} auf.",
+            "Was sind die messbaren Eigenschaften von {title}?"
         ]
     },
     {
         "type": "structure_and_components",
         "templates": [
-            "What components does {title} consist of?",
-            "How is {title} structured?",
-            "What parts does {title} have?",
-            "Describe the structure of {title}.",
-            "What elements belong to {title}?"
+            "Aus welchen Komponenten besteht {title}?",
+            "Wie ist {title} strukturiert?",
+            "Welche Bestandteile hat {title}?",
+            "Beschreiben Sie den Aufbau von {title}.",
+            "Welche Elemente gehören zu {title}?"
         ]
     },
     {
         "type": "comparison_and_differences",
         "templates": [
-            "How does {title} differ from similar concepts?",
-            "What makes {title} special?",
-            "What variants of {title} exist?",
-            "How does {title} distinguish itself?",
-            "What are the unique features of {title}?"
+            "Wie unterscheidet sich {title} von ähnlichen Konzepten?",
+            "Was macht {title} besonders?",
+            "Welche Varianten von {title} gibt es?",
+            "Wie grenzt sich {title} ab?",
+            "Was sind die Alleinstellungsmerkmale von {title}?"
         ]
     }
 ]
 
 # ========================================
-# API CONNECTION
+# API-VERBINDUNG
 # ========================================
 
 def check_api_connection():
-    """Checks API connection (OpenAI or Ollama)."""
+    """Überprüft API-Verbindung (OpenAI oder Ollama)."""
     if USE_OPENAI_API:
         return check_openai_connection()
     else:
         return check_ollama_connection()
 
 def check_openai_connection():
-    """Checks OpenAI API connection."""
+    """Überprüft OpenAI-API-Verbindung."""
     try:
         headers = {
             'Authorization': f'Bearer {OPENAI_API_KEY}',
@@ -179,24 +179,24 @@ def check_openai_connection():
         )
         
         if response.status_code == 200:
-            print(f"✅ OpenAI API connection successful ({OPENAI_BASE_URL})")
-            print(f"✅ Model '{OPENAI_MODEL_NAME}' is available")
+            print(f"✅ OpenAI-API-Verbindung erfolgreich ({OPENAI_BASE_URL})")
+            print(f"✅ Modell '{OPENAI_MODEL_NAME}' ist verfügbar")
             return True
         else:
-            print(f"❌ OpenAI API not reachable (Status: {response.status_code})")
+            print(f"❌ OpenAI-API nicht erreichbar (Status: {response.status_code})")
             if response.status_code == 401:
-                print("🔒 Authentication failed - check OPENAI_API_KEY")
+                print("🔒 Authentifizierung fehlgeschlagen - prüfen Sie OPENAI_API_KEY")
             elif response.status_code == 404:
-                print("❌ Model not found - check OPENAI_MODEL_NAME")
+                print("❌ Modell nicht gefunden - prüfen Sie OPENAI_MODEL_NAME")
             return False
             
     except requests.RequestException as e:
-        print(f"❌ OpenAI API connection failed: {e}")
-        print(f"💡 Check: Server running on {OPENAI_BASE_URL}?")
+        print(f"❌ OpenAI-API-Verbindung fehlgeschlagen: {e}")
+        print(f"💡 Überprüfen Sie: Server läuft auf {OPENAI_BASE_URL}?")
         return False
 
 def check_ollama_connection():
-    """Checks Ollama API connection."""
+    """Überprüft Ollama-API-Verbindung."""
     try:
         headers = {
             'Authorization': f'Bearer {OLLAMA_API_KEY}',
@@ -209,55 +209,55 @@ def check_ollama_connection():
             models = response.json()
             model_names = [model['name'] for model in models.get('models', [])]
             
-            print(f"✅ Ollama connection successful ({OLLAMA_SERVER_URL})")
-            print(f"📋 Available models: {', '.join(model_names[:3])}..." if len(model_names) > 3 else f"📋 Available models: {', '.join(model_names)}")
+            print(f"✅ Ollama-Verbindung erfolgreich ({OLLAMA_SERVER_URL})")
+            print(f"📋 Verfügbare Modelle: {', '.join(model_names[:3])}..." if len(model_names) > 3 else f"📋 Verfügbare Modelle: {', '.join(model_names)}")
             
             if OLLAMA_MODEL_NAME in model_names:
-                print(f"✅ Model '{OLLAMA_MODEL_NAME}' is available")
+                print(f"✅ Modell '{OLLAMA_MODEL_NAME}' ist verfügbar")
                 return True
             else:
-                print(f"❌ Model '{OLLAMA_MODEL_NAME}' not found!")
+                print(f"❌ Modell '{OLLAMA_MODEL_NAME}' nicht gefunden!")
                 return False
         else:
-            print(f"❌ Ollama not reachable (Status: {response.status_code})")
+            print(f"❌ Ollama nicht erreichbar (Status: {response.status_code})")
             return False
             
     except requests.RequestException as e:
-        print(f"❌ Ollama connection failed: {e}")
+        print(f"❌ Ollama-Verbindung fehlgeschlagen: {e}")
         return False
 
 # ========================================
-# FILE PROCESSING
+# DATEI-VERARBEITUNG
 # ========================================
 
 def load_lexikon_files(input_dir: str) -> List[Dict[str, Any]]:
-    """Loads all lexicon JSON files from the input directory."""
+    """Lädt alle Lexikon-JSON-Dateien aus dem Input-Verzeichnis."""
     input_path = Path(input_dir)
     if not input_path.exists():
-        print(f"❌ Input directory '{input_dir}' does not exist!")
+        print(f"❌ Input-Verzeichnis '{input_dir}' existiert nicht!")
         return []
     
-    # Search for all possible lexicon files
+    # Suche nach allen möglichen Lexikon-Dateien
     lexikon_patterns = ["lexikon_*.json", "processed_*.json", "*_lexikon.json"]
     lexikon_files = []
     
     for pattern in lexikon_patterns:
         lexikon_files.extend(list(input_path.glob(pattern)))
     
-    # Remove duplicates
+    # Entferne Duplikate
     lexikon_files = list(set(lexikon_files))
     
-    print(f"📁 Found lexicon files: {len(lexikon_files)}")
+    print(f"📁 Gefundene Lexikon-Dateien: {len(lexikon_files)}")
     
     all_entries = []
     
     for file in lexikon_files:
-        print(f"📖 Loading: {file.name}")
+        print(f"📖 Lade: {file.name}")
         try:
             with open(file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 
-                # Support different structures
+                # Unterstütze verschiedene Strukturen
                 if 'lexikon_entries' in data:
                     entries = data.get('lexikon_entries', [])
                 elif 'entries' in data:
@@ -265,167 +265,143 @@ def load_lexikon_files(input_dir: str) -> List[Dict[str, Any]]:
                 elif 'data' in data:
                     entries = data.get('data', [])
                 else:
-                    # Fallback: Try to interpret file as list
+                    # Fallback: Versuche die Datei als Liste zu interpretieren
                     if isinstance(data, list):
                         entries = data
                     else:
                         entries = []
                 
-                print(f"   - {len(entries)} entries found")
+                print(f"   - {len(entries)} Einträge gefunden")
                 all_entries.extend(entries)
                 
         except Exception as e:
-            print(f"❌ Error loading {file.name}: {e}")
+            print(f"❌ Fehler beim Laden von {file.name}: {e}")
     
-    print(f"📊 Total: {len(all_entries)} lexicon entries")
+    print(f"📊 Gesamt: {len(all_entries)} Lexikon-Einträge")
     return all_entries
 
 # ========================================
-# PROMPT GENERATION WITH FACT PRESERVATION
+# PROMPT-GENERIERUNG MIT FAKTEN-ERHALTUNG
 # ========================================
 
 def detect_content_features(lexikon_entry: str) -> Dict[str, bool]:
-    """Detects special content features in the lexicon entry."""
+    """Erkennt spezielle Inhaltsmerkmale im Lexikon-Eintrag."""
     features = {
         'has_table': '|' in lexikon_entry or '\t' in lexikon_entry,
         'has_technical_data': any(keyword in lexikon_entry.lower() for keyword in 
                                  ['temperaturbereich', 'messbereich', 'spezifikationen', 
-                                  'betriebsspannung', 'frequenz', 'genauigkeit', 'temperature range',
-                                  'measurement range', 'specifications', 'operating voltage', 
-                                  'frequency', 'accuracy']),
+                                  'betriebsspannung', 'frequenz', 'genauigkeit']),
         'has_numbers': any(char.isdigit() for char in lexikon_entry),
         'has_list': any(marker in lexikon_entry for marker in ['•', '●', '○', '■', '- ', '* ', '1.', '2.']),
         'has_product_code': bool(re.search(r'\b[A-Z]{2,4}-\d{2,4}\b', lexikon_entry)) if 're' in globals() else False,
-        'is_structured_data': 'bundesland' in lexikon_entry.lower() or 'tabelle' in lexikon_entry.lower() or 'table' in lexikon_entry.lower()
+        'is_structured_data': 'bundesland' in lexikon_entry.lower() or 'tabelle' in lexikon_entry.lower()
     }
     return features
 
-def detect_language(text: str) -> str:
-    """Detects the language of the text (simple detection)."""
-    # Simple language detection based on common words
-    german_indicators = ['der', 'die', 'das', 'und', 'oder', 'ist', 'sind', 'von', 'mit', 'für', 'auf', 'in', 'zu', 'bei', 'nach', 'über', 'durch', 'unter', 'gegen', 'ohne']
-    english_indicators = ['the', 'and', 'or', 'is', 'are', 'of', 'with', 'for', 'on', 'in', 'to', 'at', 'after', 'over', 'by', 'under', 'against', 'without']
-    
-    text_lower = text.lower()
-    german_count = sum(1 for word in german_indicators if word in text_lower)
-    english_count = sum(1 for word in english_indicators if word in text_lower)
-    
-    if german_count > english_count:
-        return "German"
-    elif english_count > german_count:
-        return "English"
-    else:
-        return "German"  # Default to German for this pipeline
-
 def generate_qa_prompt(title: str, lexikon_entry: str, question_type: Dict[str, Any]) -> str:
-    """Generates a prompt for QA creation with complete fact preservation."""
+    """Generiert einen Prompt für die QA-Erstellung mit vollständiger Fakten-Erhaltung."""
     
-    # Detect content features
+    # Erkenne Content-Features
     features = detect_content_features(lexikon_entry)
     
-    # Detect language of the source content
-    source_language = detect_language(lexikon_entry)
-    
-    # Build special instructions based on content features
+    # Baue spezielle Instruktionen basierend auf Content-Features
     special_instructions = []
     
     if features['has_table']:
         special_instructions.append("""
-- The lexicon entry contains TABLES or structured data - these must be COMPLETELY preserved
-- Use Markdown tables (|---|---|) for tabular data
-- Maintain structure and formatting""")
+- Der Lexikon-Eintrag enthält TABELLEN oder strukturierte Daten - diese müssen VOLLSTÄNDIG übernommen werden
+- Verwende Markdown-Tabellen (|---|---|) für tabellarische Daten
+- Behalte die Struktur und Formatierung bei""")
     
     if features['has_technical_data']:
         special_instructions.append("""
-- The entry contains TECHNICAL DATA - all specifications, values and parameters must be preserved
-- Use **bold text** for technical terms
-- Structure technical data as list or table""")
+- Der Eintrag enthält TECHNISCHE DATEN - alle Spezifikationen, Werte und Parameter müssen erhalten bleiben
+- Verwende **Fettschrift** für technische Begriffe
+- Strukturiere technische Daten als Liste oder Tabelle""")
     
     if features['has_numbers']:
         special_instructions.append("""
-- ALL numbers, measurements, percentages and quantitative data must be exactly preserved
-- Do not round values and do not change units""")
+- ALLE Zahlen, Messwerte, Prozentangaben und quantitative Daten müssen exakt übernommen werden
+- Runde keine Werte und ändere keine Einheiten""")
     
     if features['has_list']:
         special_instructions.append("""
-- Maintain all enumerations and lists
-- Use the same list structure as in the original""")
+- Behalte alle Aufzählungen und Listen bei
+- Verwende die gleiche Listenstruktur wie im Original""")
     
     if features['has_product_code']:
         special_instructions.append("""
-- This is a PRODUCT ENTRY - maintain product codes and names exactly
-- Treat it as a concrete product, not as a general concept""")
+- Dies ist ein PRODUKTEINTRAG - behalte Produktcodes und -namen exakt bei
+- Behandle es als konkretes Produkt, nicht als allgemeines Konzept""")
     
     special_instructions_text = "\n".join(special_instructions) if special_instructions else ""
     
-    # Choose a random template for the question (but in detected language)
+    # Wähle einen zufälligen Template für die Frage
     question_template = random.choice(question_type["templates"])
     
     prompt = f"""
-Create a high-quality question-answer pair for an instruction dataset.
+Erstelle ein hochwertiges Frage-Antwort-Paar für einen Instruct-Datensatz.
 
-TOPIC: {title}
-QUESTION TYPE: {question_type["type"]}
-QUESTION TEMPLATE: {question_template}
+THEMA: {title}
+FRAGETYP: {question_type["type"]}
+FRAGE-TEMPLATE: {question_template}
 
-LEXICON ENTRY (SOURCE):
+LEXIKON-EINTRAG (QUELLE):
 {lexikon_entry}
 
-LANGUAGE DETECTION: The source content appears to be in {source_language}.
+AUFGABE:
+1. Erstelle eine natürliche Frage basierend auf dem Template "{question_template}"
+2. Beantworte die Frage VOLLSTÄNDIG und AUSFÜHRLICH basierend auf dem Lexikon-Eintrag
+3. Die Antwort soll umfassend sein (3-10 Sätze oder mehr bei komplexen Themen)
+4. Übernehme ALLE relevanten Informationen, Fakten und Details aus dem Lexikon-Eintrag
+5. Stil: Professionell, lehrreich, wie ein Fachexperte
+6. Sprache: Deutsch
 
-TASK:
-1. Create a natural question based on the template "{question_template}"
-2. Answer the question COMPLETELY and THOROUGHLY based on the lexicon entry
-3. The answer should be comprehensive (3-10 sentences or more for complex topics)
-4. Include ALL relevant information, facts and details from the lexicon entry
-5. Style: Professional, educational, like a subject expert
-6. CRITICAL: Respond in the same language as the source document. If the source is in German, respond in German. If the source is in English, respond in English.
+KRITISCHE ANFORDERUNGEN:
+- KEIN Informationsverlust! Jedes Detail, jede Zahl, jeder Fakt muss erhalten bleiben
+- Bei technischen Themen: ALLE Spezifikationen und Werte übernehmen
+- Bei Produkten: Produktcodes und -namen exakt beibehalten
+- Bei Listen/Tabellen: Struktur vollständig übernehmen
 
-CRITICAL REQUIREMENTS:
-- NO information loss! Every detail, every number, every fact must be preserved
-- For technical topics: Include ALL specifications and values
-- For products: Maintain product codes and names exactly
-- For lists/tables: Preserve structure completely
+MARKDOWN-FORMATIERUNG:
+- Verwende **Fettschrift** für wichtige Begriffe und Überschriften
+- Verwende *Kursivschrift* für Hervorhebungen
+- Strukturiere mit Überschriften (##, ###) wenn sinnvoll
+- Nutze Listen (- oder *) für Aufzählungen
+- Verwende Markdown-Tabellen für tabellarische Daten
+- Code-Blöcke ``` für technische Werte wenn passend
 
-MARKDOWN FORMATTING:
-- Use **bold text** for important terms and headings
-- Use *italic text* for emphasis
-- Structure with headings (##, ###) when appropriate
-- Use lists (- or *) for enumerations
-- Use Markdown tables for tabular data
-- Code blocks ``` for technical values when appropriate
-
-SPECIAL CONTENT INSTRUCTIONS:
+SPEZIELLE CONTENT-ANWEISUNGEN:
 {special_instructions_text}
 
-ANSWER LENGTH:
-- Minimum: 3 complete sentences
-- Maximum: As long as necessary to convey ALL information
-- For complex topics or lots of data: Feel free to use 15-20 sentences
+ANTWORTLÄNGE:
+- Minimum: 3 vollständige Sätze
+- Maximum: So lang wie nötig um ALLE Informationen zu vermitteln
+- Bei komplexen Themen oder vielen Daten: Gerne auch 15-20 Sätze
 
-OUTPUT FORMAT:
+FORMAT DER AUSGABE:
 {{
-    "question": "The formulated question based on the template",
-    "answer": "The complete, detailed, fact-rich answer with all details from the lexicon entry"
+    "question": "Die formulierte Frage basierend auf dem Template",
+    "answer": "Die vollständige, ausführliche, faktenreiche Antwort mit allen Details aus dem Lexikon-Eintrag"
 }}
 
-IMPORTANT: Respond ONLY with the JSON object, no additional explanations!
+WICHTIG: Antworte NUR mit dem JSON-Objekt, keine zusätzlichen Erklärungen!
 """
     return prompt
 
 # ========================================
-# API COMMUNICATION
+# API-KOMMUNIKATION
 # ========================================
 
 def submit_to_api(prompt: str, retries: int = 3) -> Optional[str]:
-    """Sends a request to the chosen API and retrieves the response."""
+    """Sendet eine Anfrage an die gewählte API und holt die Antwort."""
     if USE_OPENAI_API:
         return submit_to_openai_api(prompt, retries)
     else:
         return submit_to_ollama_api(prompt, retries)
 
 def submit_to_openai_api(prompt: str, retries: int = 3) -> Optional[str]:
-    """Sends a request to the OpenAI API and retrieves the response."""
+    """Sendet eine Anfrage an die OpenAI-API und holt die Antwort."""
     headers = {
         'Authorization': f'Bearer {OPENAI_API_KEY}',
         'Content-Type': 'application/json'
@@ -436,12 +412,12 @@ def submit_to_openai_api(prompt: str, retries: int = 3) -> Optional[str]:
         "messages": [
             {
                 "role": "system", 
-                "content": "You are an expert at creating high-quality question-answer pairs for instruction datasets. Your answers are complete, fact-rich and preserve ALL details from the source. You use Markdown formatting for better structure. You respond in the same language as the source document."
+                "content": "Du bist ein Experte für das Erstellen von hochwertigen Frage-Antwort-Paaren für Instruct-Datensätze. Deine Antworten sind vollständig, faktenreich und behalten ALLE Details aus der Quelle bei. Du verwendest Markdown-Formatierung für bessere Struktur."
             },
             {"role": "user", "content": prompt}
         ],
-        "max_tokens": 2000,  # Increased for longer, complete answers
-        "temperature": 0.3   # Low for factual accuracy
+        "max_tokens": 2000,  # Erhöht für längere, vollständige Antworten
+        "temperature": 0.3   # Niedrig für faktentreue
     }
 
     for attempt in range(retries):
@@ -458,15 +434,15 @@ def submit_to_openai_api(prompt: str, retries: int = 3) -> Optional[str]:
                 content = result.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
                 return content
             else:
-                print(f"❌ OpenAI API error {response.status_code}: {response.text}")
+                print(f"❌ OpenAI-API-Fehler {response.status_code}: {response.text}")
                 
         except requests.RequestException as e:
-            print(f"❌ API error (attempt {attempt + 1}): {e}")
+            print(f"❌ API-Fehler (Versuch {attempt + 1}): {e}")
     
     return None
 
 def submit_to_ollama_api(prompt: str, retries: int = 3) -> Optional[str]:
-    """Sends a request to the Ollama API and retrieves the response."""
+    """Sendet eine Anfrage an die Ollama-API und holt die Antwort."""
     headers = {
         'Authorization': f'Bearer {OLLAMA_API_KEY}',
         'Content-Type': 'application/json'
@@ -474,17 +450,17 @@ def submit_to_ollama_api(prompt: str, retries: int = 3) -> Optional[str]:
     
     payload = {
         "model": OLLAMA_MODEL_NAME,
-        "temperature": 0.3,  # Low for factual accuracy
+        "temperature": 0.3,  # Niedrig für faktentreue
         "stream": False,
         "messages": [
             {
                 "role": "system", 
-                "content": "You are an expert at creating high-quality question-answer pairs for instruction datasets. Your answers are complete, fact-rich and preserve ALL details from the source. You use Markdown formatting for better structure. You respond in the same language as the source document."
+                "content": "Du bist ein Experte für das Erstellen von hochwertigen Frage-Antwort-Paaren für Instruct-Datensätze. Deine Antworten sind vollständig, faktenreich und behalten ALLE Details aus der Quelle bei. Du verwendest Markdown-Formatierung für bessere Struktur."
             },
             {"role": "user", "content": prompt}
         ],
         "options": {
-            "num_predict": 2000  # Increased for longer answers
+            "num_predict": 2000  # Erhöht für längere Antworten
         }
     }
 
@@ -496,24 +472,24 @@ def submit_to_ollama_api(prompt: str, retries: int = 3) -> Optional[str]:
                 content = response.json().get("message", {}).get("content", "").strip()
                 return content
             else:
-                print(f"❌ Ollama API error {response.status_code}: {response.text}")
+                print(f"❌ Ollama-API-Fehler {response.status_code}: {response.text}")
                 
         except requests.RequestException as e:
-            print(f"❌ API error (attempt {attempt + 1}): {e}")
+            print(f"❌ API-Fehler (Versuch {attempt + 1}): {e}")
     
     return None
 
 # ========================================
-# QA GENERATION
+# QA-GENERIERUNG
 # ========================================
 
 def extract_qa_from_response(response: str) -> Optional[Dict[str, str]]:
-    """Extracts QA pair from the API response."""
+    """Extrahiert QA-Paar aus der API-Antwort."""
     try:
-        # Clean the response
+        # Bereinige die Antwort
         response = response.strip()
         
-        # Remove code block markers if present
+        # Entferne Code-Block-Marker falls vorhanden
         if response.startswith("```json") and response.endswith("```"):
             response = response[7:-3].strip()
         elif response.startswith("```") and response.endswith("```"):
@@ -522,36 +498,36 @@ def extract_qa_from_response(response: str) -> Optional[Dict[str, str]]:
         # Parse JSON
         qa_data = json.loads(response)
         
-        # Validate structure
+        # Validiere Struktur
         if "question" in qa_data and "answer" in qa_data:
             return {
                 "question": qa_data["question"].strip(),
                 "answer": qa_data["answer"].strip()
             }
         else:
-            print(f"❌ Invalid QA format: Missing fields")
+            print(f"❌ Ungültiges QA-Format: Fehlende Felder")
             return None
             
     except json.JSONDecodeError as e:
-        print(f"❌ JSON parse error: {e}")
-        print(f"Raw Response (first 200 characters): {response[:200]}...")
+        print(f"❌ JSON-Parse-Fehler: {e}")
+        print(f"Raw Response (erste 200 Zeichen): {response[:200]}...")
         return None
     except Exception as e:
-        print(f"❌ Unexpected error during extraction: {e}")
+        print(f"❌ Unerwarteter Fehler beim Extrahieren: {e}")
         return None
 
 def generate_qa_for_entry(entry: Dict[str, Any], num_questions: Optional[int] = None) -> List[Dict[str, Any]]:
-    """Generates multiple QA pairs for a lexicon entry with focus on completeness."""
+    """Generiert mehrere QA-Paare für einen Lexikon-Eintrag mit Fokus auf Vollständigkeit."""
     
-    # Extract relevant fields (support different structures)
+    # Extrahiere relevante Felder (unterstütze verschiedene Strukturen)
     title = entry.get('title', entry.get('name', ''))
     lexikon_entry = entry.get('lexikon_entry', entry.get('entry', entry.get('content', '')))
     
     if not title or not lexikon_entry:
-        print(f"⚠️ Incomplete entry skipped: {title or 'Unknown'}")
+        print(f"⚠️ Unvollständiger Eintrag übersprungen: {title or 'Unbekannt'}")
         return []
     
-    # Determine number of questions based on content length
+    # Bestimme Anzahl der Fragen basierend auf Content-Länge
     if num_questions is None:
         content_length = len(lexikon_entry)
         if content_length < 500:
@@ -561,16 +537,16 @@ def generate_qa_for_entry(entry: Dict[str, Any], num_questions: Optional[int] = 
         else:
             num_questions = random.randint(5, 8)
     
-    print(f"🔄 Generating {num_questions} QA pairs for: {title}")
+    print(f"🔄 Generiere {num_questions} QA-Paare für: {title}")
     
     qa_pairs = []
     used_question_types = set()
     
-    # GUARANTEE a "complete_overview" question as first for maximum coverage
+    # GARANTIERE eine "complete_overview" Frage als erste für maximale Abdeckung
     overview_type = next((qt for qt in QUESTION_TYPES if qt["type"] == "complete_overview"), None)
     
     if overview_type:
-        print(f"   🎯 Creating complete overview...")
+        print(f"   🎯 Erstelle vollständige Übersicht...")
         prompt = generate_qa_prompt(title, lexikon_entry, overview_type)
         
         for attempt in range(3):
@@ -583,12 +559,12 @@ def generate_qa_for_entry(entry: Dict[str, Any], num_questions: Optional[int] = 
                     qa_pair["question_type"] = "complete_overview"
                     qa_pairs.append(qa_pair)
                     used_question_types.add("complete_overview")
-                    print(f"   ✅ QA 1/{num_questions} created (complete_overview)")
+                    print(f"   ✅ QA 1/{num_questions} erstellt (complete_overview)")
                     break
             if attempt < 2:
-                print(f"   ⚠️ Attempt {attempt + 1} failed, retrying...")
+                print(f"   ⚠️ Versuch {attempt + 1} fehlgeschlagen, wiederhole...")
     
-    # Prioritize certain question types based on content
+    # Priorisiere bestimmte Fragetypen basierend auf Content
     features = detect_content_features(lexikon_entry)
     priority_types = []
     
@@ -599,7 +575,7 @@ def generate_qa_for_entry(entry: Dict[str, Any], num_questions: Optional[int] = 
     if features['has_list'] or features['has_table']:
         priority_types.append("structure_and_components")
     
-    # Add prioritized questions
+    # Füge priorisierte Fragen hinzu
     for priority_type in priority_types:
         if len(qa_pairs) >= num_questions:
             break
@@ -618,17 +594,17 @@ def generate_qa_for_entry(entry: Dict[str, Any], num_questions: Optional[int] = 
                         qa_pair["question_type"] = priority_type
                         qa_pairs.append(qa_pair)
                         used_question_types.add(priority_type)
-                        print(f"   ✅ QA {len(qa_pairs)}/{num_questions} created ({priority_type})")
+                        print(f"   ✅ QA {len(qa_pairs)}/{num_questions} erstellt ({priority_type})")
                         break
     
-    # Fill with additional random question types
+    # Fülle mit weiteren zufälligen Fragetypen auf
     remaining_questions = num_questions - len(qa_pairs)
     
     for i in range(remaining_questions):
-        # Choose unused question types
+        # Wähle unbenutzte Fragetypen
         available_types = [qt for qt in QUESTION_TYPES if qt["type"] not in used_question_types]
         
-        # If all were used, allow repetition
+        # Wenn alle verwendet wurden, erlaube Wiederholung
         if not available_types:
             available_types = QUESTION_TYPES
             used_question_types.clear()
@@ -647,26 +623,26 @@ def generate_qa_for_entry(entry: Dict[str, Any], num_questions: Optional[int] = 
                     qa_pair["title"] = title
                     qa_pair["question_type"] = question_type["type"]
                     qa_pairs.append(qa_pair)
-                    print(f"   ✅ QA {len(qa_pairs)}/{num_questions} created ({question_type['type']})")
+                    print(f"   ✅ QA {len(qa_pairs)}/{num_questions} erstellt ({question_type['type']})")
                     break
         
         if len(qa_pairs) <= len(qa_pairs):
-            print(f"   ⚠️ QA {len(qa_pairs)+1} could not be created")
+            print(f"   ⚠️ QA {len(qa_pairs)+1} konnte nicht erstellt werden")
     
     return qa_pairs
 
 # ========================================
-# DATASET CONVERSION
+# DATENSATZ-KONVERTIERUNG
 # ========================================
 
 def convert_to_instruct_format(qa_pairs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Converts QA pairs to standard instruction format."""
+    """Konvertiert QA-Paare in das Standard-Instruct-Format."""
     instruct_dataset = []
     
     for qa in qa_pairs:
         instruct_entry = {
             "instruction": qa["question"],
-            "input": "",  # Empty for this use case
+            "input": "",  # Leer für diesen Use-Case
             "output": qa["answer"],
             "metadata": {
                 "source": qa.get("source", ""),
@@ -681,47 +657,46 @@ def convert_to_instruct_format(qa_pairs: List[Dict[str, Any]]) -> List[Dict[str,
     return instruct_dataset
 
 # ========================================
-# MAIN PROCESSING
+# HAUPTVERARBEITUNG
 # ========================================
 
 def process_lexikon_to_qa_dataset(input_dir: str, output_dir: str, output_filename: str):
-    """Main function: Converts all lexicon files to a comprehensive QA dataset."""
+    """Hauptfunktion: Konvertiert alle Lexikon-Dateien zu einem umfassenden QA-Datensatz."""
     api_name = "OpenAI-API" if USE_OPENAI_API else "Ollama-API"
     server_url = OPENAI_BASE_URL if USE_OPENAI_API else OLLAMA_SERVER_URL
     model_name = OPENAI_MODEL_NAME if USE_OPENAI_API else OLLAMA_MODEL_NAME
     
-    print(f"🚀 Starting extended conversion Lexicon → QA-Instruct-Dataset")
-    print(f"📂 Input directory: {input_dir}")
-    print(f"📂 Output directory: {output_dir}")
-    print(f"📄 Output file: {output_filename}")
-    print(f"🔧 API type: {api_name}")
+    print(f"🚀 Starte erweiterte Konvertierung Lexikon → QA-Instruct-Datensatz")
+    print(f"📂 Input-Verzeichnis: {input_dir}")
+    print(f"📂 Output-Verzeichnis: {output_dir}")
+    print(f"📄 Output-Datei: {output_filename}")
+    print(f"🔧 API-Typ: {api_name}")
     print(f"🔧 Server: {server_url}")
-    print(f"🔧 Model: {model_name}")
+    print(f"🔧 Modell: {model_name}")
     print(f"✨ Features:")
-    print(f"   - Extended question types: {len(QUESTION_TYPES)} categories")
-    print(f"   - Complete fact preservation: ✅")
-    print(f"   - Markdown formatting: ✅")
-    print(f"   - Dynamic question count: ✅")
-    print(f"   - Table support: ✅")
-    print(f"   - Language agnostic: ✅")
+    print(f"   - Erweiterte Fragetypen: {len(QUESTION_TYPES)} Kategorien")
+    print(f"   - Vollständige Fakten-Erhaltung: ✅")
+    print(f"   - Markdown-Formatierung: ✅")
+    print(f"   - Dynamische Fragenzahl: ✅")
+    print(f"   - Tabellen-Unterstützung: ✅")
     
-    # Check API connection
+    # API-Verbindung prüfen
     if not check_api_connection():
-        print("❌ API connection failed. Processing aborted.")
+        print("❌ API-Verbindung fehlgeschlagen. Verarbeitung abgebrochen.")
         return
     
-    # Load lexicon entries
+    # Lade Lexikon-Einträge
     lexikon_entries = load_lexikon_files(input_dir)
     
     if not lexikon_entries:
-        print("❌ No lexicon entries found!")
+        print("❌ Keine Lexikon-Einträge gefunden!")
         return
     
-    # Create output directory
+    # Output-Verzeichnis erstellen
     os.makedirs(output_dir, exist_ok=True)
     
     print(f"\n{'='*60}")
-    print(f"Generating QA pairs for {len(lexikon_entries)} lexicon entries")
+    print(f"Generiere QA-Paare für {len(lexikon_entries)} Lexikon-Einträge")
     print(f"{'='*60}")
     
     all_qa_pairs = []
@@ -733,10 +708,10 @@ def process_lexikon_to_qa_dataset(input_dir: str, output_dir: str, output_filena
         'qa_by_type': {}
     }
     
-    # Process each entry
+    # Verarbeite jeden Eintrag
     for idx, entry in enumerate(lexikon_entries, 1):
-        title = entry.get('title', entry.get('name', f'Entry {idx}'))
-        print(f"\n🔄 Entry {idx}/{len(lexikon_entries)}: {title}")
+        title = entry.get('title', entry.get('name', f'Eintrag {idx}'))
+        print(f"\n🔄 Eintrag {idx}/{len(lexikon_entries)}: {title}")
         
         try:
             qa_pairs = generate_qa_for_entry(entry)
@@ -746,28 +721,28 @@ def process_lexikon_to_qa_dataset(input_dir: str, output_dir: str, output_filena
                 statistics['processed_entries'] += 1
                 statistics['total_qa_pairs'] += len(qa_pairs)
                 
-                # Statistics by type
+                # Statistik nach Typ
                 for qa in qa_pairs:
                     q_type = qa.get('question_type', 'unknown')
                     statistics['qa_by_type'][q_type] = statistics['qa_by_type'].get(q_type, 0) + 1
                 
-                print(f"   📊 {len(qa_pairs)} QA pairs generated")
+                print(f"   📊 {len(qa_pairs)} QA-Paare generiert")
             else:
                 statistics['failed_entries'] += 1
-                print(f"   ⚠️ No QA pairs generated")
+                print(f"   ⚠️ Keine QA-Paare generiert")
                 
         except Exception as e:
             statistics['failed_entries'] += 1
-            print(f"   ❌ Error during processing: {e}")
+            print(f"   ❌ Fehler bei Verarbeitung: {e}")
     
-    # Convert to instruction format
+    # Konvertiere zu Instruct-Format
     instruct_dataset = convert_to_instruct_format(all_qa_pairs)
     
-    # Calculate additional statistics
+    # Berechne zusätzliche Statistiken
     avg_answer_length = sum(entry['metadata']['answer_length'] for entry in instruct_dataset) / len(instruct_dataset) if instruct_dataset else 0
     markdown_count = sum(1 for entry in instruct_dataset if entry['metadata']['has_markdown'])
     
-    # Create final dataset
+    # Erstelle finalen Datensatz
     output_path = Path(output_dir) / output_filename
     
     final_dataset = {
@@ -789,81 +764,79 @@ def process_lexikon_to_qa_dataset(input_dir: str, output_dir: str, output_filena
                 "complete_overview_guaranteed": True,
                 "fact_preservation": True,
                 "table_support": True,
-                "language_agnostic": True,
                 "extended_question_types": len(QUESTION_TYPES)
             }
         },
         "data": instruct_dataset
     }
     
-    # Save dataset
+    # Speichere Datensatz
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(final_dataset, f, ensure_ascii=False, indent=2)
     
-    # Output statistics
+    # Ausgabe der Statistiken
     print(f"\n{'='*60}")
-    print(f"🎉 QA-Instruct-Dataset successfully created!")
+    print(f"🎉 QA-Instruct-Datensatz erfolgreich erstellt!")
     print(f"{'='*60}")
-    print(f"📊 Detailed Statistics:")
-    print(f"   📁 Processing:")
-    print(f"      - Total lexicon entries: {statistics['total_entries']}")
-    print(f"      - Successfully processed: {statistics['processed_entries']}")
-    print(f"      - Failed: {statistics['failed_entries']}")
-    print(f"   📝 QA pairs:")
-    print(f"      - Total generated: {statistics['total_qa_pairs']}")
-    print(f"      - Average per entry: {statistics['total_qa_pairs']/statistics['processed_entries']:.1f}" if statistics['processed_entries'] > 0 else "")
-    print(f"      - Average answer length: {avg_answer_length:.0f} characters")
-    print(f"      - With Markdown formatting: {markdown_count}/{len(instruct_dataset)}")
-    print(f"   🎯 Question types:")
+    print(f"📊 Detaillierte Statistiken:")
+    print(f"   📁 Verarbeitung:")
+    print(f"      - Lexikon-Einträge gesamt: {statistics['total_entries']}")
+    print(f"      - Erfolgreich verarbeitet: {statistics['processed_entries']}")
+    print(f"      - Fehlgeschlagen: {statistics['failed_entries']}")
+    print(f"   📝 QA-Paare:")
+    print(f"      - Gesamt generiert: {statistics['total_qa_pairs']}")
+    print(f"      - Durchschnitt pro Eintrag: {statistics['total_qa_pairs']/statistics['processed_entries']:.1f}" if statistics['processed_entries'] > 0 else "")
+    print(f"      - Durchschnittliche Antwortlänge: {avg_answer_length:.0f} Zeichen")
+    print(f"      - Mit Markdown-Formatierung: {markdown_count}/{len(instruct_dataset)}")
+    print(f"   🎯 Fragetypen:")
     for q_type, count in sorted(statistics['qa_by_type'].items(), key=lambda x: x[1], reverse=True):
         print(f"      - {q_type}: {count}")
-    print(f"   🔧 Technical details:")
+    print(f"   🔧 Technische Details:")
     print(f"      - API: {api_name}")
     print(f"      - Server: {server_url}")
-    print(f"      - Model: {model_name}")
-    print(f"   💾 Output:")
-    print(f"      - File: {output_path}")
-    print(f"      - Size: {output_path.stat().st_size / 1024:.1f} KB" if output_path.exists() else "")
+    print(f"      - Modell: {model_name}")
+    print(f"   💾 Ausgabe:")
+    print(f"      - Datei: {output_path}")
+    print(f"      - Größe: {output_path.stat().st_size / 1024:.1f} KB" if output_path.exists() else "")
     
-    # Show examples
+    # Zeige Beispiele
     if instruct_dataset:
-        print(f"\n📋 Example QA pairs:")
+        print(f"\n📋 Beispiel-QA-Paare:")
         
-        # Show different question types
+        # Zeige verschiedene Fragetypen
         shown_types = set()
         examples_shown = 0
         
         for entry in instruct_dataset:
             q_type = entry['metadata']['question_type']
             if q_type not in shown_types and examples_shown < 3:
-                print(f"\n   Type: {q_type}")
-                print(f"   Question: {entry['instruction']}")
+                print(f"\n   Typ: {q_type}")
+                print(f"   Frage: {entry['instruction']}")
                 answer_preview = entry['output'][:200] + "..." if len(entry['output']) > 200 else entry['output']
-                print(f"   Answer: {answer_preview}")
+                print(f"   Antwort: {answer_preview}")
                 shown_types.add(q_type)
                 examples_shown += 1
 
 # ========================================
-# MAIN PROGRAM
+# HAUPTPROGRAMM
 # ========================================
 
 if __name__ == "__main__":
-    # Import regex for extended pattern matching
+    # Importiere regex für erweiterte Pattern-Matching
     import re
     
     api_name = "OpenAI-API" if USE_OPENAI_API else "Ollama-API"
     server_url = OPENAI_BASE_URL if USE_OPENAI_API else OLLAMA_SERVER_URL
     model_name = OPENAI_MODEL_NAME if USE_OPENAI_API else OLLAMA_MODEL_NAME
     
-    print(f"🔧 CONFIGURATION (from central config):")
-    print(f"   - API type: {api_name}")
+    print(f"🔧 KONFIGURATION (aus zentraler Config):")
+    print(f"   - API-Typ: {api_name}")
     print(f"   - Server: {server_url}")
-    print(f"   - Model: {model_name}")
-    print(f"   - Extended features: ✅")
-    print(f"   - Fact preservation: ✅")
-    print(f"   - Markdown formatting: ✅")
-    print(f"   - Table support: ✅")
-    print(f"   - Language agnostic: ✅")
+    print(f"   - Modell: {model_name}")
+    print(f"   - Erweiterte Features: ✅")
+    print(f"   - Fakten-Erhaltung: ✅")
+    print(f"   - Markdown-Formatierung: ✅")
+    print(f"   - Tabellen-Unterstützung: ✅")
     
-    # Start processing
+    # Starte Verarbeitung
     process_lexikon_to_qa_dataset(INPUT_DIR, OUTPUT_DIR, OUTPUT_FILENAME)

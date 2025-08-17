@@ -6,16 +6,16 @@ import sys
 from pathlib import Path
 
 # ========================================
-# ZENTRALE KONFIGURATION LADEN
+# LOAD CENTRAL CONFIGURATION
 # ========================================
-sys.path.append(str(Path(__file__).parent.parent.parent))  # Zum Hauptverzeichnis
+sys.path.append(str(Path(__file__).parent.parent.parent))  # To main directory
 from config_loader import PipelineConfigLoader
 
-# Lade Konfiguration für dieses Modul
+# Load configuration for this module
 config_loader = PipelineConfigLoader("05_bmcreator")
 config = config_loader.get_api_config()
 
-# Extrahiere Konfigurationswerte
+# Extract configuration values
 USE_OPENAI_API = config.get("use_openai_api", True)
 OPENAI_BASE_URL = config.get("openai_base_url", "http://localhost:11434/v1")
 OPENAI_API_KEY = config.get("openai_api_key", "ollama")
@@ -25,83 +25,100 @@ OLLAMA_API_KEY = config.get("ollama_api_key", "ollama")
 OLLAMA_MODEL_NAME = config.get("ollama_model_name", "gemma3:12b-it-qat")
 OLLAMA_CHAT_ENDPOINT = f"{OLLAMA_SERVER_URL}/api/chat"
 
-# Verzeichnisse
+# Directories
 INPUT_DIR = "INPUT"
 OUTPUT_DIR = "BENCHMARKFRAGEN"
 OUTPUT_FILENAME = "benchmark_fragen_complete.json"
 
-# Kategorien-Mapping basierend auf Lexikon-Dateien
+# Category mapping based on lexicon files
 CATEGORY_MAPPING = {
     "CON01_Jahresabschluss": "Jahresabschlussanalyse",
     "CON02_Liquiditatsplanung": "Liquiditätsplanung", 
     "CON03_Budgetierung": "Budgetierung"
 }
 
-# Dynamische Fragenanzahl-Konfiguration aus Config
+# Dynamic question count configuration from config
 MAX_TOTAL_QUESTIONS = config.get("max_total_questions", 100)
 MIN_QUESTIONS_PER_CATEGORY = config.get("min_questions_per_category", 5)
 MAX_QUESTIONS_PER_CATEGORY = config.get("max_questions_per_category", 10)
 
-# Fragetypen-Konfiguration aus Config
+# Question type configuration from config
 QUESTION_TYPE_DISTRIBUTION = config.get("question_type_distribution", {
     "definition": 0.7,
     "transfer": 0.3
 })
 
-# Zeige geladene Konfiguration
+# Show loaded configuration
 print("=" * 60)
-print("📋 KONFIGURATION GELADEN (05_bmcreator)")
+print("📋 CONFIGURATION LOADED (05_bmcreator)")
 print("=" * 60)
 config_loader.print_config_summary()
-print(f"  📊 Max. Fragen gesamt: {MAX_TOTAL_QUESTIONS}")
-print(f"  📊 Min. Fragen pro Kategorie: {MIN_QUESTIONS_PER_CATEGORY}")
-print(f"  📊 Max. Fragen pro Kategorie: {MAX_QUESTIONS_PER_CATEGORY}")
-print(f"  📊 Verteilung: {int(QUESTION_TYPE_DISTRIBUTION['definition']*100)}% Definition, {int(QUESTION_TYPE_DISTRIBUTION['transfer']*100)}% Transfer")
+print(f"  📊 Max total questions: {MAX_TOTAL_QUESTIONS}")
+print(f"  📊 Min questions per category: {MIN_QUESTIONS_PER_CATEGORY}")
+print(f"  📊 Max questions per category: {MAX_QUESTIONS_PER_CATEGORY}")
+print(f"  📊 Distribution: {int(QUESTION_TYPE_DISTRIBUTION['definition']*100)}% Definition, {int(QUESTION_TYPE_DISTRIBUTION['transfer']*100)}% Transfer")
 print("=" * 60)
 
-# Frage-Templates für verschiedene Typen
-DEFINITION_QUESTION_TEMPLATES = [
-    "Was versteht man unter {title}?",
-    "Wie wird {title} definiert?",
-    "Erklären Sie den Begriff {title}.",
-    "Was ist {title}?",
-    "Definieren Sie {title}.",
-    "Wie ermittelt man {title}?",
-    "Was sind die Hauptmerkmale von {title}?",
-    "Erläutern Sie {title}.",
-    "Beschreiben Sie {title}.",
-    "Welche Bedeutung hat {title}?",
-    "Was charakterisiert {title}?",
-    "Wie funktioniert {title}?",
-    "Worin besteht {title}?",
-    "Was umfasst {title}?",
-    "Wie ist {title} aufgebaut?"
+# Question templates for different types (examples for reference)
+DEFINITION_QUESTION_EXAMPLES = [
+    "What is meant by {title}?",
+    "How is {title} defined?",
+    "Explain the concept of {title}.",
+    "What is {title}?",
+    "Define {title}.",
+    "How is {title} determined?",
+    "What are the main characteristics of {title}?",
+    "Explain {title}.",
+    "Describe {title}.",
+    "What significance does {title} have?",
+    "What characterizes {title}?",
+    "How does {title} work?",
+    "What does {title} consist of?",
+    "What does {title} encompass?",
+    "How is {title} structured?"
 ]
 
-TRANSFER_QUESTION_TEMPLATES = [
-    "Ein Unternehmen A möchte {title} implementieren. Wie sollte es vorgehen?",
-    "Welche Schritte sind bei der Anwendung von {title} in einem mittelständischen Unternehmen zu beachten?",
-    "Ein Controller muss {title} für sein Unternehmen bewerten. Worauf sollte er achten?",
-    "Wie kann ein Unternehmen {title} in der Praxis umsetzen?",
-    "Ein Finanzvorstand fragt Sie nach {title}. Wie erklären Sie ihm die praktische Relevanz?",
-    "Welche Herausforderungen können bei der Umsetzung von {title} auftreten?",
-    "Ein Start-up möchte {title} einführen. Welche Empfehlungen geben Sie?",
-    "Wie wirkt sich {title} auf die Unternehmenspraxis aus?",
-    "Ein Konzern plant die Optimierung von {title}. Welche Faktoren sind entscheidend?",
-    "Welche praktischen Auswirkungen hat {title} auf das Controlling?",
-    "Ein KMU hat Probleme mit {title}. Wie können diese gelöst werden?",
-    "Warum ist {title} für Unternehmen wichtig und wie wird es angewendet?"
+TRANSFER_QUESTION_EXAMPLES = [
+    "A company A wants to implement {title}. How should it proceed?",
+    "What steps should be considered when applying {title} in a medium-sized company?",
+    "A controller must evaluate {title} for his company. What should he pay attention to?",
+    "How can a company implement {title} in practice?",
+    "A CFO asks you about {title}. How do you explain the practical relevance to him?",
+    "What challenges can arise when implementing {title}?",
+    "A startup wants to introduce {title}. What recommendations do you give?",
+    "How does {title} affect business practice?",
+    "A corporation plans to optimize {title}. Which factors are decisive?",
+    "What practical effects does {title} have on controlling?",
+    "An SME has problems with {title}. How can these be solved?",
+    "Why is {title} important for companies and how is it applied?"
 ]
+
+def detect_language(text: str) -> str:
+    """Detects the language of the text (simple detection)."""
+    # Simple language detection based on common words
+    german_indicators = ['der', 'die', 'das', 'und', 'oder', 'ist', 'sind', 'von', 'mit', 'für', 'auf', 'in', 'zu', 'bei', 'nach', 'über', 'durch', 'unter', 'gegen', 'ohne']
+    english_indicators = ['the', 'and', 'or', 'is', 'are', 'of', 'with', 'for', 'on', 'in', 'to', 'at', 'after', 'over', 'by', 'under', 'against', 'without']
+    
+    text_lower = text.lower()
+    german_count = sum(1 for word in german_indicators if word in text_lower)
+    english_count = sum(1 for word in english_indicators if word in text_lower)
+    
+    if german_count > english_count:
+        return "German"
+    elif english_count > german_count:
+        return "English"
+    else:
+        return "German"  # Default to German for this pipeline
 
 def check_api_connection():
-    """Überprüft API-Verbindung (OpenAI oder Ollama)."""
+    """Checks API connection (OpenAI or Ollama)."""
     if USE_OPENAI_API:
         return check_openai_connection()
     else:
         return check_ollama_connection()
 
 def check_openai_connection():
-    """Überprüft OpenAI-API-Verbindung."""
+    """Checks OpenAI API connection."""
     try:
         headers = {
             'Authorization': f'Bearer {OPENAI_API_KEY}',
@@ -122,19 +139,19 @@ def check_openai_connection():
         )
         
         if response.status_code == 200:
-            print(f"✅ OpenAI-API-Verbindung erfolgreich ({OPENAI_BASE_URL})")
-            print(f"✅ Modell '{OPENAI_MODEL_NAME}' ist verfügbar")
+            print(f"✅ OpenAI API connection successful ({OPENAI_BASE_URL})")
+            print(f"✅ Model '{OPENAI_MODEL_NAME}' is available")
             return True
         else:
-            print(f"❌ OpenAI-API nicht erreichbar (Status: {response.status_code})")
+            print(f"❌ OpenAI API not reachable (Status: {response.status_code})")
             return False
             
     except requests.RequestException as e:
-        print(f"❌ OpenAI-API-Verbindung fehlgeschlagen: {e}")
+        print(f"❌ OpenAI API connection failed: {e}")
         return False
 
 def check_ollama_connection():
-    """Überprüft Ollama-API-Verbindung."""
+    """Checks Ollama API connection."""
     try:
         headers = {
             'Authorization': f'Bearer {OLLAMA_API_KEY}',
@@ -147,38 +164,38 @@ def check_ollama_connection():
             models = response.json()
             model_names = [model['name'] for model in models.get('models', [])]
             
-            print(f"✅ Ollama-Verbindung erfolgreich ({OLLAMA_SERVER_URL})")
+            print(f"✅ Ollama connection successful ({OLLAMA_SERVER_URL})")
             
             if OLLAMA_MODEL_NAME in model_names:
-                print(f"✅ Modell '{OLLAMA_MODEL_NAME}' ist verfügbar")
+                print(f"✅ Model '{OLLAMA_MODEL_NAME}' is available")
                 return True
             else:
-                print(f"❌ Modell '{OLLAMA_MODEL_NAME}' nicht gefunden!")
+                print(f"❌ Model '{OLLAMA_MODEL_NAME}' not found!")
                 return False
         else:
-            print(f"❌ Ollama nicht erreichbar (Status: {response.status_code})")
+            print(f"❌ Ollama not reachable (Status: {response.status_code})")
             return False
             
     except requests.RequestException as e:
-        print(f"❌ Ollama-Verbindung fehlgeschlagen: {e}")
+        print(f"❌ Ollama connection failed: {e}")
         return False
 
 def load_lexikon_files_by_category(input_dir):
-    """Lädt alle Lexikon-JSON-Dateien und gruppiert sie nach Kategorien."""
+    """Loads all lexicon JSON files and groups them by categories."""
     input_path = Path(input_dir)
     if not input_path.exists():
-        print(f"❌ Input-Verzeichnis '{input_dir}' existiert nicht!")
+        print(f"❌ Input directory '{input_dir}' does not exist!")
         return {}
     
     lexikon_files = list(input_path.glob("lexikon_*.json"))
-    print(f"📁 Gefundene Lexikon-Dateien: {len(lexikon_files)}")
+    print(f"📁 Found lexicon files: {len(lexikon_files)}")
     
     categories = {}
     
     for file in lexikon_files:
-        print(f"📖 Lade: {file.name}")
+        print(f"📖 Loading: {file.name}")
         
-        # Bestimme Kategorie aus Dateiname
+        # Determine category from filename
         category = "Sonstiges"  # Fallback
         for key, value in CATEGORY_MAPPING.items():
             if key in file.name:
@@ -189,129 +206,124 @@ def load_lexikon_files_by_category(input_dir):
             with open(file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 entries = data.get('lexikon_entries', [])
-                print(f"   - {len(entries)} Einträge gefunden → Kategorie: {category}")
+                print(f"   - {len(entries)} entries found → Category: {category}")
                 
                 if category not in categories:
                     categories[category] = []
                 categories[category].extend(entries)
                 
         except Exception as e:
-            print(f"❌ Fehler beim Laden von {file.name}: {e}")
+            print(f"❌ Error loading {file.name}: {e}")
     
-    # Zeige Kategorien-Übersicht
-    print(f"\n📊 Kategorien-Übersicht:")
+    # Show category overview
+    print(f"\n📊 Category overview:")
     for category, entries in categories.items():
-        print(f"   - {category}: {len(entries)} Einträge")
+        print(f"   - {category}: {len(entries)} entries")
     
     return categories
 
 def select_question_type():
-    """Wählt Fragetyp basierend auf Wahrscheinlichkeitsverteilung."""
+    """Selects question type based on probability distribution."""
     rand = random.random()
     if rand < QUESTION_TYPE_DISTRIBUTION["definition"]:
         return "definition"
     else:
         return "transfer"
 
-def generate_question_template(title, question_type):
-    """Generiert eine Frage basierend auf Typ und Titel."""
-    if question_type == "definition":
-        template = random.choice(DEFINITION_QUESTION_TEMPLATES)
-    else:  # transfer
-        template = random.choice(TRANSFER_QUESTION_TEMPLATES)
-    
-    return template.format(title=title)
-
 def generate_benchmark_question_prompt(title, lexikon_entry, category, question_type=None):
-    """Generiert einen Prompt für die Erstellung einer Benchmarkfrage."""
+    """Generates a prompt for creating a benchmark question."""
     
-    # Wähle Fragetyp falls nicht vorgegeben
+    # Choose question type if not specified
     if question_type is None:
         question_type = select_question_type()
     
-    # Generiere Frage basierend auf Typ
-    question_template = generate_question_template(title, question_type)
+    # Detect language of the source content
+    source_language = detect_language(lexikon_entry)
     
     if question_type == "definition":
-        instruction = """
-Erstelle eine präzise Definitionsfrage und beantworte sie fachlich korrekt.
+        instruction = f"""
+Create a precise definition question and answer it professionally correct.
 
-WICHTIG - Antwort-Anforderungen:
-- Verwende AUSSCHLIESSLICH Informationen aus dem bereitgestellten Lexikon-Eintrag
-- Füge KEIN externes Wissen oder eigene Interpretation hinzu
-- Verwende ALLE relevanten Informationen aus dem Lexikon-Eintrag
-- Die Antwort muss vollumfänglich und vollständig sein
-- Basiere deine Antwort zu 100% auf dem gegebenen Lexikon-Inhalt
+IMPORTANT - Answer Requirements:
+- Use EXCLUSIVELY information from the provided lexicon entry
+- Add NO external knowledge or personal interpretation
+- Use ALL relevant information from the lexicon entry
+- The answer must be comprehensive and complete
+- Base your answer 100% on the given lexicon content
 
-Aufgabe:
-1. Verwende die vorgegeben Frage (oder eine sehr ähnliche Variante)
-2. Beantworte die Frage strukturiert und vollständig basierend NUR auf dem Lexikon-Eintrag
-3. Die Antwort soll alle wichtigen Aspekte aus dem Lexikon-Eintrag abdecken
-4. Fokus auf: Definition, Merkmale, Funktionsweise, Aufbau (alles aus dem Lexikon-Eintrag)
-5. Stil: Fachlich, präzise, sachlich
-6. Antwortlänge: So lang wie nötig um alle relevanten Informationen aus dem Lexikon-Eintrag abzudecken"""
+Task:
+1. Create an appropriate definition question for the topic
+2. Answer the question structured and completely based ONLY on the lexicon entry
+3. The answer should cover all important aspects from the lexicon entry
+4. Focus on: Definition, characteristics, functionality, structure (everything from the lexicon entry)
+5. Style: Professional, precise, factual
+6. Answer length: As long as necessary to cover all relevant information from the lexicon entry
+7. CRITICAL: Respond in the same language as the source document. The source appears to be in {source_language}, so respond in {source_language}."""
     
     else:  # transfer
-        instruction = """
-Erstelle eine praxisorientierte Transferfrage und beantworte sie anwendungsbezogen.
+        instruction = f"""
+Create a practice-oriented transfer question and answer it application-related.
 
-WICHTIG - Antwort-Anforderungen:
-- Verwende AUSSCHLIESSLICH Informationen aus dem bereitgestellten Lexikon-Eintrag
-- Füge KEIN externes Wissen oder eigene Interpretation hinzu
-- Verwende ALLE relevanten Informationen aus dem Lexikon-Eintrag
-- Die Antwort muss vollumfänglich und vollständig sein
-- Basiere deine Antwort zu 100% auf dem gegebenen Lexikon-Inhalt
+IMPORTANT - Answer Requirements:
+- Use EXCLUSIVELY information from the provided lexicon entry
+- Add NO external knowledge or personal interpretation
+- Use ALL relevant information from the lexicon entry
+- The answer must be comprehensive and complete
+- Base your answer 100% on the given lexicon content
 
-Aufgabe:
-1. Verwende die vorgegebene Frage (oder eine sehr ähnliche Variante)
-2. Beantworte die Frage mit praktischem Bezug basierend NUR auf dem Lexikon-Eintrag
-3. Die Antwort soll alle anwendungsrelevanten Aspekte aus dem Lexikon-Eintrag abdecken
-4. Fokus auf: Praktische Bedeutung/Anwendung (alles aus dem Lexikon-Eintrag)
-5. Stil: Praxisorientiert, beratend, umsetzungsfokussiert
-6. Antwortlänge: So lang wie nötig um alle relevanten Informationen aus dem Lexikon-Eintrag abzudecken"""
+Task:
+1. Create an appropriate practical application question for the topic
+2. Answer the question with practical reference based ONLY on the lexicon entry
+3. The answer should cover all application-relevant aspects from the lexicon entry
+4. Focus on: Practical significance/application (everything from the lexicon entry)
+5. Style: Practice-oriented, advisory, implementation-focused
+6. Answer length: As long as necessary to cover all relevant information from the lexicon entry
+7. CRITICAL: Respond in the same language as the source document. The source appears to be in {source_language}, so respond in {source_language}."""
 
     prompt = f"""
-Du bist ein Experte für {category} und sollst eine Benchmarkfrage erstellen.
+You are an expert in {category} and should create a benchmark question.
 
-KRITISCH WICHTIG - Verwende als Antwort-Quelle AUSSCHLIESSLICH den folgenden Lexikon-Eintrag:
+CRITICALLY IMPORTANT - Use as answer source EXCLUSIVELY the following lexicon entry:
 ==========================================
-Titel: {title}
-Inhalt: {lexikon_entry}
+Title: {title}
+Content: {lexikon_entry}
 ==========================================
 
-STRIKT BEFOLGEN:
-- Verwende für die Antwort NUR Informationen aus dem obigen Lexikon-Eintrag
-- Füge KEIN externes Wissen, keine eigenen Interpretationen oder Vermutungen hinzu
-- Verwende ALLE relevanten Informationen aus dem Lexikon-Eintrag
-- Die Antwort muss vollumfänglich auf dem Lexikon-Eintrag basieren
-- Lass KEINE wichtigen Aspekte aus dem Lexikon-Eintrag weg
+LANGUAGE DETECTION: The source content appears to be in {source_language}.
 
-Vorgeschlagene Frage: {question_template}
+STRICTLY FOLLOW:
+- Use for the answer ONLY information from the above lexicon entry
+- Add NO external knowledge, no personal interpretations or assumptions
+- Use ALL relevant information from the lexicon entry
+- The answer must be based completely on the lexicon entry
+- Leave out NO important aspects from the lexicon entry
 
 {instruction}
 
-Kategorien-Kontext: {category}
-Fragetyp: {question_type}
+Category context: {category}
+Question type: {question_type}
 
-Antworte im folgenden JSON-Format:
+CRITICAL: Respond in the same language as the source document. If the source is in German, respond in German. If the source is in English, respond in English.
+
+Respond in the following JSON format:
 {{
-    "frage": "Deine Benchmarkfrage hier (basierend auf dem Vorschlag)",
-    "antwort": "Deine vollumfängliche Antwort hier - basierend NUR auf dem Lexikon-Eintrag"
+    "frage": "Your benchmark question here (appropriate for the topic and type)",
+    "antwort": "Your comprehensive answer here - based ONLY on the lexicon entry"
 }}
 
-Antworte NUR mit dem JSON, ohne zusätzliche Erklärungen.
+Respond ONLY with the JSON, without additional explanations.
 """
     return prompt
 
 def submit_to_api(prompt, retries=3):
-    """Sendet eine Anfrage an die gewählte API und holt die Antwort."""
+    """Sends a request to the chosen API and retrieves the response."""
     if USE_OPENAI_API:
         return submit_to_openai_api(prompt, retries)
     else:
         return submit_to_ollama_api(prompt, retries)
 
 def submit_to_openai_api(prompt, retries=3):
-    """Sendet eine Anfrage an die OpenAI-API und holt die Antwort."""
+    """Sends a request to the OpenAI API and retrieves the response."""
     headers = {
         'Authorization': f'Bearer {OPENAI_API_KEY}',
         'Content-Type': 'application/json'
@@ -322,7 +334,7 @@ def submit_to_openai_api(prompt, retries=3):
         "messages": [
             {
                 "role": "system", 
-                "content": "Du bist ein Experte für das Erstellen von Benchmarkfragen im Finanzcontrolling. Erstelle präzise, fachlich anspruchsvolle Fragen mit vollständigen Antworten. KRITISCH WICHTIG: Verwende für alle Antworten AUSSCHLIESSLICH die bereitgestellten Lexikon-Einträge als Wissensquelle. Füge NIEMALS externes Wissen hinzu."
+                "content": "You are an expert at creating benchmark questions in financial controlling. Create precise, professionally demanding questions with complete answers. CRITICALLY IMPORTANT: Use for all answers EXCLUSIVELY the provided lexicon entries as knowledge source. NEVER add external knowledge. Respond in the same language as the source document."
             },
             {"role": "user", "content": prompt}
         ],
@@ -344,15 +356,15 @@ def submit_to_openai_api(prompt, retries=3):
                 content = result.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
                 return content
             else:
-                print(f"❌ OpenAI-API-Fehler {response.status_code}: {response.text}")
+                print(f"❌ OpenAI API error {response.status_code}: {response.text}")
                 
         except requests.RequestException as e:
-            print(f"❌ API-Fehler (Versuch {attempt + 1}): {e}")
+            print(f"❌ API error (attempt {attempt + 1}): {e}")
     
     return None
 
 def submit_to_ollama_api(prompt, retries=3):
-    """Sendet eine Anfrage an die Ollama-API und holt die Antwort."""
+    """Sends a request to the Ollama API and retrieves the response."""
     headers = {
         'Authorization': f'Bearer {OLLAMA_API_KEY}',
         'Content-Type': 'application/json'
@@ -365,7 +377,7 @@ def submit_to_ollama_api(prompt, retries=3):
         "messages": [
             {
                 "role": "system", 
-                "content": "Du bist ein Experte für das Erstellen von Benchmarkfragen im Finanzcontrolling. Erstelle präzise, fachlich anspruchsvolle Fragen mit vollständigen Antworten. KRITISCH WICHTIG: Verwende für alle Antworten AUSSCHLIESSLICH die bereitgestellten Lexikon-Einträge als Wissensquelle. Füge NIEMALS externes Wissen hinzu."
+                "content": "You are an expert at creating benchmark questions in financial controlling. Create precise, professionally demanding questions with complete answers. CRITICALLY IMPORTANT: Use for all answers EXCLUSIVELY the provided lexicon entries as knowledge source. NEVER add external knowledge. Respond in the same language as the source document."
             },
             {"role": "user", "content": prompt}
         ]
@@ -379,17 +391,17 @@ def submit_to_ollama_api(prompt, retries=3):
                 content = response.json().get("message", {}).get("content", "").strip()
                 return content
             else:
-                print(f"❌ Ollama-API-Fehler {response.status_code}: {response.text}")
+                print(f"❌ Ollama API error {response.status_code}: {response.text}")
                 
         except requests.RequestException as e:
-            print(f"❌ API-Fehler (Versuch {attempt + 1}): {e}")
+            print(f"❌ API error (attempt {attempt + 1}): {e}")
     
     return None
 
 def extract_benchmark_qa_from_response(response):
-    """Extrahiert Benchmarkfrage-Antwort-Paar aus der API-Antwort."""
+    """Extracts benchmark question-answer pair from the API response."""
     try:
-        # Bereinige die Antwort
+        # Clean the response
         response = response.strip()
         if response.startswith("```json") and response.endswith("```"):
             response = response[7:-3].strip()
@@ -398,64 +410,64 @@ def extract_benchmark_qa_from_response(response):
         
         qa_data = json.loads(response)
         
-        # Validiere die Struktur
+        # Validate the structure
         if "frage" in qa_data and "antwort" in qa_data:
             return {
                 "frage": qa_data["frage"].strip(),
                 "antwort": qa_data["antwort"].strip()
             }
         else:
-            print(f"❌ Ungültiges Benchmark-QA-Format: {list(qa_data.keys())}")
+            print(f"❌ Invalid benchmark QA format: {list(qa_data.keys())}")
             return None
             
     except json.JSONDecodeError as e:
-        print(f"❌ JSON-Parse-Fehler: {e}")
+        print(f"❌ JSON parse error: {e}")
         print(f"Raw Response (first 200 chars): {response[:200]}...")
         return None
 
 def calculate_questions_per_category(categories_data):
-    """Berechnet dynamisch die Anzahl Fragen pro Kategorie basierend auf verfügbaren Einträgen."""
+    """Dynamically calculates the number of questions per category based on available entries."""
     total_entries = sum(len(entries) for entries in categories_data.values())
     num_categories = len(categories_data)
     
-    print(f"📊 Dynamische Fragenverteilung:")
-    print(f"   - Kategorien gesamt: {num_categories}")
-    print(f"   - Einträge gesamt: {total_entries}")
-    print(f"   - Maximum Fragen: {MAX_TOTAL_QUESTIONS}")
+    print(f"📊 Dynamic question distribution:")
+    print(f"   - Total categories: {num_categories}")
+    print(f"   - Total entries: {total_entries}")
+    print(f"   - Maximum questions: {MAX_TOTAL_QUESTIONS}")
     
     questions_distribution = {}
     
-    # Berechne Fragen pro Kategorie basierend auf Einträgen
+    # Calculate questions per category based on entries
     for category, entries in categories_data.items():
         num_entries = len(entries)
         
         if num_entries <= 10:
-            # Kleine Kategorien: 5-10 Fragen
+            # Small categories: 5-10 questions
             num_questions = min(num_entries, random.randint(MIN_QUESTIONS_PER_CATEGORY, MAX_QUESTIONS_PER_CATEGORY))
         elif num_entries <= 30:
-            # Mittlere Kategorien: 10-20 Fragen
+            # Medium categories: 10-20 questions
             num_questions = min(num_entries, random.randint(10, 20))
         else:
-            # Große Kategorien: 15-35 Fragen
+            # Large categories: 15-35 questions
             num_questions = min(num_entries, random.randint(15, 35))
         
         questions_distribution[category] = num_questions
-        print(f"   - {category}: {num_questions} Fragen (aus {num_entries} Einträgen)")
+        print(f"   - {category}: {num_questions} questions (from {num_entries} entries)")
     
-    # Überprüfe Gesamtanzahl und passe an falls nötig
+    # Check total and adjust if necessary
     total_planned = sum(questions_distribution.values())
     
     if total_planned > MAX_TOTAL_QUESTIONS:
-        print(f"   ⚠️ Geplant: {total_planned} Fragen → Reduzierung auf {MAX_TOTAL_QUESTIONS}")
+        print(f"   ⚠️ Planned: {total_planned} questions → Reducing to {MAX_TOTAL_QUESTIONS}")
         
-        # Proportionale Reduzierung
+        # Proportional reduction
         reduction_factor = MAX_TOTAL_QUESTIONS / total_planned
         
         for category in questions_distribution:
             original = questions_distribution[category]
             questions_distribution[category] = max(1, int(original * reduction_factor))
         
-        # Feinabstimmung falls noch Fragen übrig sind
+        # Fine-tuning if questions remain
         current_total = sum(questions_distribution.values())
         remaining = MAX_TOTAL_QUESTIONS - current_total
         
@@ -466,51 +478,51 @@ def calculate_questions_per_category(categories_data):
                 questions_distribution[category] += 1
     
     final_total = sum(questions_distribution.values())
-    print(f"   ✅ Final: {final_total} Fragen verteilt")
+    print(f"   ✅ Final: {final_total} questions distributed")
     
     return questions_distribution
 
 def generate_benchmark_questions_for_category(category, entries, num_questions):
-    """Generiert Benchmarkfragen für eine Kategorie."""
-    print(f"\n🔄 Generiere {num_questions} Benchmarkfragen für Kategorie: {category}")
-    print(f"   📊 Verfügbare Einträge: {len(entries)}")
+    """Generates benchmark questions for a category."""
+    print(f"\n🔄 Generating {num_questions} benchmark questions for category: {category}")
+    print(f"   📊 Available entries: {len(entries)}")
     
-    # Berechne Anzahl Definition vs. Transfer Fragen
+    # Calculate number of definition vs. transfer questions
     num_definition = int(num_questions * QUESTION_TYPE_DISTRIBUTION["definition"])
     num_transfer = num_questions - num_definition
     
-    print(f"   🎯 Fragetyp-Verteilung: {num_definition} Definitionen, {num_transfer} Transfer")
+    print(f"   🎯 Question type distribution: {num_definition} definitions, {num_transfer} transfer")
     
     if len(entries) < num_questions:
-        print(f"   ⚠️ Nur {len(entries)} Einträge verfügbar, generiere {len(entries)} Fragen")
+        print(f"   ⚠️ Only {len(entries)} entries available, generating {len(entries)} questions")
         num_questions = len(entries)
     
-    # Zufällige Auswahl der Einträge (WICHTIG: Nicht die ersten!)
+    # Random selection of entries (IMPORTANT: Not the first ones!)
     selected_entries = random.sample(entries, num_questions)
-    print(f"   🎲 {num_questions} Einträge zufällig ausgewählt")
+    print(f"   🎲 {num_questions} entries randomly selected")
     
-    # Erstelle Liste der Fragetypen
+    # Create list of question types
     question_types = (["definition"] * num_definition + ["transfer"] * num_transfer)
-    random.shuffle(question_types)  # Mische die Reihenfolge
+    random.shuffle(question_types)  # Shuffle the order
     
     benchmark_questions = []
     definition_count = 0
     transfer_count = 0
     
     for idx, entry in enumerate(selected_entries, 1):
-        title = entry.get('title', f'Eintrag {idx}')
+        title = entry.get('title', f'Entry {idx}')
         lexikon_entry = entry.get('lexikon_entry', '')
         
         if not title or not lexikon_entry:
-            print(f"   ⚠️ Unvollständiger Eintrag übersprungen: {title}")
+            print(f"   ⚠️ Incomplete entry skipped: {title}")
             continue
         
-        # Bestimme Fragetyp für diese Frage
+        # Determine question type for this question
         question_type = question_types[idx-1] if idx-1 < len(question_types) else select_question_type()
         
-        print(f"   🔄 Frage {idx}/{num_questions}: {title} ({question_type})")
+        print(f"   🔄 Question {idx}/{num_questions}: {title} ({question_type})")
         
-        # Generiere Benchmarkfrage
+        # Generate benchmark question
         prompt = generate_benchmark_question_prompt(title, lexikon_entry, category, question_type)
         
         for attempt in range(3):
@@ -518,7 +530,7 @@ def generate_benchmark_questions_for_category(category, entries, num_questions):
             if response:
                 qa_pair = extract_benchmark_qa_from_response(response)
                 if qa_pair:
-                    # Bestimme ID basierend auf Kategorie
+                    # Determine ID based on category
                     category_prefix = {
                         "Jahresabschlussanalyse": "JA",
                         "Liquiditätsplanung": "LP", 
@@ -533,25 +545,25 @@ def generate_benchmark_questions_for_category(category, entries, num_questions):
                     
                     benchmark_questions.append(benchmark_question)
                     
-                    # Zähle Fragetypen
+                    # Count question types
                     if question_type == "definition":
                         definition_count += 1
                     else:
                         transfer_count += 1
                     
-                    print(f"      ✅ {question_type.title()}-Frage erstellt")
+                    print(f"      ✅ {question_type.title()} question created")
                     break
-            print(f"      ❌ Versuch {attempt + 1} fehlgeschlagen")
+            print(f"      ❌ Attempt {attempt + 1} failed")
         
         if len(benchmark_questions) < idx:
-            print(f"      ⚠️ Benchmarkfrage {idx} konnte nicht erstellt werden")
+            print(f"      ⚠️ Benchmark question {idx} could not be created")
     
-    print(f"   📊 {len(benchmark_questions)} Benchmarkfragen erfolgreich generiert")
-    print(f"   📋 Tatsächliche Verteilung: {definition_count} Definitionen, {transfer_count} Transfer")
+    print(f"   📊 {len(benchmark_questions)} benchmark questions successfully generated")
+    print(f"   📋 Actual distribution: {definition_count} definitions, {transfer_count} transfer")
     return benchmark_questions
 
 def create_benchmark_dataset(categories_data):
-    """Erstellt den kompletten Benchmark-Datensatz im gewünschten Format."""
+    """Creates the complete benchmark dataset in the desired format."""
     
     dataset = {
         "titel": "Benchmark-Fragen Finanzcontrolling",
@@ -559,7 +571,7 @@ def create_benchmark_dataset(categories_data):
         "kategorien": []
     }
     
-    # Berechne dynamische Fragenverteilung
+    # Calculate dynamic question distribution
     questions_distribution = calculate_questions_per_category(categories_data)
     
     total_questions = 0
@@ -568,7 +580,7 @@ def create_benchmark_dataset(categories_data):
         if not entries or category not in questions_distribution:
             continue
             
-        print(f"🏷️ Verarbeite Kategorie: {category}")
+        print(f"🏷️ Processing category: {category}")
         
         num_questions = questions_distribution[category]
         benchmark_questions = generate_benchmark_questions_for_category(
@@ -585,94 +597,97 @@ def create_benchmark_dataset(categories_data):
             dataset["kategorien"].append(category_data)
             total_questions += len(benchmark_questions)
     
-    print(f"\n📊 Benchmark-Datensatz erstellt:")
-    print(f"   - Kategorien: {len(dataset['kategorien'])}")
-    print(f"   - Gesamt-Fragen: {total_questions}")
+    print(f"\n📊 Benchmark dataset created:")
+    print(f"   - Categories: {len(dataset['kategorien'])}")
+    print(f"   - Total questions: {total_questions}")
     
     return dataset
 
 def main():
-    """Hauptfunktion: Erstellt Benchmark-Fragen aus Lexikon-Einträgen."""
+    """Main function: Creates benchmark questions from lexicon entries."""
     api_name = "OpenAI-API" if USE_OPENAI_API else "Ollama-API"
     server_url = OPENAI_BASE_URL if USE_OPENAI_API else OLLAMA_SERVER_URL
     model_name = OPENAI_MODEL_NAME if USE_OPENAI_API else OLLAMA_MODEL_NAME
     
-    print(f"🚀 Starte Benchmark-Fragen-Generator")
-    print(f"📂 Input-Verzeichnis: {INPUT_DIR} (alle lexikon_*.json Dateien)")
-    print(f"📂 Output-Verzeichnis: {OUTPUT_DIR}")
-    print(f"📄 Output-Datei: {OUTPUT_FILENAME}")
-    print(f"🔧 API-Typ: {api_name}")
+    print(f"🚀 Starting benchmark question generator")
+    print(f"📂 Input directory: {INPUT_DIR} (all lexikon_*.json files)")
+    print(f"📂 Output directory: {OUTPUT_DIR}")
+    print(f"📄 Output file: {OUTPUT_FILENAME}")
+    print(f"🔧 API type: {api_name}")
     print(f"🔧 Server: {server_url}")
-    print(f"🔧 Modell: {model_name}")
-    print(f"🎯 Max. Fragen gesamt: {MAX_TOTAL_QUESTIONS}")
-    print(f"🎯 Kleine Kategorien: {MIN_QUESTIONS_PER_CATEGORY}-{MAX_QUESTIONS_PER_CATEGORY} Fragen")
-    print(f"🎯 Fragetyp-Verteilung: {int(QUESTION_TYPE_DISTRIBUTION['definition']*100)}% Definitionen, {int(QUESTION_TYPE_DISTRIBUTION['transfer']*100)}% Transfer")
+    print(f"🔧 Model: {model_name}")
+    print(f"🎯 Max total questions: {MAX_TOTAL_QUESTIONS}")
+    print(f"🎯 Small categories: {MIN_QUESTIONS_PER_CATEGORY}-{MAX_QUESTIONS_PER_CATEGORY} questions")
+    print(f"🎯 Question type distribution: {int(QUESTION_TYPE_DISTRIBUTION['definition']*100)}% definitions, {int(QUESTION_TYPE_DISTRIBUTION['transfer']*100)}% transfer")
+    print(f"🌍 Language agnostic: ✅")
     
-    # Teste API-Verbindung
+    # Test API connection
     if not check_api_connection():
-        print("❌ API-Verbindung fehlgeschlagen. Verarbeitung abgebrochen.")
+        print("❌ API connection failed. Processing aborted.")
         return
     
-    # Lade Lexikon-Einträge nach Kategorien
+    # Load lexicon entries by categories
     categories_data = load_lexikon_files_by_category(INPUT_DIR)
     
     if not categories_data:
-        print("❌ Keine Lexikon-Einträge gefunden!")
+        print("❌ No lexicon entries found!")
         return
     
-    # Erstelle Output-Verzeichnis
+    # Create output directory
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
     print(f"\n{'='*60}")
-    print(f"Generiere Benchmark-Fragen")
+    print(f"Generating benchmark questions")
     print(f"{'='*60}")
     
-    # Erstelle Benchmark-Datensatz
+    # Create benchmark dataset
     benchmark_dataset = create_benchmark_dataset(categories_data)
     
-    # Speichere den Datensatz
+    # Save the dataset
     output_path = Path(OUTPUT_DIR) / OUTPUT_FILENAME
     
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(benchmark_dataset, f, ensure_ascii=False, indent=2)
     
     print(f"\n{'='*60}")
-    print(f"🎉 Benchmark-Fragen erfolgreich erstellt!")
-    print(f"📊 Statistiken:")
-    print(f"   - API verwendet: {api_name}")
+    print(f"🎉 Benchmark questions successfully created!")
+    print(f"📊 Statistics:")
+    print(f"   - API used: {api_name}")
     print(f"   - Server: {server_url}")
-    print(f"   - Modell: {model_name}")
+    print(f"   - Model: {model_name}")
     
     total_questions = sum(cat["anzahl_fragen"] for cat in benchmark_dataset["kategorien"])
     total_entries = sum(len(entries) for entries in categories_data.values())
     
-    print(f"   - Kategorien: {len(benchmark_dataset['kategorien'])}")
-    print(f"   - Benchmark-Fragen: {total_questions} (max. {MAX_TOTAL_QUESTIONS})")
-    print(f"   - Verfügbare Einträge: {total_entries}")
-    print(f"   - Alle lexikon_*.json Dateien verarbeitet: ✅")
-    print(f"   - Datei gespeichert: {output_path}")
+    print(f"   - Categories: {len(benchmark_dataset['kategorien'])}")
+    print(f"   - Benchmark questions: {total_questions} (max. {MAX_TOTAL_QUESTIONS})")
+    print(f"   - Available entries: {total_entries}")
+    print(f"   - All lexikon_*.json files processed: ✅")
+    print(f"   - Language agnostic: ✅")
+    print(f"   - File saved: {output_path}")
     
-    # Zeige Beispiel-Fragen
-    print(f"\n📋 Beispiel-Benchmarkfragen:")
-    for category_data in benchmark_dataset["kategorien"][:2]:  # Erste 2 Kategorien
+    # Show example questions
+    print(f"\n📋 Example benchmark questions:")
+    for category_data in benchmark_dataset["kategorien"][:2]:  # First 2 categories
         if category_data["fragen"]:
             example = category_data["fragen"][0]
             print(f"   [{category_data['kategorie']}] {example['id']}")
-            print(f"   Frage: {example['frage']}")
-            print(f"   Antwort: {example['antwort'][:100]}...")
+            print(f"   Question: {example['frage']}")
+            print(f"   Answer: {example['antwort'][:100]}...")
             print()
 
 if __name__ == "__main__":
-    # Zeige Konfiguration
+    # Show configuration
     api_name = "OpenAI-API" if USE_OPENAI_API else "Ollama-API"
     server_url = OPENAI_BASE_URL if USE_OPENAI_API else OLLAMA_SERVER_URL
     model_name = OPENAI_MODEL_NAME if USE_OPENAI_API else OLLAMA_MODEL_NAME
     
-    print(f"🔧 KONFIGURATION (aus zentraler Config):")
-    print(f"   - API-Typ: {api_name}")
+    print(f"🔧 CONFIGURATION (from central config):")
+    print(f"   - API type: {api_name}")
     print(f"   - Server: {server_url}")
-    print(f"   - Modell: {model_name}")
-    print(f"   - Zufällige Auswahl: ✅ Aktiviert")
+    print(f"   - Model: {model_name}")
+    print(f"   - Random selection: ✅ Activated")
+    print(f"   - Language agnostic: ✅ Activated")
     
-    # Hauptausführung
+    # Main execution
     main()

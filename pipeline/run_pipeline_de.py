@@ -4,9 +4,9 @@
 
 """
 
-OpenTuneWeaver Pipeline Runner - SIMPLIFIED with central configuration
+OpenTuneWeaver Pipeline Runner - SIMPLIFIED mit zentraler Konfiguration
 
-Version: 5.3 - With archiving functionality, viewer integration and metrics collection
+Version: 5.3 - Mit Archivierungs-Funktionalität, Viewer-Integration und Metrik-Erfassung
 
 """
 
@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional, Tuple
 from glob import glob
 
-# Pipeline steps definition
+# Pipeline-Schritte Definition
 STEPS = [
     {
         'id': 1,
@@ -83,22 +83,22 @@ STEPS = [
     {
         'id': 8,
         'name': 'Results Archive & Transfer',
-        'script': None,  # Executed directly
+        'script': None,  # Wird direkt ausgeführt
         'working_dir': '.',
         'directories': ['data/OUTPUT']
     }
 ]
 
 class SimplifiedPipelineRunner:
-    """Simplified Pipeline Runner with central configuration and metrics collection"""
+    """Vereinfachter Pipeline Runner mit zentraler Konfiguration und Metrik-Erfassung"""
 
     def __init__(self):
         self.start_time = datetime.now()
         self.config_file = "pipeline_config.json"
         self.config = {}
-        self.auto_mode = False  # Flag for automated mode
-        self.use_existing_config = True  # Flag for config usage
-        self.cleanup_after = False  # Flag for cleanup after pipeline
+        self.auto_mode = False  # Flag für automatisierten Modus
+        self.use_existing_config = True  # Flag für Config-Verwendung
+        self.cleanup_after = False  # Flag für Cleanup nach Pipeline
         self.metrics = {
             'pipeline_version': '5.3',
             'start_time': self.start_time.isoformat(),
@@ -114,7 +114,7 @@ class SimplifiedPipelineRunner:
         }
 
     def get_system_info(self):
-        """Captures system information"""
+        """Erfasst System-Informationen"""
         try:
             import torch
             cuda_available = torch.cuda.is_available()
@@ -140,7 +140,7 @@ class SimplifiedPipelineRunner:
         }
 
     def analyze_lexikon_files(self, output_dir):
-        """Analyzes lexicon JSON files"""
+        """Analysiert Lexikon-JSON Dateien"""
         stats = {
             'total_entries': 0,
             'categories': {},
@@ -161,15 +161,15 @@ class SimplifiedPipelineRunner:
                 if 'lexikon' in data:
                     for entry in data['lexikon']:
                         stats['total_entries'] += 1
-                        category = entry.get('kategorie', 'Unknown')
+                        category = entry.get('kategorie', 'Unbekannt')
                         stats['categories'][category] = stats['categories'].get(category, 0) + 1
             except Exception as e:
-                self.metrics['warnings'].append(f"Error analyzing {file_path}: {str(e)}")
+                self.metrics['warnings'].append(f"Fehler beim Analysieren von {file_path}: {str(e)}")
         
         return stats
 
     def analyze_qa_dataset(self, output_dir):
-        """Analyzes QA/Instruct datasets"""
+        """Analysiert QA/Instruct Datensätze"""
         stats = {
             'total_qa_pairs': 0,
             'instruction_types': {},
@@ -192,7 +192,7 @@ class SimplifiedPipelineRunner:
                 with open(file_path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                 
-                # Support different formats
+                # Verschiedene Formate unterstützen
                 if isinstance(data, list):
                     entries = data
                 elif 'qa_pairs' in data:
@@ -205,12 +205,12 @@ class SimplifiedPipelineRunner:
                 for entry in entries:
                     stats['total_qa_pairs'] += 1
                     
-                    # Analyze instruction types
+                    # Analysiere Instruction-Typen
                     if 'instruction' in entry:
                         inst_type = entry.get('type', 'standard')
                         stats['instruction_types'][inst_type] = stats['instruction_types'].get(inst_type, 0) + 1
                     
-                    # Length statistics
+                    # Längen-Statistiken
                     if 'question' in entry:
                         question_lengths.append(len(entry['question']))
                     if 'answer' in entry:
@@ -219,7 +219,7 @@ class SimplifiedPipelineRunner:
                         answer_lengths.append(len(entry['response']))
                         
             except Exception as e:
-                self.metrics['warnings'].append(f"Error analyzing {file_path}: {str(e)}")
+                self.metrics['warnings'].append(f"Fehler beim Analysieren von {file_path}: {str(e)}")
         
         if question_lengths:
             stats['avg_question_length'] = round(sum(question_lengths) / len(question_lengths))
@@ -229,7 +229,7 @@ class SimplifiedPipelineRunner:
         return stats
 
     def analyze_benchmark_questions(self, benchmark_dir):
-        """Analyzes benchmark questions"""
+        """Analysiert Benchmark-Fragen"""
         stats = {
             'total_questions': 0,
             'categories': {},
@@ -248,23 +248,23 @@ class SimplifiedPipelineRunner:
                 
                 if 'kategorien' in data:
                     for kategorie_data in data['kategorien']:
-                        kategorie = kategorie_data.get('kategorie', 'Unknown')
+                        kategorie = kategorie_data.get('kategorie', 'Unbekannt')
                         fragen = kategorie_data.get('fragen', [])
                         stats['categories'][kategorie] = len(fragen)
                         stats['total_questions'] += len(fragen)
                         
-                        # Difficulty distribution (if available)
+                        # Schwierigkeitsverteilung (falls vorhanden)
                         for frage in fragen:
-                            difficulty = frage.get('schwierigkeit', 'medium')
+                            difficulty = frage.get('schwierigkeit', 'mittel')
                             stats['difficulty_distribution'][difficulty] = stats['difficulty_distribution'].get(difficulty, 0) + 1
                             
             except Exception as e:
-                self.metrics['warnings'].append(f"Error analyzing benchmark questions: {str(e)}")
+                self.metrics['warnings'].append(f"Fehler beim Analysieren der Benchmark-Fragen: {str(e)}")
         
         return stats
 
     def analyze_benchmark_results(self, output_dir):
-        """Analyzes benchmark results"""
+        """Analysiert Benchmark-Ergebnisse"""
         results = {
             'comparison_available': False,
             'pre_score': None,
@@ -274,20 +274,20 @@ class SimplifiedPipelineRunner:
             'detailed_results': {}
         }
         
-        # Search for latest benchmark results
+        # Suche nach neuesten Benchmark-Ergebnissen
         result_files = glob(os.path.join(output_dir, 'comparison_*.json')) + \
                       glob(os.path.join(output_dir, 'post_only_*.json')) + \
                       glob(os.path.join(output_dir, 'pre_only_*.json'))
         
         if result_files:
-            # Take the newest file
+            # Nimm die neueste Datei
             latest_file = max(result_files, key=os.path.getctime)
             
             try:
                 with open(latest_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                 
-                # Extract scores
+                # Extrahiere Scores
                 if 'pre' in data:
                     results['pre_score'] = data['pre'].get('percentage_score')
                 if 'post' in data:
@@ -297,18 +297,18 @@ class SimplifiedPipelineRunner:
                     results['comparison_available'] = True
                     results['improvement'] = results['post_score'] - results['pre_score']
                 
-                # Analyze category scores
+                # Analysiere Kategorie-Scores
                 for model_type in ['pre', 'post']:
                     if model_type in data and 'results' in data[model_type]:
                         category_scores = {}
                         for result in data[model_type]['results']:
-                            category = result.get('category', 'Unknown')
+                            category = result.get('category', 'Unbekannt')
                             score = result.get('score', 0)
                             if category not in category_scores:
                                 category_scores[category] = []
                             category_scores[category].append(score)
                         
-                        # Calculate average per category
+                        # Berechne Durchschnitt pro Kategorie
                         for category, scores in category_scores.items():
                             avg_score = sum(scores) / len(scores) if scores else 0
                             if model_type not in results['category_scores']:
@@ -319,12 +319,12 @@ class SimplifiedPipelineRunner:
                 results['benchmark_timestamp'] = datetime.fromtimestamp(os.path.getctime(latest_file)).isoformat()
                 
             except Exception as e:
-                self.metrics['warnings'].append(f"Error analyzing benchmark results: {str(e)}")
+                self.metrics['warnings'].append(f"Fehler beim Analysieren der Benchmark-Ergebnisse: {str(e)}")
         
         return results
 
     def analyze_training_results(self, finetuning_dir):
-        """Analyzes training results"""
+        """Analysiert Training-Ergebnisse"""
         stats = {
             'model_trained': False,
             'training_duration': None,
@@ -335,7 +335,7 @@ class SimplifiedPipelineRunner:
             'gguf_available': False
         }
         
-        # Check latest_model_info.json
+        # Prüfe latest_model_info.json
         info_file = os.path.join(finetuning_dir, 'latest_model_info.json')
         if os.path.exists(info_file):
             try:
@@ -347,7 +347,7 @@ class SimplifiedPipelineRunner:
             except:
                 pass
         
-        # Analyze CustomModel directory
+        # Analysiere CustomModel Verzeichnis
         custom_model_dir = os.path.join(finetuning_dir, 'CustomModel')
         if os.path.exists(custom_model_dir):
             model_name = self.config.get('finetuning', {}).get('model_name', 'model')
@@ -379,18 +379,18 @@ class SimplifiedPipelineRunner:
 
     def detect_post_model_path(self, custom_model_dir, model_name):
         """
-        Intelligent detection of post-model path
-        Checks various possibilities and returns the best path
+        Intelligente Erkennung des Post-Model Pfads
+        Prüft verschiedene Möglichkeiten und gibt den besten Pfad zurück
         """
-        print("\n🔍 Searching for trained model...")
+        print("\n🔍 Suche trainiertes Modell...")
         
-        # Check possible paths
+        # Mögliche Pfade prüfen
         candidates = [
-            # 1. Merged model (fully merged)
+            # 1. Merged Modell (vollständig zusammengeführt)
             {
                 'path': f"{custom_model_dir}/{model_name}_merged",
                 'type': 'merged',
-                'description': 'Merged Model'
+                'description': 'Zusammengeführtes Modell'
             },
             # 2. Adapter (LoRA)
             {
@@ -398,16 +398,16 @@ class SimplifiedPipelineRunner:
                 'type': 'adapter',
                 'description': 'LoRA Adapter'
             },
-            # 3. Alternative paths
+            # 3. Alternative Pfade
             {
                 'path': f"./modules/06_finetuning/{custom_model_dir}/{model_name}_merged",
                 'type': 'merged',
-                'description': 'Merged (Module Path)'
+                'description': 'Merged (Module-Pfad)'
             },
             {
                 'path': f"./modules/06_finetuning/{custom_model_dir}/{model_name}",
                 'type': 'adapter',
-                'description': 'Adapter (Module Path)'
+                'description': 'Adapter (Module-Pfad)'
             }
         ]
         
@@ -415,10 +415,10 @@ class SimplifiedPipelineRunner:
         for candidate in candidates:
             path = candidate['path']
             if os.path.exists(path):
-                # Check if it's a valid model/adapter
+                # Prüfe ob es ein gültiges Modell/Adapter ist
                 is_valid = False
                 if candidate['type'] == 'merged':
-                    # Check for model files
+                    # Prüfe auf Modell-Dateien
                     required_files = ['config.json', 'tokenizer_config.json']
                     model_files = ['model.safetensors', 'pytorch_model.bin', 'model-00001-of-*.safetensors']
                     has_config = any(os.path.exists(os.path.join(path, f)) for f in required_files)
@@ -428,46 +428,46 @@ class SimplifiedPipelineRunner:
                     )
                     is_valid = has_config or has_model
                     if is_valid:
-                        print(f" ✅ Found: {candidate['description']} in {path}")
+                        print(f" ✅ Gefunden: {candidate['description']} in {path}")
                         found_models.append(candidate)
                     else:
-                        print(f" ⚠️ Directory exists but incomplete: {path}")
+                        print(f" ⚠️ Verzeichnis existiert, aber unvollständig: {path}")
                 elif candidate['type'] == 'adapter':
-                    # Check for adapter files
+                    # Prüfe auf Adapter-Dateien
                     adapter_files = ['adapter_config.json', 'adapter_model.safetensors', 'adapter_model.bin']
                     has_adapter = any(os.path.exists(os.path.join(path, f)) for f in adapter_files)
                     if has_adapter:
-                        print(f" ✅ Found: {candidate['description']} in {path}")
+                        print(f" ✅ Gefunden: {candidate['description']} in {path}")
                         found_models.append(candidate)
                         is_valid = True
                     else:
-                        print(f" ⚠️ Directory exists but no adapter: {path}")
+                        print(f" ⚠️ Verzeichnis existiert, aber kein Adapter: {path}")
         
-        # Decide which model to use
+        # Entscheide welches Modell verwendet werden soll
         if found_models:
-            # Preference: 1. Merged, 2. Adapter
+            # Präferenz: 1. Merged, 2. Adapter
             merged_models = [m for m in found_models if m['type'] == 'merged']
             adapter_models = [m for m in found_models if m['type'] == 'adapter']
             
             if merged_models:
                 chosen = merged_models[0]
-                print(f"\n📦 Using: {chosen['description']}")
+                print(f"\n📦 Verwende: {chosen['description']}")
                 return chosen['path'], 'merged'
             elif adapter_models:
                 chosen = adapter_models[0]
-                print(f"\n🔧 Using: {chosen['description']}")
-                print(" ℹ️ Note: Benchmark script will load Base+Adapter")
+                print(f"\n🔧 Verwende: {chosen['description']}")
+                print(" ℹ️ Hinweis: Das Benchmark-Skript wird Base+Adapter laden")
                 return chosen['path'], 'adapter'
         
         # Fallback
-        print("\n⚠️ No trained model found!")
-        print(" Using fallback path for later detection")
+        print("\n⚠️ Kein trainiertes Modell gefunden!")
+        print(" Verwende Fallback-Pfad für spätere Erkennung")
         return f"{custom_model_dir}/{model_name}", 'unknown'
 
     def create_default_config(self):
-        """Creates a default configuration without user input (for auto mode)"""
+        """Erstellt eine Standard-Konfiguration ohne Benutzereingaben (für Auto-Modus)"""
         print("\n" + "="*60)
-        print("📋 CREATING DEFAULT CONFIGURATION (AUTO MODE)")
+        print("📋 ERSTELLE STANDARD-KONFIGURATION (AUTO-MODUS)")
         print("="*60)
         
         config = {
@@ -582,19 +582,19 @@ class SimplifiedPipelineRunner:
             }
         }
         
-        # Save
+        # Speichern
         with open(self.config_file, 'w', encoding='utf-8') as f:
             json.dump(config, f, indent=2, ensure_ascii=False)
         
-        print(f"✅ Default configuration saved: {self.config_file}")
+        print(f"✅ Standard-Konfiguration gespeichert: {self.config_file}")
         self.config = config
         self.metrics['model_name'] = "AutoModel"
         return config
 
     def create_central_config(self):
-        """Creates the central configuration file"""
+        """Erstellt die zentrale Konfigurationsdatei"""
         print("\n" + "="*60)
-        print("📋 CENTRAL PIPELINE CONFIGURATION")
+        print("📋 ZENTRALE PIPELINE-KONFIGURATION")
         print("="*60)
         
         config = {
@@ -605,25 +605,25 @@ class SimplifiedPipelineRunner:
         
         # 1. HuggingFace Tokens
         print("\n🔑 HUGGINGFACE TOKENS:")
-        print("Required for fine-tuning (Step 6)")
-        setup_tokens = input("Configure HF tokens? (y/n) [y]: ").lower().strip() != 'n'
+        print("Werden für Fine-tuning (Schritt 6) benötigt")
+        setup_tokens = input("HF-Tokens konfigurieren? (y/n) [y]: ").lower().strip() != 'n'
         
         if setup_tokens:
-            print("\n1. READ Token (for model downloads):")
-            hf_token = getpass.getpass("Enter HF_TOKEN (hidden): ").strip()
+            print("\n1. READ Token (für Model-Downloads):")
+            hf_token = getpass.getpass("HF_TOKEN eingeben (versteckt): ").strip()
             if not hf_token:
-                hf_token = input("Use dummy token? (y/n) [n]: ").lower() == 'y'
+                hf_token = input("Oder Dummy-Token verwenden? (y/n) [n]: ").lower() == 'y'
                 if hf_token:
                     hf_token = "hf_DUMMY_TOKEN_REPLACE_ME"
-                    print("⚠️ Dummy token set - replace later!")
+                    print("⚠️ Dummy-Token gesetzt - später ersetzen!")
             
-            print("\n2. WRITE Token (for uploads, optional):")
-            hf_write = input("Set write token? (y/n) [n]: ").lower() == 'y'
+            print("\n2. WRITE Token (für Uploads, optional):")
+            hf_write = input("Write-Token setzen? (y/n) [n]: ").lower() == 'y'
             hf_write_token = None
             if hf_write:
-                hf_write_token = getpass.getpass("Enter HF_WRITE_TOKEN: ").strip()
+                hf_write_token = getpass.getpass("HF_WRITE_TOKEN eingeben: ").strip()
                 if not hf_write_token:
-                    hf_write_token = hf_token # Fallback to READ token
+                    hf_write_token = hf_token # Fallback auf READ token
             
             config["tokens"] = {
                 "hf_token": hf_token,
@@ -635,26 +635,26 @@ class SimplifiedPipelineRunner:
                 "hf_write_token": ""
             }
         
-        # 2. API configurations for modules
-        print("\n🌐 API CONFIGURATIONS:")
-        print("For modules 01-03 and 05 (data processing)")
+        # 2. API-Konfigurationen für Module
+        print("\n🌐 API-KONFIGURATIONEN:")
+        print("Für Module 01-03 und 05 (Datenverarbeitung)")
         
-        # Standard API config
-        use_openai = input("Use OpenAI-compatible API? (y/n) [y]: ").lower().strip() != 'n'
+        # Standard API-Config
+        use_openai = input("OpenAI-kompatible API verwenden? (y/n) [y]: ").lower().strip() != 'n'
         
         if use_openai:
             base_url = input("API Base URL [http://localhost:11434/v1]: ").strip()
             base_url = base_url or "http://localhost:11434/v1"
             api_key = input("API Key [ollama]: ").strip() or "ollama"
             
-            print("\nModel configuration for each module:")
+            print("\nModell-Konfiguration für jedes Modul:")
             
-            # Module-specific models
+            # Modul-spezifische Modelle
             api_configs = {}
             
             # 01_convert
-            print("\n📄 Module 01 - Document Conversion:")
-            model_01 = input("Model [gemma3:12b-it-qat]: ").strip() or "gemma3:12b-it-qat"
+            print("\n📄 Modul 01 - Document Conversion:")
+            model_01 = input("Modell [gemma3:12b-it-qat]: ").strip() or "gemma3:12b-it-qat"
             api_configs["01_convert"] = {
                 "use_openai_api": True,
                 "openai_base_url": base_url,
@@ -664,8 +664,8 @@ class SimplifiedPipelineRunner:
             }
             
             # 02_genwiki
-            print("\n📚 Module 02 - Wiki Generation:")
-            model_02 = input("Model [gemma3:12b-it-qat]: ").strip() or "gemma3:12b-it-qat"
+            print("\n📚 Modul 02 - Wiki Generation:")
+            model_02 = input("Modell [gemma3:12b-it-qat]: ").strip() or "gemma3:12b-it-qat"
             api_configs["02_genwiki"] = {
                 "use_openai_api": True,
                 "openai_base_url": base_url,
@@ -675,8 +675,8 @@ class SimplifiedPipelineRunner:
             }
             
             # 03_instructQA
-            print("\n❓ Module 03 - Instruct QA:")
-            model_03 = input("Model [gemma3:12b-it-qat]: ").strip() or "gemma3:12b-it-qat"
+            print("\n❓ Modul 03 - Instruct QA:")
+            model_03 = input("Modell [gemma3:12b-it-qat]: ").strip() or "gemma3:12b-it-qat"
             api_configs["03_instructQA"] = {
                 "use_openai_api": True,
                 "openai_base_url": base_url,
@@ -686,8 +686,8 @@ class SimplifiedPipelineRunner:
             }
             
             # 05_bmcreator
-            print("\n📊 Module 05 - Benchmark Creation:")
-            model_05 = input("Model [gemma3:12b-it-qat]: ").strip() or "gemma3:12b-it-qat"
+            print("\n📊 Modul 05 - Benchmark Creation:")
+            model_05 = input("Modell [gemma3:12b-it-qat]: ").strip() or "gemma3:12b-it-qat"
             api_configs["05_bmcreator"] = {
                 "use_openai_api": True,
                 "openai_base_url": base_url,
@@ -699,14 +699,14 @@ class SimplifiedPipelineRunner:
             config["api_configs"] = api_configs
             
         else:
-            # Ollama configuration
-            print("\n🦙 Ollama Configuration:")
+            # Ollama-Konfiguration
+            print("\n🦙 Ollama-Konfiguration:")
             ollama_url = input("Ollama Server URL [http://localhost:11434]: ").strip()
             ollama_url = ollama_url or "http://localhost:11434"
             
             api_configs = {}
             for module_id in ["01_convert", "02_genwiki", "03_instructQA", "05_bmcreator"]:
-                model_name = input(f"Model for {module_id} [gemma3:12b-it-qat]: ").strip() or "gemma3:12b-it-qat"
+                model_name = input(f"Modell für {module_id} [gemma3:12b-it-qat]: ").strip() or "gemma3:12b-it-qat"
                 api_configs[module_id] = {
                     "use_openai_api": False,
                     "ollama_server_url": ollama_url,
@@ -715,15 +715,15 @@ class SimplifiedPipelineRunner:
             
             config["api_configs"] = api_configs
         
-        # 3. Fine-tuning configuration
-        print("\n🤖 FINE-TUNING CONFIGURATION:")
-        model_name = input("Output model name [FoxLM-e2b]: ").strip() or "FoxLM-e2b"
-        custom_model_dir = input("CustomModel directory [CustomModel]: ").strip() or "CustomModel"
+        # 3. Fine-tuning Konfiguration
+        print("\n🤖 FINE-TUNING KONFIGURATION:")
+        model_name = input("Output-Modellname [FoxLM-e2b]: ").strip() or "FoxLM-e2b"
+        custom_model_dir = input("CustomModel Verzeichnis [CustomModel]: ").strip() or "CustomModel"
 
-        # New queries: save_merged and save_gguf
-        print("\n📦 Model Export Options:")
-        save_merged = input("Save merged model? (y/n) [y]: ").strip().lower() or 'y'
-        save_gguf = input("Save GGUF model? (y/n) [n]: ").strip().lower() or 'n'
+        # Neue Abfragen: save_merged und save_gguf
+        print("\n📦 Modell-Export Optionen:")
+        save_merged = input("Merged-Modell speichern? (y/n) [y]: ").strip().lower() or 'y'
+        save_gguf = input("GGUF-Modell speichern? (y/n) [n]: ").strip().lower() or 'n'
         
         config["finetuning"] = {
             "model_name": model_name,
@@ -767,16 +767,16 @@ class SimplifiedPipelineRunner:
             "max_new_tokens": 128
         }
         
-        # Generate HF Repo ID
+        # HF Repo ID generieren
         username = input("HuggingFace Username [user]: ").strip() or "user"
         config["finetuning"]["hf_repo_id"] = f"{username}/{model_name}"
         
-        # Training profile
-        print("\n📊 Training Profile:")
-        print("1. Test (fast)")
+        # Training-Profil
+        print("\n📊 Training-Profil:")
+        print("1. Test (schnell)")
         print("2. Development")
         print("3. Production")
-        profile = input("Profile (1-3) [2]: ").strip() or "2"
+        profile = input("Profil (1-3) [2]: ").strip() or "2"
         
         if profile == "1":
             config["finetuning"]["num_train_epochs"] = 1
@@ -785,10 +785,10 @@ class SimplifiedPipelineRunner:
             config["finetuning"]["num_train_epochs"] = 10
             config["finetuning"]["warmup_steps"] = 500
         
-        # 4. Benchmark configuration with intelligent post-model detection
-        print("\n🏁 BENCHMARK CONFIGURATION:")
+        # 4. Benchmark Konfiguration mit intelligenter Post-Model Erkennung
+        print("\n🏁 BENCHMARK KONFIGURATION:")
         
-        # Try to find the post-model
+        # Versuche das Post-Model zu finden
         post_model_path, model_type = self.detect_post_model_path(custom_model_dir, model_name)
         
         config["benchmark"] = {
@@ -800,14 +800,14 @@ class SimplifiedPipelineRunner:
                 "max_seq_length": 2048
             },
             "post_model": {
-                "name": post_model_path, # Concrete path instead of "auto-detect"
-                "type": model_type, # "merged", "adapter" or "unknown"
+                "name": post_model_path, # Konkreter Pfad statt "auto-detect"
+                "type": model_type, # "merged", "adapter" oder "unknown"
                 "load_in_4bit": False,
                 "max_seq_length": 2048,
                 "base_model": "unsloth/gemma-3n-E2B-it" if model_type == "adapter" else None
             },
             "evaluator": {
-                "type": "api", # api or local
+                "type": "api", # api oder local
                 "api_base_url": base_url if use_openai else "http://localhost:11434/v1",
                 "api_key": api_key if use_openai else "ollama",
                 "model": "gemma3:12b-it-qat"
@@ -820,7 +820,7 @@ class SimplifiedPipelineRunner:
             "repetition_penalty": 1.1
         }
         
-        # 5. Pipeline settings
+        # 5. Pipeline-Einstellungen
         config["pipeline"] = {
             "auto_cleanup": False,
             "verbose": True,
@@ -829,19 +829,19 @@ class SimplifiedPipelineRunner:
             "capture_output_stats": True
         }
         
-        # Save
+        # Speichern
         with open(self.config_file, 'w', encoding='utf-8') as f:
             json.dump(config, f, indent=2, ensure_ascii=False)
         
-        print(f"\n✅ Central configuration saved: {self.config_file}")
+        print(f"\n✅ Zentrale Konfiguration gespeichert: {self.config_file}")
         self.config = config
-        self.metrics['model_name'] = model_name  # Save in metrics
+        self.metrics['model_name'] = model_name  # Speichere in Metriken
         return config
 
     def update_post_model_path(self):
         """
-        Updates the post-model path in an existing config
-        Useful after fine-tuning
+        Aktualisiert den Post-Model Pfad in einer existierenden Config
+        Nützlich nach dem Fine-tuning
         """
         if not self.config:
             return
@@ -858,75 +858,75 @@ class SimplifiedPipelineRunner:
             if model_type == "adapter":
                 self.config["benchmark"]["post_model"]["base_model"] = ft_config.get("base_model", "unsloth/gemma-3n-E2B-it")
         
-        # Save
+        # Speichern
         self.config["last_modified"] = datetime.now().isoformat()
         with open(self.config_file, 'w', encoding='utf-8') as f:
             json.dump(self.config, f, indent=2, ensure_ascii=False)
         
-        print(f"✅ Post-model path updated: {post_model_path} ({model_type})")
+        print(f"✅ Post-Model Pfad aktualisiert: {post_model_path} ({model_type})")
 
     def load_or_create_config(self):
-        """Loads existing config or creates new one"""
+        """Lädt existierende Config oder erstellt neue"""
         if os.path.exists(self.config_file):
-            print(f"📋 Loading existing configuration: {self.config_file}")
+            print(f"📋 Lade existierende Konfiguration: {self.config_file}")
             with open(self.config_file, 'r', encoding='utf-8') as f:
                 self.config = json.load(f)
             
             # Update timestamp
             self.config["last_modified"] = datetime.now().isoformat()
             
-            # In auto mode: No question, use existing config
+            # Im Auto-Modus: Keine Frage, verwende existierende Config
             if self.auto_mode:
-                print("🤖 Auto mode: Using existing configuration")
-                # Check if post-model path should be updated
+                print("🤖 Auto-Modus: Verwende existierende Konfiguration")
+                # Prüfe ob Post-Model Pfad aktualisiert werden sollte
                 if self.config.get("benchmark", {}).get("post_model", {}).get("name") in ["auto-detect", None, ""]:
-                    print("\n🔍 Post-model path needs to be updated...")
+                    print("\n🔍 Post-Model Pfad muss aktualisiert werden...")
                     self.update_post_model_path()
             else:
-                # Interactive mode: Ask if reconfigure
-                reconfigure = input("\n🔄 Create new configuration? (y/n) [n]: ").lower().strip() == 'y'
+                # Interaktiver Modus: Frage ob neu konfigurieren
+                reconfigure = input("\n🔄 Konfiguration neu erstellen? (y/n) [n]: ").lower().strip() == 'y'
                 if reconfigure:
                     return self.create_central_config()
                 
-                # Check if post-model path should be updated
+                # Prüfe ob Post-Model Pfad aktualisiert werden sollte
                 if self.config.get("benchmark", {}).get("post_model", {}).get("name") in ["auto-detect", None, ""]:
-                    print("\n🔍 Post-model path needs to be updated...")
+                    print("\n🔍 Post-Model Pfad muss aktualisiert werden...")
                     self.update_post_model_path()
             
-            # Save model name in metrics
+            # Speichere Modellnamen in Metriken
             self.metrics['model_name'] = self.config.get("finetuning", {}).get("model_name", "Unknown")
             
             return self.config
         else:
             if self.auto_mode:
-                print("❌ No configuration found! Creating default configuration...")
-                # Create default config without inputs
+                print("❌ Keine Konfiguration gefunden! Erstelle Standard-Konfiguration...")
+                # Erstelle Standard-Config ohne Eingaben
                 return self.create_default_config()
             else:
-                print("🆕 No configuration found - creating new one")
+                print("🆕 Keine Konfiguration gefunden - erstelle neue")
                 return self.create_central_config()
 
     def setup_environment(self):
-        """Sets environment variables from config"""
+        """Setzt Umgebungsvariablen aus Config"""
         if "tokens" in self.config:
             tokens = self.config["tokens"]
             if tokens.get("hf_token"):
                 os.environ["HF_TOKEN"] = tokens["hf_token"]
                 os.environ["HUGGINGFACE_TOKEN"] = tokens["hf_token"]
-                print("🔑 HF_TOKEN set")
+                print("🔑 HF_TOKEN gesetzt")
             if tokens.get("hf_write_token"):
                 os.environ["HF_WRITE_TOKEN"] = tokens["hf_write_token"]
-                print("🔑 HF_WRITE_TOKEN set")
+                print("🔑 HF_WRITE_TOKEN gesetzt")
 
     def copy_config_loader(self):
-        """Copies config_loader.py to all modules"""
-        # The config_loader code remains the same as before
+        """Kopiert config_loader.py zu allen Modulen"""
+        # Der config_loader Code bleibt gleich wie vorher
         config_loader_content = '''#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
-Central Config Loader for OpenTuneWeaver Pipeline
-Loads the central pipeline_config.json for all modules
+Zentrale Config-Loader für OpenTuneWeaver Pipeline
+Lädt die zentrale pipeline_config.json für alle Module
 """
 
 import os
@@ -935,13 +935,13 @@ import sys
 from pathlib import Path
 
 class PipelineConfigLoader:
-    """Loads and manages the central pipeline configuration"""
+    """Lädt und verwaltet die zentrale Pipeline-Konfiguration"""
     
     def __init__(self, module_id=None):
         """
-        Initializes the config loader
+        Initialisiert den Config-Loader
         Args:
-            module_id: Module ID (e.g. "01_convert", "02_genwiki", etc.)
+            module_id: ID des Moduls (z.B. "01_convert", "02_genwiki", etc.)
         """
         self.module_id = module_id
         self.config = self._load_config()
@@ -951,20 +951,20 @@ class PipelineConfigLoader:
             self.api_config = self.config["api_configs"][module_id]
     
     def _find_config_file(self):
-        """Searches for the central config file"""
-        # Priority 1: Environment variable
+        """Sucht die zentrale Config-Datei"""
+        # Priorität 1: Umgebungsvariable
         if "PIPELINE_CONFIG_PATH" in os.environ:
             config_path = Path(os.environ["PIPELINE_CONFIG_PATH"])
             if config_path.exists():
                 return config_path
         
-        # Priority 2: Search relative to current directory
+        # Priorität 2: Suche relativ zum aktuellen Verzeichnis
         search_paths = [
-            Path.cwd() / "pipeline_config.json", # In current directory
-            Path.cwd().parent / "pipeline_config.json", # One level up
-            Path.cwd().parent.parent / "pipeline_config.json", # Two levels up
-            Path.cwd().parent.parent.parent / "pipeline_config.json", # Three levels up (for modules)
-            Path(__file__).parent / "pipeline_config.json", # Next to this script
+            Path.cwd() / "pipeline_config.json", # Im aktuellen Verzeichnis
+            Path.cwd().parent / "pipeline_config.json", # Eine Ebene höher
+            Path.cwd().parent.parent / "pipeline_config.json", # Zwei Ebenen höher
+            Path.cwd().parent.parent.parent / "pipeline_config.json", # Drei Ebenen höher (für Module)
+            Path(__file__).parent / "pipeline_config.json", # Neben diesem Skript
             Path(__file__).parent.parent / "pipeline_config.json",
             Path(__file__).parent.parent.parent / "pipeline_config.json",
         ]
@@ -973,22 +973,22 @@ class PipelineConfigLoader:
             if path.exists():
                 return path
         
-        # Not found
+        # Nicht gefunden
         raise FileNotFoundError(
-            "pipeline_config.json not found!\\n"
-            "Please run run_pipeline.py first or set PIPELINE_CONFIG_PATH"
+            "pipeline_config.json nicht gefunden!\\n"
+            "Bitte führen Sie zuerst run_pipeline.py aus oder setzen Sie PIPELINE_CONFIG_PATH"
         )
     
     def _load_config(self):
-        """Loads the central configuration"""
+        """Lädt die zentrale Konfiguration"""
         config_path = self._find_config_file()
-        print(f"📋 Loading configuration from: {config_path}")
+        print(f"📋 Lade Konfiguration aus: {config_path}")
         
         try:
             with open(config_path, 'r', encoding='utf-8') as f:
                 config = json.load(f)
             
-            # Set environment variables for tokens
+            # Setze Umgebungsvariablen für Tokens
             if "tokens" in config:
                 if config["tokens"].get("hf_token"):
                     os.environ["HF_TOKEN"] = config["tokens"]["hf_token"]
@@ -999,104 +999,104 @@ class PipelineConfigLoader:
             return config
             
         except json.JSONDecodeError as e:
-            print(f"❌ Error parsing config: {e}")
+            print(f"❌ Fehler beim Parsen der Config: {e}")
             sys.exit(1)
         except Exception as e:
-            print(f"❌ Error loading config: {e}")
+            print(f"❌ Fehler beim Laden der Config: {e}")
             sys.exit(1)
     
     def get_api_config(self, module_id=None):
         """
-        Returns the API configuration for a module
+        Gibt die API-Konfiguration für ein Modul zurück
         Args:
-            module_id: Optional module ID, if not set in constructor
+            module_id: Optionale Module-ID, falls nicht im Konstruktor gesetzt
         Returns:
-            Dict with API configuration
+            Dict mit API-Konfiguration
         """
         if module_id:
             return self.config.get("api_configs", {}).get(module_id, {})
         return self.api_config or {}
     
     def get_finetuning_config(self):
-        """Returns the finetuning configuration"""
+        """Gibt die Finetuning-Konfiguration zurück"""
         return self.config.get("finetuning", {})
     
     def get_benchmark_config(self):
-        """Returns the benchmark configuration"""
+        """Gibt die Benchmark-Konfiguration zurück"""
         return self.config.get("benchmark", {})
     
     def get_pipeline_config(self):
-        """Returns the pipeline configuration"""
+        """Gibt die Pipeline-Konfiguration zurück"""
         return self.config.get("pipeline", {})
     
     def get_tokens(self):
-        """Returns the token configuration"""
+        """Gibt die Token-Konfiguration zurück"""
         return self.config.get("tokens", {})
     
     def get_full_config(self):
-        """Returns the complete configuration"""
+        """Gibt die komplette Konfiguration zurück"""
         return self.config
     
     def print_config_summary(self):
-        """Prints a configuration summary"""
-        print("\\n📊 Configuration Overview:")
-        print(f" 📋 Version: {self.config.get('version', 'unknown')}")
-        print(f" 📅 Created: {self.config.get('created', 'unknown')}")
-        print(f" 🔄 Modified: {self.config.get('last_modified', 'unknown')}")
+        """Gibt eine Zusammenfassung der Konfiguration aus"""
+        print("\\n📊 Konfigurations-Übersicht:")
+        print(f" 📋 Version: {self.config.get('version', 'unbekannt')}")
+        print(f" 📅 Erstellt: {self.config.get('created', 'unbekannt')}")
+        print(f" 🔄 Geändert: {self.config.get('last_modified', 'unbekannt')}")
         
         if self.api_config:
-            print(f"\\n 📡 API Config for {self.module_id}:")
+            print(f"\\n 📡 API-Config für {self.module_id}:")
             api_type = "OpenAI" if self.api_config.get("use_openai_api") else "Ollama"
             if api_type == "OpenAI":
-                print(f" - Type: {api_type}")
-                print(f" - URL: {self.api_config.get('openai_base_url', 'not set')}")
-                print(f" - Model: {self.api_config.get('openai_model_name', 'not set')}")
+                print(f" - Typ: {api_type}")
+                print(f" - URL: {self.api_config.get('openai_base_url', 'nicht gesetzt')}")
+                print(f" - Model: {self.api_config.get('openai_model_name', 'nicht gesetzt')}")
             else:
-                print(f" - Type: {api_type}")
-                print(f" - URL: {self.api_config.get('ollama_server_url', 'not set')}")
-                print(f" - Model: {self.api_config.get('ollama_model_name', 'not set')}")
+                print(f" - Typ: {api_type}")
+                print(f" - URL: {self.api_config.get('ollama_server_url', 'nicht gesetzt')}")
+                print(f" - Model: {self.api_config.get('ollama_model_name', 'nicht gesetzt')}")
 
-# Convenience functions for direct import
+# Convenience-Funktionen für direkten Import
 def load_config(module_id=None):
     """
-    Loads the central pipeline configuration
+    Lädt die zentrale Pipeline-Konfiguration
     Args:
-        module_id: Optional module ID (e.g. "01_convert")
+        module_id: Optionale Module-ID (z.B. "01_convert")
     Returns:
-        PipelineConfigLoader instance
+        PipelineConfigLoader Instanz
     """
     return PipelineConfigLoader(module_id)
 
 def get_api_config(module_id):
     """
-    Gets the API configuration directly for a module
+    Holt direkt die API-Konfiguration für ein Modul
     Args:
-        module_id: Module ID (e.g. "01_convert")
+        module_id: Module-ID (z.B. "01_convert")
     Returns:
-        Dict with API configuration
+        Dict mit API-Konfiguration
     """
     loader = PipelineConfigLoader(module_id)
     return loader.get_api_config()
 '''
         
-        # Save config_loader.py in main directory
+        # Speichere config_loader.py im Hauptverzeichnis
         loader_path = Path("config_loader.py")
         with open(loader_path, 'w', encoding='utf-8') as f:
             f.write(config_loader_content)
         
-        print(f"✅ config_loader.py created: {loader_path}")
+        print(f"✅ config_loader.py erstellt: {loader_path}")
         
-        # Optional: Copy to all modules
+        # Optional: Kopiere auch zu allen Modulen
         for step in STEPS:
-            if step['script']:  # Only for real modules (not step 8)
+            if step['script']:  # Nur für echte Module (nicht Schritt 8)
                 module_dir = Path(step['working_dir'])
                 if module_dir.exists():
                     target_path = module_dir / "config_loader.py"
                     shutil.copy2(loader_path, target_path)
-                    print(f" 📋 Copied to: {target_path}")
+                    print(f" 📋 Kopiert nach: {target_path}")
 
     def copy_files_between_steps(self, current_step_id):
-        """Copies output files between pipeline steps"""
+        """Kopiert Output-Dateien zwischen Pipeline-Schritten"""
         transfers = {
             2: {
                 'source': 'modules/01_convert/OUTPUT',
@@ -1138,7 +1138,7 @@ def get_api_config(module_id):
         target_dir = transfer['target']
         file_pattern = transfer['files']
         
-        print(f"🔄 Copying files: {source_dir} → {target_dir}")
+        print(f"🔄 Kopiere Dateien: {source_dir} → {target_dir}")
         os.makedirs(target_dir, exist_ok=True)
         
         source_files = glob(f"{source_dir}/{file_pattern}")
@@ -1153,103 +1153,103 @@ def get_api_config(module_id):
                     copied_count += 1
                     print(f" ✅ {filename}")
                 except Exception as e:
-                    print(f" ❌ Error with {filename}: {e}")
+                    print(f" ❌ Fehler bei {filename}: {e}")
         
-        print(f" 📊 {copied_count} files copied")
+        print(f" 📊 {copied_count} Dateien kopiert")
         return copied_count > 0 or current_step_id == 1
 
     def save_metrics(self, output_dir=None):
-        """Saves the collected metrics"""
+        """Speichert die gesammelten Metriken"""
         if output_dir is None:
             output_dir = '.'
         
         metrics_file = os.path.join(output_dir, 'pipeline_metrics.json')
         
-        # Calculate final metrics
+        # Berechne finale Metriken
         self.metrics['end_time'] = datetime.now().isoformat()
         duration = datetime.now() - self.start_time
         self.metrics['total_duration'] = str(duration)
         self.metrics['total_duration_seconds'] = duration.total_seconds()
         
-        # Save
+        # Speichern
         with open(metrics_file, 'w', encoding='utf-8') as f:
             json.dump(self.metrics, f, indent=2, ensure_ascii=False, default=str)
         
-        print(f"📊 Metrics saved: {metrics_file}")
+        print(f"📊 Metriken gespeichert: {metrics_file}")
         return metrics_file
 
     def transfer_and_archive_results(self):
         """
-        Transfers all pipeline results to data/OUTPUT with timestamp-based archiving
-        Creates a common ZIP with all documents and collects metrics
+        Überträgt alle Pipeline-Ergebnisse in data/OUTPUT mit Timestamp-basierter Archivierung
+        Erstellt einen gemeinsamen ZIP mit allen Dokumenten und sammelt Metriken
         """
         print(f"\n{'='*60}")
-        print("📦 STEP 8: ARCHIVE AND TRANSFER RESULTS")
+        print("📦 SCHRITT 8: ERGEBNISSE ARCHIVIEREN UND ÜBERTRAGEN")
         print(f"{'='*60}")
         
         base_dir = Path('.').resolve()
         output_base = base_dir / 'data' / 'OUTPUT'
         
-        # Ensure data/OUTPUT exists
+        # Sicherstellen, dass data/OUTPUT existiert
         output_base.mkdir(parents=True, exist_ok=True)
-        print(f"📁 Target directory: {output_base}")
+        print(f"📁 Zielverzeichnis: {output_base}")
         
-        # Generate unique timestamp and get model name
+        # Eindeutigen Timestamp generieren und Modellnamen holen
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         model_name = self.config.get("finetuning", {}).get("model_name", "model")
         archive_name = f"{model_name}_{timestamp}"
         print(f"🕒 Timestamp: {timestamp}")
-        print(f"🤖 Model name: {model_name}")
+        print(f"🤖 Modellname: {model_name}")
         
-        # Collect final data statistics before archiving
-        print("\n📊 Collecting final statistics...")
+        # Sammle finale Daten-Statistiken vor Archivierung
+        print("\n📊 Sammle finale Statistiken...")
         
-        # Lexicon statistics
+        # Lexikon-Statistiken
         self.metrics['data_statistics']['lexikon'] = self.analyze_lexikon_files('modules/02_wiki/OUTPUT')
         
-        # QA dataset statistics
+        # QA-Dataset Statistiken
         self.metrics['data_statistics']['qa_dataset'] = self.analyze_qa_dataset('modules/03_instructQA/OUTPUT')
         
-        # Formatted dataset statistics
+        # Formatted Dataset Statistiken
         self.metrics['data_statistics']['formatted_dataset'] = self.analyze_qa_dataset('modules/04_format/OUTPUT')
         
-        # Benchmark questions statistics
+        # Benchmark-Fragen Statistiken
         self.metrics['data_statistics']['benchmark_questions'] = self.analyze_benchmark_questions('modules/05_bmcreator/BENCHMARKFRAGEN')
         
-        # Training results
+        # Training-Ergebnisse
         self.metrics['data_statistics']['training'] = self.analyze_training_results('modules/06_finetuning')
         
-        # Benchmark results
+        # Benchmark-Ergebnisse
         self.metrics['benchmark_results'] = self.analyze_benchmark_results('modules/07_benchmark/OUTPUT')
         
-        # Save metrics
+        # Speichere Metriken
         metrics_file = self.save_metrics()
         
-        # Temporary directory for collecting all files
+        # Temporäres Verzeichnis für die Sammlung aller Dateien
         temp_collection_dir = output_base / f"temp_{archive_name}"
         temp_collection_dir.mkdir(exist_ok=True)
         
-        # Mapping of pipeline steps to source and target directories
+        # Mapping der Pipeline-Schritte zu Quell- und Zielverzeichnissen
         transfer_config = {
             'Step1_Convert': {
                 'source': base_dir / 'modules' / '01_convert' / 'OUTPUT',
                 'patterns': ['*.md'],
-                'description': 'Converted Markdown files'
+                'description': 'Konvertierte Markdown-Dateien'
             },
             'Step2_Wiki': {
                 'source': base_dir / 'modules' / '02_wiki' / 'OUTPUT', 
                 'patterns': ['lexikon_*.json'],
-                'description': 'Wiki lexicon JSON files'
+                'description': 'Wiki-Lexikon JSON-Dateien'
             },
             'Step3_InstructQA': {
                 'source': base_dir / 'modules' / '03_instructQA' / 'OUTPUT',
                 'patterns': ['*.json'],
-                'description': 'InstructQA datasets'
+                'description': 'InstructQA Datensätze'
             },
             'Step4_Conversation': {
                 'source': base_dir / 'modules' / '04_format' / 'OUTPUT',
                 'patterns': ['*.json'],
-                'description': 'Conversation-formatted datasets'
+                'description': 'Conversation-formatierte Datensätze'
             },
             'Step5_Benchmark': {
                 'sources': [
@@ -1257,32 +1257,32 @@ def get_api_config(module_id):
                     base_dir / 'modules' / '07_benchmark' / 'OUTPUT'
                 ],
                 'patterns': ['*.json', '*.txt', '*.csv', '*.md'],
-                'description': 'Benchmark questions and results'
+                'description': 'Benchmark-Fragen und Ergebnisse'
             },
             'Step6_PipelineMeta': {
-                'sources': [base_dir],  # Main directory for pipeline_config.json
+                'sources': [base_dir],  # Hauptverzeichnis für pipeline_config.json
                 'patterns': ['pipeline_config.json', 'pipeline_metrics.json', '*.log'],
-                'description': 'Pipeline metadata incl. configuration and metrics'
+                'description': 'Pipeline-Metadaten inkl. Konfiguration und Metriken'
             }
         }
         
-        # Handle viewer separately (corrected path)
+        # Viewer separat behandeln (korrigierter Pfad)
         viewer_config = {
             'Viewer': {
-                'source': base_dir / 'viewer',  # Corrected path: directly in main directory
+                'source': base_dir / 'viewer',  # Korrigierter Pfad: direkt im Hauptverzeichnis
                 'patterns': ['*.html', '*.js', '*.css'],
                 'copy_directories': [
                     {'source': base_dir / 'viewer' / 'images', 'target_name': 'images'}
                 ],
-                'description': 'Viewer HTML and associated files'
+                'description': 'Viewer HTML und zugehörige Dateien'
             }
         }
         
         transferred_items = []
         total_file_count = 0
         
-        # Step 1: Collect all documents in subdirectories
-        print("\n📁 Collecting all documents...")
+        # Schritt 1: Alle Dokumente in Unterordner sammeln
+        print("\n📁 Sammle alle Dokumente...")
         
         for step_name, config in transfer_config.items():
             step_subdir = temp_collection_dir / step_name
@@ -1302,12 +1302,12 @@ def get_api_config(module_id):
                                 print(f"  ✅ {step_name}/{file_path.name}")
             
             if file_count > 0:
-                transferred_items.append(f"{step_name}: {file_count} files")
+                transferred_items.append(f"{step_name}: {file_count} Dateien")
                 total_file_count += file_count
-                print(f"  📊 {step_name}: {file_count} files collected")
+                print(f"  📊 {step_name}: {file_count} Dateien gesammelt")
         
-        # Add viewer
-        print("\n📁 Processing viewer...")
+        # Viewer hinzufügen
+        print("\n📁 Verarbeite Viewer...")
         viewer_source = viewer_config['Viewer']['source']
         
         if viewer_source.exists():
@@ -1316,7 +1316,7 @@ def get_api_config(module_id):
             
             viewer_file_count = 0
             
-            # HTML and other files
+            # HTML und andere Dateien
             for pattern in viewer_config['Viewer']['patterns']:
                 for file_path in viewer_source.glob(pattern):
                     if file_path.is_file():
@@ -1325,7 +1325,7 @@ def get_api_config(module_id):
                         viewer_file_count += 1
                         print(f"  ✅ Viewer/{file_path.name}")
             
-            # Images directory
+            # Images-Verzeichnis
             for dir_config in viewer_config['Viewer']['copy_directories']:
                 source_dir = dir_config['source']
                 target_name = dir_config['target_name']
@@ -1334,24 +1334,24 @@ def get_api_config(module_id):
                     target_dir = viewer_subdir / target_name
                     shutil.copytree(source_dir, target_dir, dirs_exist_ok=True)
                     
-                    # Count files in copied directory
+                    # Zähle Dateien im kopierten Verzeichnis
                     copied_files = list(target_dir.rglob('*'))
                     dir_file_count = len([f for f in copied_files if f.is_file()])
                     viewer_file_count += dir_file_count
-                    print(f"  📂 Viewer/{target_name}: {dir_file_count} files")
+                    print(f"  📂 Viewer/{target_name}: {dir_file_count} Dateien")
             
             if viewer_file_count > 0:
-                transferred_items.append(f"Viewer: {viewer_file_count} files")
+                transferred_items.append(f"Viewer: {viewer_file_count} Dateien")
                 total_file_count += viewer_file_count
-                print(f"  📊 Viewer: {viewer_file_count} files collected")
+                print(f"  📊 Viewer: {viewer_file_count} Dateien gesammelt")
         else:
-            print(f"  ⚠️ Viewer directory not found: {viewer_source}")
-            print(f"     Expected path: viewer/ (relative to run_pipeline.py)")
+            print(f"  ⚠️ Viewer-Verzeichnis nicht gefunden: {viewer_source}")
+            print(f"     Erwarteter Pfad: viewer/ (relativ zu run_pipeline.py)")
         
-        # Step 2: Create common ZIP archive
+        # Schritt 2: Gemeinsames ZIP-Archiv erstellen
         if total_file_count > 0:
             documents_zip_path = output_base / f"{archive_name}_documents.zip"
-            print(f"\n📦 Creating document archive: {documents_zip_path.name}")
+            print(f"\n📦 Erstelle Dokumenten-Archiv: {documents_zip_path.name}")
             
             with zipfile.ZipFile(documents_zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
                 for file_path in temp_collection_dir.rglob('*'):
@@ -1359,43 +1359,43 @@ def get_api_config(module_id):
                         archive_name_in_zip = file_path.relative_to(temp_collection_dir)
                         zipf.write(file_path, arcname=archive_name_in_zip)
             
-            # Calculate size
+            # Größe berechnen
             zip_size = documents_zip_path.stat().st_size / (1024 * 1024)  # MB
-            print(f"  ✅ Document archive created: {zip_size:.2f} MB")
+            print(f"  ✅ Dokumenten-Archiv erstellt: {zip_size:.2f} MB")
             
-            # Clean up temporary directory
+            # Temporäres Verzeichnis bereinigen
             shutil.rmtree(temp_collection_dir)
         
-        # Step 3: Archive CustomModel separately (corrected path)
-        print(f"\n🤖 Processing CustomModel...")
+        # Schritt 3: CustomModel separat archivieren (korrigierter Pfad)
+        print(f"\n🤖 Verarbeite CustomModel...")
         custom_model_dir = base_dir / 'modules' / '06_finetuning' / 'CustomModel'
         
         if custom_model_dir.exists() and any(custom_model_dir.iterdir()):
             model_zip_path = output_base / f"{archive_name}_models.zip"
             
-            print(f"  📦 Creating model archive (may take several minutes)...")
-            print(f"     Source: {custom_model_dir}")
+            print(f"  📦 Erstelle Modell-Archiv (kann einige Minuten dauern)...")
+            print(f"     Quelle: {custom_model_dir}")
             
-            # Use ZIP_STORED for large model files (no compression)
-            # as these are already compressed
+            # Verwende ZIP_STORED für große Modell-Dateien (keine Kompression)
+            # da diese bereits komprimiert sind
             with zipfile.ZipFile(model_zip_path, 'w', zipfile.ZIP_STORED) as zipf:
                 for file_path in custom_model_dir.rglob('*'):
                     if file_path.is_file():
                         archive_name_in_zip = file_path.relative_to(custom_model_dir.parent)
                         zipf.write(file_path, arcname=archive_name_in_zip)
-                        # Show progress for large files
+                        # Zeige Fortschritt für große Dateien
                         if file_path.stat().st_size > 100 * 1024 * 1024:  # > 100 MB
                             file_size_mb = file_path.stat().st_size / (1024 * 1024)
                             print(f"     📄 {file_path.name} ({file_size_mb:.1f} MB)")
             
-            # Calculate size
+            # Größe berechnen
             model_size = model_zip_path.stat().st_size / (1024 * 1024)  # MB
-            print(f"  ✅ Model archive created: {model_size:.1f} MB")
+            print(f"  ✅ Modell-Archiv erstellt: {model_size:.1f} MB")
         else:
-            print(f"  ⚠️ CustomModel directory not found or empty")
-            print(f"     Expected path: {custom_model_dir}")
+            print(f"  ⚠️ CustomModel Verzeichnis nicht gefunden oder leer")
+            print(f"     Erwarteter Pfad: {custom_model_dir}")
         
-        # Update metrics with archive information
+        # Metriken aktualisieren mit Archiv-Informationen
         self.metrics['archive_info'] = {
             'timestamp': timestamp,
             'model_name': model_name,
@@ -1404,21 +1404,21 @@ def get_api_config(module_id):
             'total_files': total_file_count
         }
         
-        # Save final metrics
+        # Finale Metriken speichern
         final_metrics_file = output_base / f"{archive_name}_pipeline_metrics.json"
         with open(final_metrics_file, 'w', encoding='utf-8') as f:
             json.dump(self.metrics, f, indent=2, ensure_ascii=False, default=str)
-        print(f"\n📊 Final metrics saved: {final_metrics_file.name}")
+        print(f"\n📊 Finale Metriken gespeichert: {final_metrics_file.name}")
         
-        # Step 4: Clean up source directories
-        print(f"\n🧹 CLEANING UP SOURCE DIRECTORIES")
+        # Schritt 4: Bereinigung der Quellverzeichnisse
+        print(f"\n🧹 BEREINIGUNG DER QUELLVERZEICHNISSE")
         
-        # In auto mode: Automatic cleanup if cleanup_after is set
+        # Im Auto-Modus: Automatische Bereinigung wenn cleanup_after gesetzt
         if self.auto_mode and self.cleanup_after:
-            print("🤖 Auto mode: Performing automatic cleanup...")
+            print("🤖 Auto-Modus: Führe automatische Bereinigung durch...")
             cleanup_confirm = 'y'
         else:
-            cleanup_confirm = input("Clean up source directories now? (y/n) [y]: ").lower().strip()
+            cleanup_confirm = input("Quellverzeichnisse jetzt bereinigen? (y/n) [y]: ").lower().strip()
         
         if cleanup_confirm != 'n':
             cleanup_dirs = [
@@ -1428,14 +1428,14 @@ def get_api_config(module_id):
                 'modules/04_format/OUTPUT',
                 'modules/05_bmcreator/BENCHMARKFRAGEN',
                 'modules/07_benchmark/OUTPUT',
-                'modules/06_finetuning/CustomModel'  # Corrected path
+                'modules/06_finetuning/CustomModel'  # Korrigierter Pfad
             ]
             
             cleaned_count = 0
             for cleanup_dir in cleanup_dirs:
                 cleanup_path = base_dir / cleanup_dir
                 if cleanup_path.exists():
-                    # Special handling for CustomModel (only delete content, not the directory)
+                    # Spezialbehandlung für CustomModel (nur Inhalt löschen, nicht das Verzeichnis)
                     if 'CustomModel' in str(cleanup_path):
                         for item in cleanup_path.iterdir():
                             if item.is_file():
@@ -1444,60 +1444,60 @@ def get_api_config(module_id):
                             elif item.is_dir():
                                 shutil.rmtree(item)
                                 cleaned_count += 1
-                        print(f"  🗑️ CustomModel content cleaned")
+                        print(f"  🗑️ CustomModel Inhalt bereinigt")
                     else:
-                        # For other directories: only delete files
+                        # Für andere Verzeichnisse: nur Dateien löschen
                         for item in cleanup_path.iterdir():
                             if item.is_file():
                                 item.unlink()
                                 cleaned_count += 1
-                                print(f"  🗑️ Deleted: {cleanup_dir}/{item.name}")
+                                print(f"  🗑️ Gelöscht: {cleanup_dir}/{item.name}")
             
-            print(f"  📊 Total {cleaned_count} items cleaned")
-            print(f"  🔒 Viewer files preserved for further use")
+            print(f"  📊 Insgesamt {cleaned_count} Elemente bereinigt")
+            print(f"  🔒 Viewer-Dateien bleiben erhalten für weitere Nutzung")
         
-        # Summary
+        # Zusammenfassung
         print(f"\n{'='*60}")
-        print("📊 ARCHIVING COMPLETED")
+        print("📊 ARCHIVIERUNG ABGESCHLOSSEN")
         print(f"{'='*60}")
-        print(f"📁 Target directory: {output_base}")
-        print(f"🤖 Model: {model_name}")
+        print(f"📁 Zielverzeichnis: {output_base}")
+        print(f"🤖 Modell: {model_name}")
         print(f"🕒 Timestamp: {timestamp}")
-        print(f"\n📦 Created archives:")
+        print(f"\n📦 Erstellte Archive:")
         
-        # List all created archives
+        # Liste alle erstellten Archive auf
         for archive_file in output_base.glob(f"{model_name}_{timestamp}_*.zip"):
             archive_size = archive_file.stat().st_size / (1024 * 1024)
             print(f"  • {archive_file.name} ({archive_size:.1f} MB)")
         
-        # List metrics files
+        # Liste Metrik-Dateien
         for metrics_file in output_base.glob(f"{model_name}_{timestamp}_*.json"):
             file_size = metrics_file.stat().st_size / 1024
             print(f"  • {metrics_file.name} ({file_size:.1f} KB)")
         
-        # Calculate total size
+        # Gesamtgröße berechnen
         total_size = sum(
             f.stat().st_size for f in output_base.glob(f"{model_name}_{timestamp}_*")
         ) / (1024 * 1024)
         
-        print(f"\n💾 Total size of all files: {total_size:.1f} MB")
-        print(f"📊 Total {total_file_count} files archived")
+        print(f"\n💾 Gesamtgröße aller Dateien: {total_size:.1f} MB")
+        print(f"📊 Insgesamt {total_file_count} Dateien archiviert")
         
-        # Show important metrics
+        # Zeige wichtige Metriken
         if self.metrics.get('benchmark_results', {}).get('comparison_available'):
-            print(f"\n🏆 Benchmark Results:")
+            print(f"\n🏆 Benchmark-Ergebnisse:")
             print(f"  Pre-Score: {self.metrics['benchmark_results']['pre_score']:.1f}%")
             print(f"  Post-Score: {self.metrics['benchmark_results']['post_score']:.1f}%")
-            print(f"  Improvement: {self.metrics['benchmark_results']['improvement']:+.1f}%")
+            print(f"  Verbesserung: {self.metrics['benchmark_results']['improvement']:+.1f}%")
         
         print(f"{'='*60}")
         
         return True
 
     def run_step(self, step):
-        """Executes a single pipeline step and collects metrics"""
+        """Führt einen einzelnen Pipeline-Schritt aus und sammelt Metriken"""
         
-        # Special handling for step 8 (archiving)
+        # Spezialbehandlung für Schritt 8 (Archivierung)
         if step['id'] == 8:
             step_start = datetime.now()
             success = self.transfer_and_archive_results()
@@ -1513,10 +1513,10 @@ def get_api_config(module_id):
             return success
         
         print(f"\n{'='*60}")
-        print(f"📋 STEP {step['id']}/8: {step['name'].upper()}")
+        print(f"📋 SCHRITT {step['id']}/8: {step['name'].upper()}")
         print(f"{'='*60}")
         
-        # Initialize step metrics
+        # Initialisiere Step-Metriken
         step_metrics = {
             'name': step['name'],
             'start_time': datetime.now().isoformat(),
@@ -1529,36 +1529,36 @@ def get_api_config(module_id):
         
         step_start = datetime.now()
         
-        # After fine-tuning: Update post-model path
-        if step['id'] == 6: # After fine-tuning
-            print("\n🔄 Updating post-model path after fine-tuning...")
+        # Nach dem Fine-tuning: Aktualisiere Post-Model Pfad
+        if step['id'] == 6: # Nach Fine-tuning
+            print("\n🔄 Aktualisiere Post-Model Pfad nach Fine-tuning...")
             self.update_post_model_path()
         
-        # Prepare working directory
+        # Arbeitsverzeichnis vorbereiten
         working_dir = step['working_dir']
-        print(f"📁 Working directory: {working_dir}")
+        print(f"📁 Arbeitsverzeichnis: {working_dir}")
         
-        # Create directories
+        # Verzeichnisse erstellen
         for subdir in step['directories']:
             dir_path = os.path.join(working_dir, subdir)
             os.makedirs(dir_path, exist_ok=True)
             print(f" ✅ {dir_path}")
         
-        # Count input files before step
+        # Zähle Input-Dateien vor dem Schritt
         if 'INPUT' in step['directories']:
             input_dir = os.path.join(working_dir, 'INPUT')
             if os.path.exists(input_dir):
                 step_metrics['files_processed'] = len(os.listdir(input_dir))
         
-        # Copy files from previous step
+        # Dateien vom vorherigen Schritt kopieren
         if step['id'] > 1:
             self.copy_files_between_steps(step['id'])
         
-        # Set config path as environment variable
+        # Setze Config-Pfad als Umgebungsvariable
         env = os.environ.copy()
         env["PIPELINE_CONFIG_PATH"] = os.path.abspath(self.config_file)
         
-        print(f"\n🚀 Starting {step['name']}...")
+        print(f"\n🚀 Starte {step['name']}...")
         print("=" * 60)
         
         try:
@@ -1574,14 +1574,14 @@ def get_api_config(module_id):
             step_metrics['duration_seconds'] = step_duration
             
             if result.returncode == 0:
-                print(f"✅ {step['name']} successful!")
+                print(f"✅ {step['name']} erfolgreich!")
                 step_metrics['success'] = True
                 
-                # After fine-tuning: Update post-model path
+                # Nach dem Fine-tuning: Update Post-Model Path
                 if step['id'] == 6:
                     self.update_post_model_path()
                 
-                # Count output files after step
+                # Zähle Output-Dateien nach dem Schritt
                 if 'OUTPUT' in step['directories']:
                     output_dir = os.path.join(working_dir, 'OUTPUT')
                     if os.path.exists(output_dir):
@@ -1591,7 +1591,7 @@ def get_api_config(module_id):
                     if os.path.exists(output_dir):
                         step_metrics['files_created'] = len(os.listdir(output_dir))
                 
-                # Capture specific metrics per step
+                # Erfasse spezifische Metriken pro Schritt
                 if step['id'] == 2:  # Wiki Generation
                     output_dir = os.path.join(working_dir, 'OUTPUT')
                     lexikon_stats = self.analyze_lexikon_files(output_dir)
@@ -1612,20 +1612,20 @@ def get_api_config(module_id):
                 self.metrics['steps'][f"step_{step['id']}"] = step_metrics
                 return True
             else:
-                print(f"❌ {step['name']} failed (Code: {result.returncode})")
+                print(f"❌ {step['name']} fehlgeschlagen (Code: {result.returncode})")
                 step_metrics['error'] = f"Return code: {result.returncode}"
                 self.metrics['steps'][f"step_{step['id']}"] = step_metrics
                 self.metrics['errors'].append(f"Step {step['id']} failed: {step['name']}")
                 return False
                 
         except KeyboardInterrupt:
-            print("\n⚠️ Cancelled")
+            print("\n⚠️ Abgebrochen")
             step_metrics['error'] = "User interrupted"
             step_metrics['duration_seconds'] = (datetime.now() - step_start).total_seconds()
             self.metrics['steps'][f"step_{step['id']}"] = step_metrics
             return False
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"❌ Fehler: {e}")
             step_metrics['error'] = str(e)
             step_metrics['duration_seconds'] = (datetime.now() - step_start).total_seconds()
             self.metrics['steps'][f"step_{step['id']}"] = step_metrics
@@ -1633,61 +1633,61 @@ def get_api_config(module_id):
             return False
 
     def cleanup(self):
-        """Offers cleanup of previous runs"""
+        """Bietet Bereinigung vorheriger Läufe an"""
         print("\n🧹 CLEANUP")
         print("="*60)
         
         dirs_to_clean = []
         for step in STEPS:
-            if step['script']:  # Only for real modules (not step 8)
+            if step['script']:  # Nur für echte Module (nicht Schritt 8)
                 for subdir in step['directories']:
                     dir_path = os.path.join(step['working_dir'], subdir)
                     if os.path.exists(dir_path) and os.listdir(dir_path):
                         dirs_to_clean.append(dir_path)
         
         if not dirs_to_clean:
-            print("✅ No temporary files found")
+            print("✅ Keine temporären Dateien gefunden")
             return
         
-        print("Found temporary directories:")
+        print("Gefundene temporäre Verzeichnisse:")
         for dir_path in dirs_to_clean:
             file_count = len(os.listdir(dir_path))
-            print(f" • {dir_path} ({file_count} files)")
+            print(f" • {dir_path} ({file_count} Dateien)")
         
-        if input("\n🧹 Delete everything? (y/n) [n]: ").lower().strip() == 'y':
+        if input("\n🧹 Alles löschen? (y/n) [n]: ").lower().strip() == 'y':
             for dir_path in dirs_to_clean:
                 try:
                     shutil.rmtree(dir_path)
                     os.makedirs(dir_path, exist_ok=True)
-                    print(f" ✅ Cleaned: {dir_path}")
+                    print(f" ✅ Bereinigt: {dir_path}")
                 except Exception as e:
-                    print(f" ❌ Error with {dir_path}: {e}")
+                    print(f" ❌ Fehler bei {dir_path}: {e}")
 
     def run(self, start_step=1, end_step=8):
-        """Runs the pipeline and collects metrics"""
+        """Führt die Pipeline aus und sammelt Metriken"""
         print("\n" + "="*60)
         print("🚀 OpenTuneWeaver Pipeline - SIMPLIFIED")
         print("="*60)
-        print(f"📋 Version: 5.3 (with metrics collection)")
+        print(f"📋 Version: 5.3 (mit Metrik-Erfassung)")
         print(f"⏰ Start: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"📍 Steps: {start_step} to {end_step}")
+        print(f"📍 Schritte: {start_step} bis {end_step}")
         print("="*60)
         
-        # Load/create config
+        # Config laden/erstellen
         self.load_or_create_config()
         
-        # Copy config loader
+        # Config-Loader kopieren
         if not os.path.exists("config_loader.py"):
             self.copy_config_loader()
         
-        # Set up environment
+        # Umgebung einrichten
         self.setup_environment()
         
-        # Offer cleanup
+        # Cleanup anbieten
         if self.config.get("pipeline", {}).get("auto_cleanup", False):
             self.cleanup()
         
-        # Execute steps
+        # Schritte ausführen
         completed = []
         failed = []
         
@@ -1702,109 +1702,109 @@ def get_api_config(module_id):
             else:
                 failed.append(step['name'])
                 if not self.config.get("pipeline", {}).get("continue_on_error", True):
-                    print("❌ Pipeline stopped due to error")
+                    print("❌ Pipeline gestoppt wegen Fehler")
                     break
                 
-                if input("Continue anyway? (y/n) [y]: ").lower().strip() == 'n':
+                if input("Trotzdem fortfahren? (y/n) [y]: ").lower().strip() == 'n':
                     break
             
             if step['id'] < end_step:
                 time.sleep(2)
         
-        # Final metrics
+        # Finale Metriken
         self.metrics['completed_steps'] = completed
         self.metrics['failed_steps'] = failed
         
-        # Summary
+        # Zusammenfassung
         duration = datetime.now() - self.start_time
         print(f"\n{'='*60}")
-        print("📊 PIPELINE SUMMARY")
+        print("📊 PIPELINE-ZUSAMMENFASSUNG")
         print(f"{'='*60}")
-        print(f"⏱️ Duration: {duration}")
-        print(f"✅ Successful: {len(completed)} steps")
+        print(f"⏱️ Dauer: {duration}")
+        print(f"✅ Erfolgreich: {len(completed)} Schritte")
         
         if completed:
             for name in completed:
                 print(f" • {name}")
         
         if failed:
-            print(f"❌ Failed: {len(failed)} steps")
+            print(f"❌ Fehlgeschlagen: {len(failed)} Schritte")
             for name in failed:
                 print(f" • {name}")
         
-        # Show important metrics
+        # Zeige wichtige Metriken
         if self.metrics.get('data_statistics'):
-            print(f"\n📊 DATA STATISTICS:")
+            print(f"\n📊 DATEN-STATISTIKEN:")
             stats = self.metrics['data_statistics']
             
             if 'lexikon' in stats and stats['lexikon']:
-                print(f" • Lexicon entries: {stats['lexikon'].get('total_entries', 0)}")
+                print(f" • Lexikon-Einträge: {stats['lexikon'].get('total_entries', 0)}")
             if 'qa_dataset' in stats and stats['qa_dataset']:
-                print(f" • QA pairs created: {stats['qa_dataset'].get('total_qa_pairs', 0)}")
+                print(f" • QA-Paare erstellt: {stats['qa_dataset'].get('total_qa_pairs', 0)}")
             if 'benchmark_questions' in stats and stats['benchmark_questions']:
-                print(f" • Benchmark questions: {stats['benchmark_questions'].get('total_questions', 0)}")
+                print(f" • Benchmark-Fragen: {stats['benchmark_questions'].get('total_questions', 0)}")
             if 'training' in stats and stats['training'].get('model_trained'):
-                print(f" • Model trained: ✅")
+                print(f" • Modell trainiert: ✅")
                 if stats['training'].get('merged_model_available'):
                     print(f"   - Merged Model: ✅")
                 if stats['training'].get('gguf_available'):
                     print(f"   - GGUF Export: ✅")
         
         if self.metrics.get('benchmark_results', {}).get('comparison_available'):
-            print(f"\n🏆 BENCHMARK RESULTS:")
+            print(f"\n🏆 BENCHMARK-ERGEBNISSE:")
             br = self.metrics['benchmark_results']
             print(f" • Pre-Finetuning: {br['pre_score']:.1f}%")
             print(f" • Post-Finetuning: {br['post_score']:.1f}%")
-            print(f" • Improvement: {br['improvement']:+.1f}%")
+            print(f" • Verbesserung: {br['improvement']:+.1f}%")
         
         print(f"{'='*60}")
-        print("✨ Pipeline completed!")
+        print("✨ Pipeline abgeschlossen!")
         
-        # Save final metrics
+        # Speichere finale Metriken
         if self.config.get("pipeline", {}).get("save_metrics", True):
             self.save_metrics()
 
 def main():
-    """Main function with support for automated mode"""
+    """Hauptfunktion mit Unterstützung für automatisierten Modus"""
     import argparse
     
-    # Command line arguments for automation
+    # Kommandozeilenargumente für Automatisierung
     parser = argparse.ArgumentParser(description='OpenTuneWeaver Pipeline Runner')
     parser.add_argument('--auto', action='store_true', 
-                       help='Automated mode (no input required)')
+                       help='Automatisierter Modus (keine Eingaben erforderlich)')
     parser.add_argument('--mode', type=str, default='full',
                        choices=['full', 'data', 'training', 'single', 'custom', 'archive', 'cleanup'],
-                       help='Pipeline mode: full(1-8), data(1-5), training(6-7), single, custom, archive(8), cleanup')
+                       help='Pipeline-Modus: full(1-8), data(1-5), training(6-7), single, custom, archive(8), cleanup')
     parser.add_argument('--step', type=int, default=1,
-                       help='Single step (for mode=single)')
+                       help='Einzelner Schritt (für mode=single)')
     parser.add_argument('--start', type=int, default=1,
-                       help='Start step (for mode=custom)')
+                       help='Start-Schritt (für mode=custom)')
     parser.add_argument('--end', type=int, default=8,
-                       help='End step (for mode=custom)')
+                       help='End-Schritt (für mode=custom)')
     parser.add_argument('--use-existing-config', action='store_true', default=True,
-                       help='Use existing configuration without asking')
+                       help='Verwende existierende Konfiguration ohne Nachfrage')
     parser.add_argument('--cleanup-after', action='store_true', default=True,
-                       help='Automatic cleanup after pipeline')
+                       help='Automatische Bereinigung nach Pipeline')
     
     args = parser.parse_args()
     
     runner = SimplifiedPipelineRunner()
     
-    # Set flags for automated mode
+    # Setze Flags für automatisierten Modus
     if args.auto:
         runner.auto_mode = True
         runner.use_existing_config = args.use_existing_config
         runner.cleanup_after = args.cleanup_after
         
         print("\n" + "="*60)
-        print("🤖 OpenTuneWeaver Pipeline Runner - AUTOMATED MODE")
+        print("🤖 OpenTuneWeaver Pipeline Runner - AUTOMATISIERTER MODUS")
         print("="*60)
-        print(f"📋 Mode: {args.mode}")
-        print(f"✅ Use existing config: {args.use_existing_config}")
-        print(f"🧹 Cleanup after pipeline: {args.cleanup_after}")
+        print(f"📋 Modus: {args.mode}")
+        print(f"✅ Verwende existierende Config: {args.use_existing_config}")
+        print(f"🧹 Cleanup nach Pipeline: {args.cleanup_after}")
         print("="*60)
         
-        # Run pipeline based on mode
+        # Führe Pipeline basierend auf Modus aus
         if args.mode == 'full':
             runner.run(1, 8)
         elif args.mode == 'data':
@@ -1820,18 +1820,18 @@ def main():
         elif args.mode == 'cleanup':
             runner.cleanup()
     else:
-        # Interactive mode (original)
+        # Interaktiver Modus (Original)
         print("\n" + "="*60)
         print("🎯 OpenTuneWeaver Pipeline Runner")
         print("="*60)
         
-        print("\n📋 Pipeline Options:")
-        print("1. 🔄 Complete pipeline with archiving (1-8)")
-        print("2. 📝 Data processing only (1-5)")
-        print("3. 🤖 Training & benchmark only (6-7)")
-        print("4. ⚙️ Single step")
-        print("5. 🎯 Custom")
-        print("6. 📦 Archiving only (8)")
+        print("\n📋 Pipeline-Optionen:")
+        print("1. 🔄 Komplette Pipeline mit Archivierung (1-8)")
+        print("2. 📝 Nur Datenverarbeitung (1-5)")
+        print("3. 🤖 Nur Training & Benchmark (6-7)")
+        print("4. ⚙️ Einzelner Schritt")
+        print("5. 🎯 Benutzerdefiniert")
+        print("6. 📦 Nur Archivierung (8)")
         print("7. 🧹 Cleanup")
         
         choice = input("\nOption (1-7) [1]: ").strip() or "1"
@@ -1843,27 +1843,27 @@ def main():
         elif choice == "3":
             runner.run(6, 7)
         elif choice == "4":
-            step_num = int(input("Which step (1-8)? "))
+            step_num = int(input("Welcher Schritt (1-8)? "))
             runner.run(step_num, step_num)
         elif choice == "5":
-            start = int(input("Start step [1]: ").strip() or "1")
-            end = int(input("End step [8]: ").strip() or "8")
+            start = int(input("Start-Schritt [1]: ").strip() or "1")
+            end = int(input("End-Schritt [8]: ").strip() or "8")
             runner.run(start, end)
         elif choice == "6":
             runner.run(8, 8)
         elif choice == "7":
             runner.cleanup()
         else:
-            print("❌ Invalid option")
+            print("❌ Ungültige Option")
 
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\n⚠️ Pipeline cancelled")
+        print("\n⚠️ Pipeline abgebrochen")
         sys.exit(1)
     except Exception as e:
-        print(f"\n❌ Error: {e}")
+        print(f"\n❌ Fehler: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)

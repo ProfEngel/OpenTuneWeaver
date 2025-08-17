@@ -3,14 +3,14 @@
 """
 OTW Benchmark Script - VERSION 5.2 + AUTO-DOWNLOAD + DYNAMIC BASE MODEL
 
-With automatic download of base model and dynamic detection
-from finetuning configuration for consistent benchmarks.
+Mit automatischem Download des Basis-Modells und dynamischer Erkennung
+aus der Finetuning-Konfiguration für konsistente Benchmarks.
 
-MAIN IMPROVEMENTS:
-- Automatic download of base model if not in cache
-- Dynamic detection of used base model from finetuning config
-- Consistent comparison: same base model for PRE and POST
-- Batch mode to avoid VRAM conflicts remains preserved
+HAUPTVERBESSERUNGEN:
+- Automatisches Herunterladen des Basis-Modells wenn nicht im Cache
+- Dynamische Erkennung des verwendeten Basis-Modells aus Finetuning-Config
+- Konsistenter Vergleich: gleiches Basis-Modell für PRE und POST
+- Batch-Modus zur VRAM-Konflikt-Vermeidung bleibt erhalten
 """
 
 import json
@@ -27,27 +27,27 @@ import sys
 from pathlib import Path
 
 # ========================================
-# LOAD CENTRAL CONFIGURATION
+# ZENTRALE KONFIGURATION LADEN
 # ========================================
 
-sys.path.append(str(Path(__file__).parent.parent.parent))  # To main directory
+sys.path.append(str(Path(__file__).parent.parent.parent))  # Zum Hauptverzeichnis
 from config_loader import PipelineConfigLoader
 
-# Load configuration
+# Lade Konfiguration
 config_loader = PipelineConfigLoader()
 bm_config = config_loader.get_benchmark_config()
 tokens = config_loader.get_tokens()
 
-# Show loaded configuration
+# Zeige geladene Konfiguration
 print("=" * 60)
-print("📋 CONFIGURATION LOADED (07_benchmark + BATCH MODE)")
+print("📋 KONFIGURATION GELADEN (07_benchmark + BATCH MODUS)")
 print("=" * 60)
 config_loader.print_config_summary()
 
-print(f"\n📊 Mode: {bm_config.get('mode', 'Unknown')}")
+print(f"\n📊 Modus: {bm_config.get('mode', 'Unknown')}")
 print(f"⚖️ Evaluator: {bm_config.get('evaluator', {}).get('type', 'Unknown')}")
 print(f"🔑 HF-Token: {'✅' if tokens.get('hf_token') else '❌'}")
-print(f"🚀 Batch mode: Activated (avoids VRAM conflicts)")
+print(f"🚀 Batch-Modus: Aktiviert (vermeidet VRAM-Konflikte)")
 print("=" * 60)
 
 # =============================================================================
@@ -60,52 +60,52 @@ def setup_hf_cache_optimization():
     os.environ["HF_HOME"] = cache_base
     os.environ["HUGGINGFACE_HUB_CACHE"] = os.path.join(cache_base, "hub")
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
-    print(f"🗄️ HF Cache optimized: {cache_base}")
+    print(f"🗄️ HF Cache optimiert: {cache_base}")
     return cache_base
 
-# Setup cache and set tokens
+# Setup cache und setze Tokens
 cache_base = setup_hf_cache_optimization()
 
-# Set HF tokens from central config
+# Setze HF-Tokens aus zentraler Config
 if tokens.get('hf_token'):
     os.environ["HF_TOKEN"] = tokens['hf_token']
     os.environ["HUGGINGFACE_TOKEN"] = tokens['hf_token']
     os.environ["HUGGINGFACE_HUB_TOKEN"] = tokens['hf_token']
     hf_token = tokens['hf_token']
-    print(f"🔑 HF_TOKEN loaded from pipeline_config.json")
+    print(f"🔑 HF_TOKEN aus pipeline_config.json geladen")
 else:
     hf_token = None
-    print("⚠️ No HF_TOKEN found in pipeline_config.json")
+    print("⚠️ Kein HF_TOKEN in pipeline_config.json gefunden")
 
-# 🚨 CRITICAL FIX: Disable PyTorch Dynamo/torch.compile for stability
+# 🚨 KRITISCHER FIX: Deaktiviere PyTorch Dynamo/torch.compile für Stabilität
 os.environ['TORCH_COMPILE_DISABLE'] = '1'
 os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
 
 import torch
 
-# Global Dynamo deactivation
+# Globale Dynamo-Deaktivierung
 try:
     import torch._dynamo as dynamo
     dynamo.reset()
     torch._dynamo.config.disable = True
     torch._dynamo.config.suppress_errors = True
-    print("✅ PyTorch Dynamo/Compile disabled for stability")
+    print("✅ PyTorch Dynamo/Compile deaktiviert für Stabilität")
 except:
     pass
 
-# IMPORTANT: Import Unsloth before Transformers
+# WICHTIG: Unsloth vor Transformers importieren
 try:
     from unsloth import FastModel
     from unsloth.chat_templates import get_chat_template
     UNSLOTH_AVAILABLE = True
 except ImportError:
-    print("⚠️ Unsloth not available - using Transformers only")
+    print("⚠️ Unsloth nicht verfügbar - verwende nur Transformers")
     UNSLOTH_AVAILABLE = False
 
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from openai import OpenAI
 
-# Matplotlib for visualizations
+# Matplotlib für Visualisierungen
 try:
     import matplotlib.pyplot as plt
     import numpy as np
@@ -113,32 +113,32 @@ try:
     MATPLOTLIB_AVAILABLE = True
     import matplotlib
     matplotlib.use('Agg')
-    print("✅ Matplotlib available - visualizations enabled")
+    print("✅ Matplotlib verfügbar - Visualisierungen aktiviert")
 except ImportError:
-    print("⚠️ Matplotlib not available")
+    print("⚠️ Matplotlib nicht verfügbar")
     MATPLOTLIB_AVAILABLE = False
 
 # =============================================================================
-# DYNAMIC BASE MODEL DETECTION
+# DYNAMISCHE BASIS-MODELL ERKENNUNG
 # =============================================================================
 
 def get_base_model_from_finetuning():
-    """Determines the base model used in finetuning from config"""
+    """Ermittelt das im Finetuning verwendete Basis-Modell aus der Config"""
     ft_config = config_loader.get_finetuning_config()
     base_model = ft_config.get('base_model', 'unsloth/gemma-3n-E2B-it')
     
-    print(f"🔍 Base model from finetuning config: {base_model}")
+    print(f"🔍 Basis-Modell aus Finetuning-Config: {base_model}")
     return base_model
 
 def find_trained_model():
-    """Finds the trained model (adapter or merged)"""
+    """Findet das trainierte Modell (Adapter oder Merged)"""
     ft_config = config_loader.get_finetuning_config()
     custom_model_dir = ft_config.get('custom_model_dir', 'CustomModel')
     model_name = ft_config.get('model_name', 'model')
     
-    print(f"🔍 Looking for trained model: {model_name} in {custom_model_dir}")
+    print(f"🔍 Suche trainiertes Modell: {model_name} in {custom_model_dir}")
     
-    # Check various path combinations
+    # Prüfe verschiedene Pfad-Kombinationen
     paths_to_check = [
         (f"../06_finetuning/{custom_model_dir}/{model_name}", "adapter"),
         (f"../06_finetuning/{custom_model_dir}/{model_name}_merged", "merged"),
@@ -158,44 +158,44 @@ def find_trained_model():
             ):
                 return os.path.abspath(path), "merged"
     
-    # Fallback to adapter if nothing found
+    # Fallback auf Adapter wenn nichts gefunden
     default_path = f"../06_finetuning/{custom_model_dir}/{model_name}"
     return default_path, "adapter"
 
 # =============================================================================
-# FALLBACK FUNCTIONS FOR BASE + ADAPTER
+# FALLBACK-FUNKTIONEN FÜR BASE + ADAPTER
 # =============================================================================
 
 def find_adapter_for_merged(merged_path):
-    """Finds the corresponding adapter path for a merged model"""
-    print(f"   🔍 Looking for adapter for: {merged_path}")
+    """Findet den entsprechenden Adapter-Pfad für ein merged Modell"""
+    print(f"   🔍 Suche Adapter für: {merged_path}")
     
-    # If path doesn't end with _merged, it's probably already the adapter
+    # Wenn der Pfad bereits OHNE _merged ist, ist es wahrscheinlich der Adapter
     if not merged_path.endswith('_merged'):
         if os.path.exists(merged_path) and os.path.exists(os.path.join(merged_path, 'adapter_config.json')):
-            print(f"   ✅ Path is already the adapter: {merged_path}")
+            print(f"   ✅ Pfad ist bereits der Adapter: {merged_path}")
             return merged_path
     
-    # Remove _merged from name
+    # Entferne _merged vom Namen
     adapter_path = merged_path.replace('_merged', '')
     
     if os.path.exists(adapter_path):
-        # Check if it's a PEFT adapter
+        # Prüfe ob es ein PEFT-Adapter ist
         if os.path.exists(os.path.join(adapter_path, 'adapter_config.json')):
-            print(f"   ✅ Adapter found: {adapter_path}")
+            print(f"   ✅ Adapter gefunden: {adapter_path}")
             return adapter_path
     
-    # If merged_path is absolute, try in same directory
+    # Wenn merged_path ein absoluter Pfad ist, versuche im gleichen Verzeichnis
     if os.path.isabs(merged_path):
         parent = os.path.dirname(merged_path)
         adapter_name = os.path.basename(merged_path).replace('_merged', '')
         possible_adapter = os.path.join(parent, adapter_name)
         
         if os.path.exists(possible_adapter) and os.path.exists(os.path.join(possible_adapter, 'adapter_config.json')):
-            print(f"   ✅ Adapter found: {possible_adapter}")
+            print(f"   ✅ Adapter gefunden: {possible_adapter}")
             return possible_adapter
     
-    # Additional search paths
+    # Weitere Suchpfade
     parent = os.path.dirname(merged_path) if merged_path else "."
     adapter_name = os.path.basename(merged_path).replace('_merged', '') if merged_path else ""
     
@@ -208,18 +208,18 @@ def find_adapter_for_merged(merged_path):
     
     for path in possible_paths:
         if os.path.exists(path) and os.path.exists(os.path.join(path, 'adapter_config.json')):
-            print(f"   ✅ Adapter found: {path}")
+            print(f"   ✅ Adapter gefunden: {path}")
             return path
             
-    print(f"   ❌ No adapter found for: {merged_path}")
+    print(f"   ❌ Kein Adapter gefunden für: {merged_path}")
     return None
 
 def get_base_model_for_adapter(adapter_path):
-    """Determines base model from adapter_config.json"""
+    """Ermittelt das Base-Modell aus der adapter_config.json"""
     config_path = os.path.join(adapter_path, 'adapter_config.json')
     
     if not os.path.exists(config_path):
-        # Fallback to base model from finetuning config
+        # Fallback auf Basis-Modell aus Finetuning-Config
         return get_base_model_from_finetuning()
     
     try:
@@ -228,18 +228,18 @@ def get_base_model_for_adapter(adapter_path):
         
         base_model = config.get('base_model_name_or_path')
         if not base_model:
-            # Fallback to finetuning config
+            # Fallback auf Finetuning-Config
             base_model = get_base_model_from_finetuning()
         
-        print(f"   📋 Base model from adapter config: {base_model}")
+        print(f"   📋 Base-Modell aus Adapter-Config: {base_model}")
         return base_model
         
     except Exception as e:
-        print(f"   ⚠️ Error reading adapter config: {e}")
+        print(f"   ⚠️ Fehler beim Lesen der Adapter-Config: {e}")
         return get_base_model_from_finetuning()
 
 # =============================================================================
-# IMPROVED MEMORY FUNCTIONS WITH OLLAMA SUPPORT
+# VERBESSERTE MEMORY-FUNKTIONEN MIT OLLAMA-SUPPORT
 # =============================================================================
 
 def cleanup_memory():
@@ -250,87 +250,87 @@ def cleanup_memory():
         torch.cuda.synchronize()
 
 def aggressive_cleanup():
-    """Aggressive memory cleanup with multiple passes"""
-    print("🧹 Aggressive memory cleanup...")
+    """Aggressives Memory Cleanup mit mehreren Durchgängen"""
+    print("🧹 Aggressives Memory Cleanup...")
     
-    # Python Garbage Collection - multiple passes
+    # Python Garbage Collection - mehrere Durchgänge
     for i in range(5):
         gc.collect()
     
     # PyTorch CUDA Cleanup
     if torch.cuda.is_available():
-        # Clear cache
+        # Cache leeren
         torch.cuda.empty_cache()
         torch.cuda.synchronize()
         
-        # Collect IPC memory
+        # IPC Memory sammeln
         torch.cuda.ipc_collect()
         
-        # Reset stats
+        # Stats zurücksetzen
         torch.cuda.reset_peak_memory_stats()
         torch.cuda.reset_accumulated_memory_stats()
         
-        # Clear cache again after reset
+        # Nochmals Cache leeren nach Reset
         torch.cuda.empty_cache()
         
-        # Additional memory cleanup
+        # Zusätzliche Memory-Bereinigung
         try:
             torch.cuda.reset_cached_memory_stats()
             torch.cuda.synchronize()
         except:
             pass
     
-    # Wait briefly for OS to clean up
+    # Warte kurz, damit OS aufräumen kann
     time.sleep(2)
 
 def cleanup_ollama_memory():
-    """Specific cleanup for Ollama server"""
-    print("🦙 Ollama memory cleanup...")
+    """Spezifisches Cleanup für Ollama-Server"""
+    print("🦙 Ollama Memory-Cleanup...")
     
-    # Optional: Ollama API call for memory cleanup
+    # Optional: Ollama API-Call zum Memory-Cleanup
     try:
         import requests
         
-        # Use API URL from configuration
+        # Verwende die API-URL aus der Konfiguration
         evaluator_config = bm_config.get('evaluator', {})
         base_url = evaluator_config.get('api_base_url', "http://localhost:11434")
         model = evaluator_config.get('model', "gemma3:12b-it-qat")
         
-        # Remove /v1 suffix for direct Ollama API
+        # Entferne /v1 suffix für direkte Ollama API
         ollama_url = base_url.replace('/v1', '')
         
         requests.post(f"{ollama_url}/api/generate", 
                      json={"model": model, "keep_alive": 0},
                      timeout=5)
-        print("   ✅ Ollama memory release requested")
+        print("   ✅ Ollama Memory-Release angefordert")
     except Exception as e:
-        print(f"   ⚠️ Ollama memory release failed: {e}")
+        print(f"   ⚠️ Ollama Memory-Release fehlgeschlagen: {e}")
     
-    time.sleep(10)  # Wait for Ollama cleanup
+    time.sleep(10)  # Warte auf Ollama-Cleanup
 
 def wait_for_vram_free(min_gb=15):
-    """Waits until enough VRAM is free"""
+    """Wartet bis genug VRAM frei ist"""
     if not torch.cuda.is_available():
         return True
     
-    for attempt in range(30):  # Max 5 minutes wait
+    for attempt in range(30):  # Max 5 Minuten warten
         free_vram = (torch.cuda.get_device_properties(0).total_memory - 
                     torch.cuda.memory_allocated()) / 1024**3
         
         if free_vram >= min_gb:
-            print(f"   ✅ {free_vram:.1f} GB VRAM free")
+            print(f"   ✅ {free_vram:.1f} GB VRAM frei")
             return True
         
-        print(f"   ⏳ Only {free_vram:.1f} GB free, waiting... ({attempt+1}/30)")
+        print(f"   ⏳ Nur {free_vram:.1f} GB frei, warte... ({attempt+1}/30)")
         time.sleep(10)
     
-    print(f"   ❌ Timeout: Only {free_vram:.1f} GB after 5 minutes free")
+    print(f"   ❌ Timeout: Nur {free_vram:.1f} GB nach 5 Minuten frei")
     return False
 
 def force_model_unload(model_wrapper):
-    """Forces complete unloading of a model"""
+    """Forciert das komplette Entladen eines Modells"""
     if hasattr(model_wrapper, 'model') and model_wrapper.model:
-        # Try to move model to CPU before deleting
+        # Versuche Modell auf CPU zu verschieben bevor Löschen
         try:
             model_wrapper.model.cpu()
             del model_wrapper.model
@@ -348,11 +348,11 @@ def force_model_unload(model_wrapper):
             pass
         model_wrapper.tokenizer = None
     
-    # Cleanup after unloading
+    # Cleanup nach Entladen
     aggressive_cleanup()
 
 def print_memory_status(prefix=""):
-    """GPU Memory Status with more details"""
+    """GPU Memory Status mit mehr Details"""
     if torch.cuda.is_available():
         total = torch.cuda.get_device_properties(0).total_memory / 1024**3
         allocated = torch.cuda.memory_allocated() / 1024**3
@@ -361,16 +361,16 @@ def print_memory_status(prefix=""):
         
         print(f"{prefix}💾 VRAM Status:")
         print(f"   Total: {total:.1f} GB")
-        print(f"   Used: {allocated:.1f} GB ({allocated/total*100:.1f}%)")
-        print(f"   Free: {free:.1f} GB")
-        print(f"   Reserved: {reserved:.1f} GB")
+        print(f"   Belegt: {allocated:.1f} GB ({allocated/total*100:.1f}%)")
+        print(f"   Frei: {free:.1f} GB")
+        print(f"   Reserviert: {reserved:.1f} GB")
 
 def check_device_placement(model):
-    """Checks where the model actually resides"""
+    """Prüft wo das Modell tatsächlich liegt"""
     if hasattr(model, 'hf_device_map'):
         print("🔍 Device Map:", model.hf_device_map)
     
-    # Check module placement
+    # Prüfe Module-Platzierung
     cpu_modules = []
     gpu_modules = []
     
@@ -384,63 +384,63 @@ def check_device_placement(model):
     gpu_modules = list(set(gpu_modules))
     
     if cpu_modules:
-        print(f"⚠️ {len(cpu_modules)} modules on CPU!")
-        print(f"✅ {len(gpu_modules)} modules on GPU")
+        print(f"⚠️ {len(cpu_modules)} Module auf CPU!")
+        print(f"✅ {len(gpu_modules)} Module auf GPU")
         return False
     else:
-        print(f"✅ All {len(gpu_modules)} modules on GPU")
+        print(f"✅ Alle {len(gpu_modules)} Module auf GPU")
         return True
 
 def ultra_cleanup(phase):
-    """Ultra-aggressive cleanup between phases"""
-    print(f"\n🧹 ULTRA-CLEANUP after {phase}")
+    """Ultra-aggressives Cleanup zwischen Phasen"""
+    print(f"\n🧹 ULTRA-CLEANUP nach {phase}")
     
-    # Multiple cleanup passes
+    # Mehrfache Cleanup-Durchgänge
     for i in range(5):
         aggressive_cleanup()
         if torch.cuda.is_available():
             allocated = torch.cuda.memory_allocated() / 1024**3
-            print(f"   Cleanup {i+1}/5: {allocated:.1f} GB used")
+            print(f"   Cleanup {i+1}/5: {allocated:.1f} GB belegt")
             if allocated < 0.5:
-                print("   ✅ Memory successfully cleared")
+                print("   ✅ Memory erfolgreich bereinigt")
                 break
         time.sleep(2)
     
-    # Ollama-specific cleanup
+    # Ollama-spezifisches Cleanup
     cleanup_ollama_memory()
     
-    print_memory_status("   After ultra-cleanup: ")
+    print_memory_status("   Nach Ultra-Cleanup: ")
 
 # =============================================================================
-# CONFIGURATION FROM CENTRAL CONFIG - DYNAMICALLY IMPROVED
+# KONFIGURATION AUS ZENTRALER CONFIG - DYNAMISCH VERBESSERT
 # =============================================================================
 
-# Determine used base model from finetuning config
+# Ermittle das verwendete Basis-Modell aus der Finetuning-Config
 BASE_MODEL_NAME = get_base_model_from_finetuning()
 
-# Pre-Finetuning (Base model from finetuning)
+# Pre-Finetuning (Basis-Modell aus Finetuning)
 PRE_FINETUNING_CONFIG = {
-    'model_name': BASE_MODEL_NAME,  # Dynamic from finetuning config
+    'model_name': BASE_MODEL_NAME,  # Dynamisch aus Finetuning-Config
     'model_type': "base",
-    'load_in_4bit': False,  # Gemma without quantization
+    'load_in_4bit': False,  # Gemma ohne Quantization
     'max_seq_length': 2048,
     'description': f"Pre-Finetuning: {BASE_MODEL_NAME}",
     'chat_template': "gemma-3"
 }
 
-# Post-Finetuning (Trained model)
+# Post-Finetuning (Trainiertes Modell)
 trained_model_path, trained_model_type = find_trained_model()
 POST_FINETUNING_CONFIG = {
     'model_name': trained_model_path,
     'model_type': trained_model_type,
     'load_in_4bit': False,
     'max_seq_length': 2048,
-    'description': f"Post-Finetuning: Trained Adapter",
+    'description': f"Post-Finetuning: Trainierter Adapter",
     'chat_template': "gemma-3",
-    'base_model': BASE_MODEL_NAME  # For adapter loading
+    'base_model': BASE_MODEL_NAME  # Für Adapter-Loading
 }
 
-# Evaluation model
+# Bewertungsmodell
 evaluator_config = bm_config.get('evaluator', {})
 EVAL_API_CONFIG = {
     'base_url': evaluator_config.get('api_base_url', "http://localhost:11434/v1"),
@@ -463,103 +463,82 @@ INFERENCE_CONFIG = {
 BENCHMARK_MODE = bm_config.get('mode', 'comparison')
 
 # =============================================================================
-# LANGUAGE DETECTION FOR EVALUATION
-# =============================================================================
-
-def detect_language(text: str) -> str:
-    """Detects the language of the text (simple detection)."""
-    # Simple language detection based on common words
-    german_indicators = ['der', 'die', 'das', 'und', 'oder', 'ist', 'sind', 'von', 'mit', 'für', 'auf', 'in', 'zu', 'bei', 'nach', 'über', 'durch', 'unter', 'gegen', 'ohne']
-    english_indicators = ['the', 'and', 'or', 'is', 'are', 'of', 'with', 'for', 'on', 'in', 'to', 'at', 'after', 'over', 'by', 'under', 'against', 'without']
-    
-    text_lower = text.lower()
-    german_count = sum(1 for word in german_indicators if word in text_lower)
-    english_count = sum(1 for word in english_indicators if word in text_lower)
-    
-    if german_count > english_count:
-        return "German"
-    elif english_count > german_count:
-        return "English"
-    else:
-        return "German"  # Default to German for this pipeline
-
-# =============================================================================
-# INTELLIGENT MODEL DETECTION WITH FALLBACK SUPPORT
+# INTELLIGENTE MODELL-ERKENNUNG MIT FALLBACK-SUPPORT
 # =============================================================================
 
 def detect_model_type(model_name: str, config_type: str = None) -> dict:
     """
-    Detects model type and recommends optimal configuration with fallback info
+    Erkennt Modell-Typ und empfiehlt optimale Konfiguration mit Fallback-Info
     
     Args:
-        model_name: Path to model
-        config_type: Type from config ("merged", "adapter", "unknown", "base")
+        model_name: Pfad zum Modell
+        config_type: Typ aus der Config ("merged", "adapter", "unknown", "base")
     """
     model_name_lower = model_name.lower()
     
-    # Base model (PRE)
+    # Base-Modell (PRE)
     if config_type == 'base':
         return {
             'type': 'base',
             'use_quantization': False,
             'use_unsloth': False,
             'dtype': torch.bfloat16 if 'gemma' in model_name_lower else torch.float16,
-            'reason': 'Base model for PRE benchmark',
+            'reason': 'Basis-Modell für PRE-Benchmark',
             'fallback_available': False,
             'fallback_adapter': None
         }
     
-    # Use config type if available
+    # Verwende Config-Type wenn vorhanden
     if config_type == 'adapter':
-        # It's definitely an adapter
+        # Es ist definitiv ein Adapter
         adapter_path = model_name
         if adapter_path.endswith('_merged'):
             adapter_path = adapter_path.replace('_merged', '')
         
-        # Check if adapter path exists
+        # Prüfe ob der Adapter-Pfad existiert
         if os.path.exists(adapter_path) and os.path.exists(os.path.join(adapter_path, 'adapter_config.json')):
             fallback_available = True
         else:
             fallback_available = False
-            print(f"   ⚠️ Adapter path not found: {adapter_path}")
+            print(f"   ⚠️ Adapter-Pfad nicht gefunden: {adapter_path}")
         
         return {
             'type': 'adapter',
             'use_quantization': False,
             'use_unsloth': False,
             'dtype': torch.float16,
-            'reason': 'Adapter detected from config',
+            'reason': 'Adapter aus Config erkannt',
             'fallback_available': fallback_available,
             'fallback_adapter': adapter_path if fallback_available else None
         }
     
-    # Check if it's an adapter directory
+    # Prüfe ob es ein Adapter-Verzeichnis ist
     if os.path.exists(model_name) and os.path.exists(os.path.join(model_name, 'adapter_config.json')):
         return {
             'type': 'adapter',
             'use_quantization': False,
             'use_unsloth': False,
             'dtype': torch.float16,
-            'reason': 'Adapter directory detected',
+            'reason': 'Adapter-Verzeichnis erkannt',
             'fallback_available': True,
             'fallback_adapter': model_name
         }
     
-    # Gemma models - special handling for cast errors
+    # Gemma Modelle - spezielle Behandlung für Cast-Fehler
     if 'gemma' in model_name_lower:
         return {
             'type': 'gemma',
-            'use_quantization': False,  # NO 4-bit for Gemma!
+            'use_quantization': False,  # KEINE 4-bit für Gemma!
             'use_unsloth': False,
             'dtype': torch.bfloat16 if torch.cuda.is_available() else torch.float32,
-            'reason': 'Gemma detected - using bfloat16 without quantization',
+            'reason': 'Gemma erkannt - verwende bfloat16 ohne Quantization',
             'fallback_available': False,
             'fallback_adapter': None
         }
     
-    # Merged models
+    # Merged Modelle
     if '_merged' in model_name_lower:
-        # Check if adapter available for fallback
+        # Prüfe ob Adapter verfügbar ist für Fallback
         adapter_path = find_adapter_for_merged(model_name)
         fallback_available = adapter_path is not None
         
@@ -568,7 +547,7 @@ def detect_model_type(model_name: str, config_type: str = None) -> dict:
             'use_quantization': False,
             'use_unsloth': False,
             'dtype': torch.float16,
-            'reason': 'Merged model - no quantization needed',
+            'reason': 'Merged Modell - keine Quantization nötig',
             'fallback_available': fallback_available,
             'fallback_adapter': adapter_path
         }
@@ -579,30 +558,30 @@ def detect_model_type(model_name: str, config_type: str = None) -> dict:
         'use_quantization': True,
         'use_unsloth': UNSLOTH_AVAILABLE,
         'dtype': torch.float16,
-        'reason': 'Standard model',
+        'reason': 'Standard Modell',
         'fallback_available': False,
         'fallback_adapter': None
     }
 
 def ensure_model_downloaded(model_name):
-    """Ensures the model is downloaded"""
-    # Check if it's a local path
+    """Stellt sicher, dass das Modell heruntergeladen ist"""
+    # Prüfe ob es ein lokaler Pfad ist
     if os.path.exists(model_name):
-        print(f"✅ Local model found: {model_name}")
+        print(f"✅ Lokales Modell gefunden: {model_name}")
         return model_name
     
-    # Check if it's a HuggingFace model
+    # Prüfe ob es ein HuggingFace Modell ist
     if "/" in model_name and not model_name.startswith("./") and not model_name.startswith("../"):
-        print(f"🔍 Checking HuggingFace model: {model_name}")
+        print(f"🔍 Prüfe HuggingFace Modell: {model_name}")
         
-        # Try to download the model
+        # Versuche das Modell herunterzuladen
         try:
             from huggingface_hub import snapshot_download
             
-            print(f"📥 Downloading model: {model_name}")
-            print("   This may take several minutes on first run...")
+            print(f"📥 Lade Modell herunter: {model_name}")
+            print("   Dies kann beim ersten Mal einige Minuten dauern...")
             
-            # Download with token if available
+            # Download mit Token wenn verfügbar
             download_kwargs = {
                 'repo_id': model_name,
                 'cache_dir': cache_base,
@@ -612,86 +591,86 @@ def ensure_model_downloaded(model_name):
                 download_kwargs['token'] = hf_token
             
             local_path = snapshot_download(**download_kwargs)
-            print(f"✅ Model downloaded to: {local_path}")
+            print(f"✅ Modell heruntergeladen nach: {local_path}")
             return local_path
             
         except Exception as e:
-            print(f"❌ Download error: {e}")
-            # Try with original name anyway
+            print(f"❌ Fehler beim Download: {e}")
+            # Versuche trotzdem mit dem Original-Namen
             return model_name
     
     return model_name
 
 # =============================================================================
-# MODEL WRAPPER with improved Device Management and AUTO-DOWNLOAD
+# MODEL WRAPPER mit verbessertem Device Management und AUTO-DOWNLOAD
 # =============================================================================
 
 class TransformersModelWrapper:
-    """Wrapper with intelligent configuration, improved device management and fallback"""
+    """Wrapper mit intelligenter Konfiguration, verbessertem Device Management und Fallback"""
     
     def __init__(self, config: dict):
         self.config = config
         self.model = None
         self.tokenizer = None
         self.chat_template = config.get('chat_template')
-        # Pass config_type from pipeline config
+        # Übergebe den config_type aus der Pipeline-Config
         config_type = config.get('model_type', None)
         self.model_info = detect_model_type(config['model_name'], config_type)
         
-        # If it's an adapter, go directly to adapter loading
+        # Wenn es ein Adapter ist, direkt zum Adapter-Loading
         if self.model_info['type'] == 'adapter' and self.model_info.get('fallback_adapter'):
-            # Set adapter path directly
+            # Setze den Adapter-Pfad direkt
             self.config['model_name'] = self.model_info['fallback_adapter']
             self.config['is_adapter'] = True
     
     def _load_base_with_adapter(self):
-        """Fallback: Loads base model and applies adapter"""
+        """Fallback: Lädt Base-Modell und wendet Adapter an"""
         
-        # Adapter path is already set correctly or needs to be determined
+        # Adapter-Pfad ist bereits korrekt gesetzt oder muss ermittelt werden
         adapter_path = self.config.get('model_name', '')
         
-        # Remove _merged if present
+        # Entferne _merged falls vorhanden
         if adapter_path.endswith('_merged'):
             adapter_path = adapter_path.replace('_merged', '')
-            print(f"   📂 Correcting path to: {adapter_path}")
+            print(f"   📂 Korrigiere Pfad zu: {adapter_path}")
         
-        # Check if adapter exists
+        # Prüfe ob Adapter existiert
         if not os.path.exists(adapter_path):
-            print(f"   ❌ Adapter path does not exist: {adapter_path}")
+            print(f"   ❌ Adapter-Pfad existiert nicht: {adapter_path}")
             return False
             
         if not os.path.exists(os.path.join(adapter_path, 'adapter_config.json')):
-            print(f"   ❌ No valid adapter in: {adapter_path}")
-            # Try searching in same directory
+            print(f"   ❌ Kein gültiger Adapter in: {adapter_path}")
+            # Versuche im gleichen Verzeichnis zu suchen
             parent = os.path.dirname(adapter_path)
             base_name = os.path.basename(adapter_path)
             
-            # Try without _merged suffix
+            # Versuche ohne _merged suffix
             if '_merged' in base_name:
                 base_name = base_name.replace('_merged', '')
                 adapter_path = os.path.join(parent, base_name)
                 
                 if not os.path.exists(os.path.join(adapter_path, 'adapter_config.json')):
-                    print(f"   ❌ Also no adapter in: {adapter_path}")
+                    print(f"   ❌ Auch kein Adapter in: {adapter_path}")
                     return False
             else:
                 return False
             
-        print(f"   ✅ Using adapter: {adapter_path}")
+        print(f"   ✅ Verwende Adapter: {adapter_path}")
             
-        # Determine base model from config or adapter config
+        # Base-Modell aus Config oder Adapter-Config ermitteln
         base_model_name = self.config.get('base_model')
         if not base_model_name:
             base_model_name = get_base_model_for_adapter(adapter_path)
         
-        # Ensure base model is downloaded
+        # Stelle sicher, dass Base-Modell heruntergeladen ist
         base_model_path = ensure_model_downloaded(base_model_name)
         
-        print(f"   🔍 Base model: {base_model_name}")
+        print(f"   🔍 Base-Modell: {base_model_name}")
         print(f"   🔧 Adapter: {adapter_path}")
         
         try:
-            # 2. Load base model tokenizer
+            # 2. Lade Base-Modell Tokenizer
             tokenizer_kwargs = {
                 'trust_remote_code': True
             }
@@ -707,63 +686,63 @@ class TransformersModelWrapper:
             if self.tokenizer.pad_token is None:
                 self.tokenizer.pad_token = self.tokenizer.eos_token
             
-            # 3. Load base model
+            # 3. Lade Base-Modell
             model_kwargs = {
                 'torch_dtype': self.model_info['dtype'],
                 'trust_remote_code': True,
                 'low_cpu_mem_usage': True,
             }
             
-            # IMPORTANT: Explicit GPU device map
+            # WICHTIG: Explizite GPU-Device-Map
             if torch.cuda.is_available():
                 free_vram = (torch.cuda.get_device_properties(0).total_memory - 
                            torch.cuda.memory_allocated()) / 1024**3
-                if free_vram > 12:  # Enough VRAM for whole model
-                    model_kwargs['device_map'] = {'': 0}  # Everything on GPU 0
-                    print(f"   🎯 Forcing GPU-only loading (VRAM free: {free_vram:.1f} GB)")
+                if free_vram > 12:  # Genug VRAM für ganzes Modell
+                    model_kwargs['device_map'] = {'': 0}  # Alles auf GPU 0
+                    print(f"   🎯 Forciere GPU-only Loading (VRAM frei: {free_vram:.1f} GB)")
                 else:
                     model_kwargs['device_map'] = 'auto'
-                    print(f"   ⚠️ Low VRAM ({free_vram:.1f} GB) - Auto device_map")
+                    print(f"   ⚠️ Wenig VRAM ({free_vram:.1f} GB) - Auto device_map")
             else:
                 model_kwargs['device_map'] = 'auto'
             
             if hf_token:
                 model_kwargs['token'] = hf_token
             
-            print("   🔧 WITHOUT quantization - Base model loading")
+            print("   🔧 OHNE Quantization - Base-Modell Loading")
             
             self.model = AutoModelForCausalLM.from_pretrained(
                 base_model_path,
                 **model_kwargs
             )
             
-            # 4. Load and apply adapter
-            print("   🔧 Loading PEFT adapter...")
+            # 4. Lade und wende Adapter an
+            print("   🔧 Lade PEFT Adapter...")
             try:
                 from peft import PeftModel
                 self.model = PeftModel.from_pretrained(self.model, adapter_path)
                 
-                # 🚨 CRITICAL FIX: Ensure entire model is on GPU
+                # 🚨 KRITISCHER FIX: Stelle sicher, dass das gesamte Modell auf GPU ist
                 if torch.cuda.is_available():
-                    print("   🔧 Moving adapter model completely to GPU...")
+                    print("   🔧 Verschiebe Adapter-Modell komplett auf GPU...")
                     
-                    # Method 1: Direct .cuda() call
+                    # Methode 1: Direct .cuda() call
                     try:
                         self.model = self.model.cuda()
-                        print("   ✅ Model moved to GPU")
+                        print("   ✅ Modell auf GPU verschoben")
                     except Exception as cuda_error:
-                        print(f"   ⚠️ .cuda() error: {cuda_error}")
+                        print(f"   ⚠️ .cuda() Fehler: {cuda_error}")
                         
-                        # Method 2: Manual device placement
+                        # Methode 2: Manual device placement
                         try:
                             device = torch.device('cuda:0')
                             self.model = self.model.to(device)
-                            print("   ✅ Model moved with .to(device)")
+                            print("   ✅ Modell mit .to(device) verschoben")
                         except Exception as to_error:
-                            print(f"   ⚠️ .to(device) error: {to_error}")
+                            print(f"   ⚠️ .to(device) Fehler: {to_error}")
                             return False
                 
-                # Check final device placement
+                # Prüfe finale Device-Placement
                 cpu_params = 0
                 gpu_params = 0
                 for name, param in self.model.named_parameters():
@@ -773,94 +752,94 @@ class TransformersModelWrapper:
                         gpu_params += 1
                 
                 if cpu_params > 0:
-                    print(f"   ⚠️ WARNING: {cpu_params} parameters still on CPU, {gpu_params} on GPU")
+                    print(f"   ⚠️ WARNUNG: {cpu_params} Parameter noch auf CPU, {gpu_params} auf GPU")
                 else:
-                    print(f"   ✅ All {gpu_params} parameters on GPU")
+                    print(f"   ✅ Alle {gpu_params} Parameter auf GPU")
                 
-                print("   ✅ Base + Adapter successfully loaded!")
+                print("   ✅ Base + Adapter erfolgreich geladen!")
                 return True
                 
             except Exception as adapter_error:
-                print(f"   ❌ PEFT Adapter error: {adapter_error}")
+                print(f"   ❌ PEFT Adapter Fehler: {adapter_error}")
                 return False
                 
         except Exception as e:
-            print(f"   ❌ Base+Adapter error: {e}")
+            print(f"   ❌ Base+Adapter Fehler: {e}")
             return False
     
     def load_model(self):
-        """Loads model with optimal strategy, device map control and AUTO-DOWNLOAD"""
+        """Lädt Modell mit optimaler Strategie, Device-Map Kontrolle und AUTO-DOWNLOAD"""
         model_name = os.path.basename(self.config['model_name'])
-        print(f"\n🔄 Loading model: {model_name}")
+        print(f"\n🔄 Lade Modell: {model_name}")
         print(f"   📋 {self.model_info['reason']}")
-        print(f"   📍 Full path: {self.config['model_name']}")
+        print(f"   📍 Vollständiger Pfad: {self.config['model_name']}")
         
-        # Cleanup before loading
+        # Cleanup vor dem Laden
         cleanup_memory()
-        print_memory_status("   Before loading: ")
+        print_memory_status("   Vor Laden: ")
         
-        # If already detected as adapter, load directly
+        # Wenn es bereits als Adapter erkannt wurde, direkt laden
         if self.config.get('is_adapter') or self.model_info['type'] == 'adapter':
-            print("   🔧 Loading as adapter...")
+            print("   🔧 Lade als Adapter...")
             return self._load_base_with_adapter()
         
-        # For base models: Ensure it's downloaded
+        # Für Base-Modelle: Stelle sicher, dass es heruntergeladen ist
         if self.model_info['type'] == 'base':
-            print("   📥 Ensuring base model is available...")
+            print("   📥 Stelle sicher, dass Basis-Modell verfügbar ist...")
             self.config['model_name'] = ensure_model_downloaded(self.config['model_name'])
         
-        # Check if path exists
+        # Prüfe ob der Pfad existiert
         model_path = self.config['model_name']
         
         if os.path.exists(model_path):
-            # Local path exists
-            print(f"   ✅ Local path exists: {model_path}")
+            # Lokaler Pfad existiert
+            print(f"   ✅ Lokaler Pfad existiert: {model_path}")
             use_local = True
         else:
-            # For HuggingFace models: Download if needed
+            # Für HuggingFace Modelle: Download wenn nötig
             if "/" in model_path and not model_path.startswith("./") and not model_path.startswith("../"):
-                print(f"   📥 Trying to load/download model: {model_path}")
+                print(f"   📥 Versuche Modell zu laden/herunterzuladen: {model_path}")
                 model_path = ensure_model_downloaded(model_path)
                 use_local = True
             else:
-                print(f"   ❌ Model not found: {model_path}")
+                print(f"   ❌ Modell nicht gefunden: {model_path}")
                 
-                # Try fallback to adapter
+                # Versuche Fallback auf Adapter
                 if self.model_info.get('fallback_available', False):
-                    print("   🔄 Fallback: Trying base model + adapter...")
+                    print("   🔄 Fallback: Versuche Base-Modell + Adapter...")
                     return self._load_base_with_adapter()
                 else:
                     raise FileNotFoundError(f"Model not found: {model_path}")
         
         try:
-            # Try to load merged/base model
+            # Versuche merged/base Modell zu laden
             return self._load_merged_model(model_path, use_local)
             
         except Exception as merged_error:
             error_msg = str(merged_error)
-            print(f"   ⚠️ Model loading error: {error_msg[:200]}...")
+            print(f"   ⚠️ Modell-Lade Fehler: {error_msg[:200]}...")
             
-            # Check fallback scenarios
+            # Prüfe Fallback-Szenarien
             if self.model_info.get('fallback_available', False):
-                print("   🔄 Fallback: Trying base model + adapter...")
+                print("   🔄 Fallback: Versuche Base-Modell + Adapter...")
                 return self._load_base_with_adapter()
             
             elif "CUDA out of memory" in error_msg:
-                print("   🚨 CUDA OOM - trying with quantization...")
+                print("   🚨 CUDA OOM - versuche mit Quantization...")
                 return self._try_quantization_fallback(model_path, use_local)
             
             else:
-                print("   ❌ No suitable fallback available")
+                print("   ❌ Kein geeigneter Fallback verfügbar")
                 raise merged_error
     
     def _try_quantization_fallback(self, model_path, use_local):
-        """Fallback with quantization for memory problems"""
-        print("   🔧 Quantization fallback activated")
+        """Fallback mit Quantization bei Memory-Problemen"""
+        print("   🔧 Quantization-Fallback aktiviert")
         
         # Emergency Memory Recovery
         aggressive_cleanup()
         
-        # Force quantization
+        # Erzwinge Quantization
         original_quantization = self.model_info['use_quantization']
         original_4bit = self.config.get('load_in_4bit', False)
         
@@ -869,40 +848,40 @@ class TransformersModelWrapper:
         
         try:
             result = self._load_merged_model(model_path, use_local)
-            print("   ✅ Quantization fallback successful!")
+            print("   ✅ Quantization-Fallback erfolgreich!")
             return result
         except Exception as e:
-            print(f"   ❌ Quantization fallback also failed: {e}")
+            print(f"   ❌ Auch Quantization-Fallback gescheitert: {e}")
             # Restore original settings
             self.model_info['use_quantization'] = original_quantization
             self.config['load_in_4bit'] = original_4bit
             return False
     
     def _load_merged_model(self, model_path, use_local):
-        """Loads merged/base model (original logic with improvements)"""
+        """Lädt das merged/base Modell (ursprüngliche Logik mit Verbesserungen)"""
         
-        print(f"   📂 Loading from: {model_path}")
+        print(f"   📂 Lade von: {model_path}")
         
-        # Load tokenizer
+        # Tokenizer laden
         tokenizer_kwargs = {
             'trust_remote_code': True
         }
         
-        # Add token if available
+        # Füge Token hinzu wenn verfügbar
         if hf_token:
             tokenizer_kwargs['token'] = hf_token
         
-        # For local path always load from there
+        # Bei lokalem Pfad immer von dort laden
         try:
             self.tokenizer = AutoTokenizer.from_pretrained(
                 model_path,
                 **tokenizer_kwargs
             )
         except Exception as e:
-            print(f"   ⚠️ Tokenizer error: {e}")
-            # Fallback: Try base model tokenizer
+            print(f"   ⚠️ Tokenizer-Fehler: {e}")
+            # Fallback: Versuche Base-Model Tokenizer
             if self.config.get('base_model'):
-                print(f"   🔄 Loading base model tokenizer: {self.config['base_model']}")
+                print(f"   🔄 Lade Base-Model Tokenizer: {self.config['base_model']}")
                 base_tokenizer_path = ensure_model_downloaded(self.config['base_model'])
                 self.tokenizer = AutoTokenizer.from_pretrained(
                     base_tokenizer_path,
@@ -914,31 +893,31 @@ class TransformersModelWrapper:
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
         
-        # Model configuration with explicit device map
+        # Modell-Konfiguration mit expliziter Device-Map
         model_kwargs = {
             'torch_dtype': self.model_info['dtype'],
             'trust_remote_code': True,
             'low_cpu_mem_usage': True,
         }
         
-        # IMPORTANT: Explicit GPU device map if enough VRAM
+        # WICHTIG: Explizite GPU-Device-Map wenn genug VRAM
         if torch.cuda.is_available():
             free_vram = (torch.cuda.get_device_properties(0).total_memory - 
                         torch.cuda.memory_allocated()) / 1024**3
-            if free_vram > 12:  # Enough VRAM for whole model
-                model_kwargs['device_map'] = {'': 0}  # Everything on GPU 0
-                print(f"   🎯 Forcing GPU-only loading (VRAM free: {free_vram:.1f} GB)")
+            if free_vram > 12:  # Genug VRAM für ganzes Modell
+                model_kwargs['device_map'] = {'': 0}  # Alles auf GPU 0
+                print(f"   🎯 Forciere GPU-only Loading (VRAM frei: {free_vram:.1f} GB)")
             else:
-                print(f"   ⚠️ Low VRAM ({free_vram:.1f} GB) - Auto device_map")
+                print(f"   ⚠️ Wenig VRAM ({free_vram:.1f} GB) - Auto device_map")
                 model_kwargs['device_map'] = 'auto'
         else:
             model_kwargs['device_map'] = 'auto'
         
-        # Add token if available
+        # Füge Token hinzu wenn verfügbar
         if hf_token:
             model_kwargs['token'] = hf_token
         
-        # Quantization only if recommended
+        # Quantization nur wenn empfohlen
         if self.model_info['use_quantization'] and self.config.get('load_in_4bit'):
             bnb_config = BitsAndBytesConfig(
                 load_in_4bit=True,
@@ -947,46 +926,46 @@ class TransformersModelWrapper:
                 bnb_4bit_use_double_quant=True
             )
             model_kwargs['quantization_config'] = bnb_config
-            print("   🔧 With 4-bit quantization")
+            print("   🔧 Mit 4-bit Quantization")
         else:
-            print(f"   🔧 WITHOUT quantization - {self.model_info['dtype']}")
+            print(f"   🔧 OHNE Quantization - {self.model_info['dtype']}")
         
-        # Load model - directly from local path
+        # Modell laden - direkt vom lokalen Pfad
         try:
             self.model = AutoModelForCausalLM.from_pretrained(
                 model_path,
                 **model_kwargs
             )
         except Exception as e:
-            print(f"   ❌ Error loading model: {e}")
+            print(f"   ❌ Fehler beim Laden des Modells: {e}")
             raise e
         
-        # Check device placement
+        # Prüfe Device-Placement
         is_fully_on_gpu = check_device_placement(self.model)
         if not is_fully_on_gpu:
-            print("   ⚠️ WARNING: Model partially on CPU - performance will suffer!")
+            print("   ⚠️ WARNUNG: Modell teilweise auf CPU - Performance wird leiden!")
         
-        print(f"   ✅ Model loaded")
-        print_memory_status("   After loading: ")
+        print(f"   ✅ Modell geladen")
+        print_memory_status("   Nach Laden: ")
         
         return True
     
     def generate_answer(self, question: str, question_id: str) -> str:
-        """Generates answer with device error workaround"""
+        """Generiert Antwort mit Device-Fehler Workaround"""
         if not self.model or not self.tokenizer:
-            return "Error: Model not loaded"
+            return "Fehler: Modell nicht geladen"
         
         try:
-            # Chat template
+            # Chat Template
             if self.chat_template and hasattr(self.tokenizer, 'apply_chat_template'):
                 messages = [{"role": "user", "content": question}]
                 prompt = self.tokenizer.apply_chat_template(
                     messages, tokenize=False, add_generation_prompt=True
                 )
             else:
-                prompt = f"Question: {question}\nAnswer:"
+                prompt = f"Frage: {question}\nAntwort:"
             
-            # Tokenization
+            # Tokenisierung
             inputs = self.tokenizer(
                 prompt,
                 return_tensors="pt",
@@ -994,22 +973,22 @@ class TransformersModelWrapper:
                 max_length=self.config['max_seq_length'] - INFERENCE_CONFIG['max_new_tokens'],
             )
             
-            # 🚨 DEVICE-FIX: Ensure inputs are on same device as model
+            # 🚨 DEVICE-FIX: Stelle sicher, dass inputs auf gleichem Device wie Modell sind
             if torch.cuda.is_available():
-                # Determine model device
+                # Ermittle Device des Modells
                 try:
                     model_device = next(self.model.parameters()).device
-                    # Move inputs to same device
+                    # Verschiebe Inputs auf gleiches Device
                     inputs = {k: v.to(model_device) for k, v in inputs.items()}
                 except:
-                    # Fallback: Try CUDA
+                    # Fallback: Versuche CUDA
                     inputs = {k: v.cuda() for k, v in inputs.items()}
             
-            # Generation with improved error handling
+            # Generation mit verbesserter Fehlerbehandlung
             with torch.no_grad():
                 try:
                     if 'gemma' in self.config['model_name'].lower():
-                        # Special handling for Gemma
+                        # Spezielle Behandlung für Gemma
                         with torch.cuda.amp.autocast(dtype=torch.bfloat16):
                             outputs = self.model.generate(
                                 **inputs,
@@ -1034,8 +1013,8 @@ class TransformersModelWrapper:
                         )
                 except RuntimeError as device_error:
                     if "device" in str(device_error).lower():
-                        print(f"   ⚠️ Device error: Attempting repair...")
-                        # Try moving all model parameters to GPU
+                        print(f"   ⚠️ Device-Fehler: Versuche Reparatur...")
+                        # Versuche alle Modell-Parameter auf GPU zu verschieben
                         if torch.cuda.is_available():
                             try:
                                 self.model = self.model.cuda()
@@ -1043,18 +1022,18 @@ class TransformersModelWrapper:
                             except:
                                 pass
                         
-                        # Simplified second attempt
+                        # Vereinfachter zweiter Versuch
                         outputs = self.model.generate(
                             **inputs,
                             max_new_tokens=INFERENCE_CONFIG['max_new_tokens'],
                             temperature=0.7,
-                            do_sample=False,  # Simplified generation
+                            do_sample=False,  # Vereinfachte Generation
                             pad_token_id=self.tokenizer.eos_token_id,
                         )
                     else:
                         raise device_error
             
-            # Decoding
+            # Dekodierung
             input_length = inputs['input_ids'].shape[1]
             generated_tokens = outputs[0][input_length:]
             answer = self.tokenizer.decode(generated_tokens, skip_special_tokens=True)
@@ -1062,14 +1041,14 @@ class TransformersModelWrapper:
             return answer.strip()
             
         except Exception as e:
-            print(f"   ⚠️ Generation error: {str(e)[:100]}")
-            return "Answer could not be generated."
+            print(f"   ⚠️ Generation-Fehler: {str(e)[:100]}")
+            return "Antwort konnte nicht generiert werden."
     
     def unload_model(self):
-        """Unloads model completely"""
-        print("   🗑️ Unloading model...")
+        """Entlädt Modell vollständig"""
+        print("   🗑️ Entlade Modell...")
         if self.model:
-            # Try moving to CPU before deleting
+            # Versuche auf CPU zu verschieben vor dem Löschen
             try:
                 self.model.cpu()
             except:
@@ -1081,12 +1060,12 @@ class TransformersModelWrapper:
             del self.tokenizer
             self.tokenizer = None
         
-        # Aggressive cleanup
+        # Aggressives Cleanup
         aggressive_cleanup()
-        print("   ✅ Model unloaded and memory cleaned")
+        print("   ✅ Modell entladen und Memory bereinigt")
 
 # =============================================================================
-# BENCHMARK CLASS with BATCH MODE
+# BENCHMARK KLASSE mit BATCH-MODUS
 # =============================================================================
 
 class TransformersBenchmark:
@@ -1106,12 +1085,12 @@ class TransformersBenchmark:
         self.questions_data = None
         self.results = []
         
-        print(f"🔧 Benchmark initialized")
-        print(f"   📝 Model: {os.path.basename(answer_config['model_name'])}")
-        print(f"   ⚖️ Evaluator: {'API' if use_api_eval else 'Local'}")
+        print(f"🔧 Benchmark initialisiert")
+        print(f"   📝 Modell: {os.path.basename(answer_config['model_name'])}")
+        print(f"   ⚖️  Bewerter: {'API' if use_api_eval else 'Lokal'}")
     
     def load_questions(self, file_path: str = None):
-        """Loads questions"""
+        """Lädt Fragen"""
         if file_path is None:
             file_path = bm_config.get('questions_file', "BENCHMARKFRAGEN/benchmark_fragen_complete.json")
         
@@ -1120,21 +1099,16 @@ class TransformersBenchmark:
                 self.questions_data = json.load(f)
             
             total = sum(len(k['fragen']) for k in self.questions_data['kategorien'])
-            print(f"✅ {total} questions loaded from {file_path}")
+            print(f"✅ {total} Fragen geladen aus {file_path}")
             return True
         except Exception as e:
-            print(f"❌ Error loading: {e}")
+            print(f"❌ Fehler beim Laden: {e}")
             return False
     
     def evaluate_answer(self, question: str, generated: str, correct: str, question_id: str):
-        """Evaluates answer with language-agnostic prompt"""
+        """Bewertet Antwort"""
         try:
-            # Detect language of the content for appropriate evaluation
-            content_language = detect_language(question + " " + correct)
-            
-            # Create language-agnostic evaluation prompt
-            if content_language == "German":
-                prompt = f"""Bewerte diese Antwort auf einer Skala von 0-10.
+            prompt = f"""Bewerte diese Antwort auf einer Skala von 0-10.
 
 FRAGE: {question}
 
@@ -1150,23 +1124,6 @@ Bewerte nach:
 5. Struktur (0-2)
 
 Gib nur die GESAMTPUNKTE als Zahl zwischen 0 und 10 zurück."""
-            else:
-                prompt = f"""Evaluate this answer on a scale of 0-10.
-
-QUESTION: {question}
-
-REFERENCE SOLUTION: {correct}
-
-GIVEN ANSWER: {generated}
-
-Evaluate based on:
-1. Completeness (0-2)
-2. Correctness (0-2)
-3. Precision (0-2)
-4. No hallucinations (0-2)
-5. Structure (0-2)
-
-Return only the TOTAL POINTS as a number between 0 and 10."""
             
             if self.use_api_eval and self.eval_client:
                 response = self.eval_client.chat.completions.create(
@@ -1178,30 +1135,30 @@ Return only the TOTAL POINTS as a number between 0 and 10."""
                 
                 text = response.choices[0].message.content.strip()
                 
-                # Extract score
+                # Extrahiere Score
                 numbers = re.findall(r'\d+', text)
                 if numbers:
-                    score = int(numbers[-1])  # Take the last number
+                    score = int(numbers[-1])  # Nimm die letzte Zahl
                     score = max(0, min(10, score))
                 else:
                     score = 5
                 
                 return score, text
             else:
-                return 5, "Local evaluation not implemented"
+                return 5, "Lokale Bewertung nicht implementiert"
                 
         except Exception as e:
-            print(f"   ⚠️ Evaluation error: {e}")
-            return 0, "Error"
+            print(f"   ⚠️ Bewertungsfehler: {e}")
+            return 0, "Fehler"
     
     def _generate_answers_only(self, description):
-        """Generates only answers without evaluation"""
-        print(f"\n🚀 Generating {description} answers")
+        """Generiert nur Antworten ohne Bewertung"""
+        print(f"\n🚀 Generiere {description} Antworten")
         
-        # Load model
+        # Lade Modell
         self.answer_model = TransformersModelWrapper(self.answer_config)
         if not self.answer_model.load_model():
-            print(f"❌ {description} model could not be loaded")
+            print(f"❌ {description}-Modell konnte nicht geladen werden")
             return []
         
         answers = []
@@ -1229,14 +1186,14 @@ Return only the TOTAL POINTS as a number between 0 and 10."""
                     'generated': generated
                 })
         
-        # Unload model immediately
+        # Modell sofort entladen
         self.answer_model.unload_model()
-        print(f"✅ {description} model unloaded")
+        print(f"✅ {description}-Modell entladen")
         
         return answers
     
     def _evaluate_answers_batch(self, answers):
-        """Evaluates all answers in a batch"""
+        """Bewertet alle Antworten in einem Batch"""
         results = []
         total = len(answers)
         
@@ -1262,68 +1219,68 @@ Return only the TOTAL POINTS as a number between 0 and 10."""
         return results
     
     def _calculate_score(self, results):
-        """Calculates percentage score"""
+        """Berechnet Prozentscore"""
         scores = [r['score'] for r in results]
         return (sum(scores) / (len(scores) * 10)) * 100 if scores else 0
     
     def _show_results(self, results):
-        """Shows final results"""
+        """Zeigt finale Ergebnisse"""
         if 'pre' in results and 'post' in results:
             pre_score = results['pre']['percentage_score']
             post_score = results['post']['percentage_score']
             improvement = post_score - pre_score
             
-            print(f"\n🏆 COMPLETE RESULTS:")
+            print(f"\n🏆 VOLLSTÄNDIGES ERGEBNIS:")
             print(f"   Pre: {pre_score:.1f}%")
             print(f"   Post: {post_score:.1f}%")
-            print(f"   📈 Improvement: {improvement:+.1f}%")
+            print(f"   📈 Verbesserung: {improvement:+.1f}%")
             
             if improvement > 0:
-                print("   ✅ Finetuning successful!")
+                print("   ✅ Finetuning erfolgreich!")
             else:
-                print("   ⚠️ No measurable improvement")
+                print("   ⚠️ Keine Verbesserung messbar")
                 
         elif 'post' in results:
             post_score = results['post']['percentage_score']
-            print(f"\n⚠️ PARTIAL RESULTS (POST only):")
+            print(f"\n⚠️  TEILWEISES ERGEBNIS (nur POST):")
             print(f"   Post: {post_score:.1f}%")
             
         elif 'pre' in results:
             pre_score = results['pre']['percentage_score']
-            print(f"\n⚠️ PARTIAL RESULTS (PRE only):")
+            print(f"\n⚠️  TEILWEISES ERGEBNIS (nur PRE):")
             print(f"   Pre: {pre_score:.1f}%")
     
     def run_benchmark(self, description=""):
-        """Runs single benchmark"""
+        """Führt Einzelbenchmark durch"""
         if not self.questions_data:
-            print("❌ No questions loaded")
+            print("❌ Keine Fragen geladen")
             return None
         
-        print(f"\n🚀 Starting benchmark {description}")
+        print(f"\n🚀 Starte Benchmark {description}")
         print("=" * 60)
         
         start_time = datetime.now()
         
-        # Phase 1: Generate answers
-        print("\n📝 Phase 1: Generate answers")
+        # Phase 1: Antworten generieren
+        print("\n📝 Phase 1: Antworten generieren")
         answers = self._generate_answers_only(description)
         
         if not answers:
             return None
         
-        # Phase 2: Evaluate
-        print(f"\n⚖️ Phase 2: Evaluate")
+        # Phase 2: Bewerten
+        print(f"\n⚖️  Phase 2: Bewerten")
         self.results = self._evaluate_answers_batch(answers)
         
-        # Statistics
+        # Statistiken
         duration = datetime.now() - start_time
         percentage = self._calculate_score(self.results)
         scores = [r['score'] for r in self.results]
         
-        print(f"\n\n✅ FINISHED")
-        print(f"   ⏱️ {duration}")
+        print(f"\n\n✅ FERTIG")
+        print(f"   ⏱️  {duration}")
         print(f"   📊 Score: {percentage:.1f}%")
-        print(f"   📈 Average: {statistics.mean(scores):.1f}/10")
+        print(f"   📈 Durchschnitt: {statistics.mean(scores):.1f}/10")
         
         return {
             'config': self.answer_config,
@@ -1333,68 +1290,68 @@ Return only the TOTAL POINTS as a number between 0 and 10."""
         }
     
     def run_comparison(self, pre_config, post_config):
-        """Comparison benchmark with BATCH MODE to avoid VRAM conflicts"""
-        print("🎯 COMPARISON BENCHMARK - BATCH MODE")
+        """Vergleichsbenchmark mit BATCH-MODUS zur VRAM-Konflikt-Vermeidung"""
+        print("🎯 VERGLEICHSBENCHMARK - BATCH MODUS")
         print("=" * 60)
         
-        all_answers = {}  # Collects all answers
+        all_answers = {}  # Sammelt alle Antworten
         results = {}
         
         # ========================================
-        # PHASE 1: GENERATE ALL ANSWERS
+        # PHASE 1: ALLE ANTWORTEN GENERIEREN
         # ========================================
-        print("\n📝 PHASE 1: GENERATE ANSWERS")
+        print("\n📝 PHASE 1: ANTWORTEN GENERIEREN")
         print("=" * 40)
-        print("🎯 Generate all answers WITHOUT Ollama evaluator")
-        print("   (Avoids VRAM conflict between models)")
+        print("🎯 Generiere alle Antworten OHNE Ollama-Bewerter")
+        print("   (Vermeidet VRAM-Konflikt zwischen Modellen)")
         
-        # Pre-finetuning answers
-        print("\n🔄 Generating PRE-finetuning answers...")
-        print(f"   Base model: {pre_config['model_name']}")
-        print_memory_status("Before pre-generation: ")
+        # Pre-Finetuning Antworten
+        print("\n🔄 Generiere PRE-Finetuning Antworten...")
+        print(f"   Basis-Modell: {pre_config['model_name']}")
+        print_memory_status("Vor Pre-Generation: ")
         
         pre_benchmark = TransformersBenchmark(pre_config, self.eval_config, use_api_eval=False)
         if pre_benchmark.load_questions():
             pre_answers = pre_benchmark._generate_answers_only("PRE")
             all_answers['pre'] = pre_answers
-            print(f"✅ {len(pre_answers)} PRE answers generated")
+            print(f"✅ {len(pre_answers)} PRE-Antworten generiert")
         
-        # Aggressive cleanup between models
+        # Aggressives Cleanup zwischen Modellen
         ultra_cleanup("Pre-Generation")
         
-        # Post-finetuning answers  
-        print("\n🔄 Generating POST-finetuning answers...")
-        print(f"   Trained model: {post_config['model_name']}")
-        print_memory_status("Before post-generation: ")
+        # Post-Finetuning Antworten  
+        print("\n🔄 Generiere POST-Finetuning Antworten...")
+        print(f"   Trainiertes Modell: {post_config['model_name']}")
+        print_memory_status("Vor Post-Generation: ")
         
         post_benchmark = TransformersBenchmark(post_config, self.eval_config, use_api_eval=False)
         if post_benchmark.load_questions():
             post_answers = post_benchmark._generate_answers_only("POST")
             all_answers['post'] = post_answers
-            print(f"✅ {len(post_answers)} POST answers generated")
+            print(f"✅ {len(post_answers)} POST-Antworten generiert")
         
-        # Final cleanup before evaluation
+        # Finales Cleanup vor Bewertung
         ultra_cleanup("Post-Generation")
         
         # ========================================
-        # PHASE 2: EVALUATE ALL ANSWERS
+        # PHASE 2: ALLE ANTWORTEN BEWERTEN
         # ========================================
-        print("\n⚖️ PHASE 2: BATCH EVALUATION")
+        print("\n⚖️  PHASE 2: BATCH-BEWERTUNG")
         print("=" * 40)
-        print("🤖 Starting Ollama evaluator...")
-        print("   (Now VRAM is free for evaluation)")
+        print("🤖 Starte Ollama-Bewerter...")
+        print("   (Jetzt ist VRAM frei für Bewertung)")
         
-        # Wait until enough VRAM is free
+        # Warte bis genug VRAM frei ist
         if not wait_for_vram_free(min_gb=12):
-            print("❌ Not enough VRAM for Ollama evaluator")
+            print("❌ Nicht genug VRAM für Ollama-Bewerter")
             return results
         
-        # Now VRAM is free for Ollama
+        # Jetzt ist VRAM frei für Ollama
         evaluator = TransformersBenchmark(pre_config, self.eval_config, use_api_eval=True)
         
-        # Evaluate all PRE answers
+        # Bewerte alle PRE-Antworten
         if 'pre' in all_answers:
-            print("\n📊 Evaluating PRE answers...")
+            print("\n📊 Bewerte PRE-Antworten...")
             pre_results = evaluator._evaluate_answers_batch(all_answers['pre'])
             results['pre'] = {
                 'config': pre_config,
@@ -1403,9 +1360,9 @@ Return only the TOTAL POINTS as a number between 0 and 10."""
                 'duration': None
             }
         
-        # Evaluate all POST answers
+        # Bewerte alle POST-Antworten
         if 'post' in all_answers:
-            print("\n📊 Evaluating POST answers...")
+            print("\n📊 Bewerte POST-Antworten...")
             post_results = evaluator._evaluate_answers_batch(all_answers['post'])
             results['post'] = {
                 'config': post_config,
@@ -1415,11 +1372,11 @@ Return only the TOTAL POINTS as a number between 0 and 10."""
             }
         
         # ========================================
-        # RESULTS
+        # ERGEBNISSE
         # ========================================
         evaluator._show_results(results)
         
-        # Save results
+        # Speichern
         if results:
             os.makedirs("OUTPUT", exist_ok=True)
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -1434,53 +1391,52 @@ Return only the TOTAL POINTS as a number between 0 and 10."""
             with open(filename, 'w', encoding='utf-8') as f:
                 json.dump(results, f, indent=2, ensure_ascii=False, default=str)
             
-            print(f"\n💾 Saved: {filename}")
+            print(f"\n💾 Gespeichert: {filename}")
         
         return results
 
 # =============================================================================
-# MAIN FUNCTION
+# HAUPTFUNKTION
 # =============================================================================
 
 def main():
-    """Main function with central configuration and batch mode"""
-    print("🎯 OTW Benchmark Tool - WITH AUTO-DOWNLOAD + DYNAMIC CONFIG")
-    print("✅ Base model from finetuning config")
-    print("✅ Automatic download when needed")
-    print("✅ Batch mode against VRAM conflicts")
-    print("✅ Base + Adapter fallback")
-    print("✅ Ollama-compatible memory management")
-    print("✅ Language-agnostic evaluation")
+    """Hauptfunktion mit zentraler Konfiguration und Batch-Modus"""
+    print("🎯 OTW Benchmark Tool - MIT AUTO-DOWNLOAD + DYNAMISCHER CONFIG")
+    print("✅ Basis-Modell aus Finetuning-Config")
+    print("✅ Automatisches Herunterladen bei Bedarf")
+    print("✅ Batch-Modus gegen VRAM-Konflikte")
+    print("✅ Base + Adapter Fallback")
+    print("✅ Ollama-kompatibles Memory Management")
     print("=" * 60)
     
-    # Immediate startup cleanup
-    print("\n🧹 Startup memory cleanup...")
+    # Sofortiger Startup-Cleanup
+    print("\n🧹 Startup Memory Cleanup...")
     aggressive_cleanup()
     
-    # Show cache status
-    print(f"\n📍 Cache directory: {cache_base}")
-    print_memory_status("Start status: ")
+    # Zeige Cache-Status
+    print(f"\n📍 Cache-Verzeichnis: {cache_base}")
+    print_memory_status("Start-Status: ")
     
-    # Show used models
-    print(f"\n📋 Configured models:")
-    print(f"   Base model: {BASE_MODEL_NAME}")
-    print(f"   Trained model: {POST_FINETUNING_CONFIG['model_name']}")
-    print(f"   Type: {POST_FINETUNING_CONFIG['model_type']}")
+    # Zeige verwendete Modelle
+    print(f"\n📋 Konfigurierte Modelle:")
+    print(f"   Basis-Modell: {BASE_MODEL_NAME}")
+    print(f"   Trainiertes Modell: {POST_FINETUNING_CONFIG['model_name']}")
+    print(f"   Typ: {POST_FINETUNING_CONFIG['model_type']}")
     
-    # Use evaluator type from config
+    # Verwende Evaluator-Typ aus Config
     use_api = evaluator_config.get('type', 'api') == 'api'
     
-    # Benchmark based on mode from config
+    # Benchmark basierend auf Mode aus Config
     if BENCHMARK_MODE == "comparison":
-        # Comparison with batch mode
-        print(f"\n🔄 Starting batch comparison benchmark")
+        # Vergleich mit Batch-Modus
+        print(f"\n🔄 Starte Batch-Vergleichsbenchmark")
         print(f"   Pre-Model: {PRE_FINETUNING_CONFIG['model_name']}")
         print(f"   Post-Model: {POST_FINETUNING_CONFIG['model_name']}")
-        print(f"   🎯 BATCH MODE activated:")
-        print(f"      1. Generate PRE answers → Unload model")
-        print(f"      2. Generate POST answers → Unload model") 
-        print(f"      3. Start Ollama evaluator → Evaluate ALL")
-        print(f"      ✅ No VRAM conflict between models!")
+        print(f"   🎯 BATCH-MODUS aktiviert:")
+        print(f"      1. Generiere PRE-Antworten → Modell entladen")
+        print(f"      2. Generiere POST-Antworten → Modell entladen") 
+        print(f"      3. Starte Ollama-Bewerter → Bewerte ALLE")
+        print(f"      ✅ Kein VRAM-Konflikt zwischen Modellen!")
         
         benchmark = TransformersBenchmark(
             PRE_FINETUNING_CONFIG,
@@ -1491,41 +1447,41 @@ def main():
             benchmark.run_comparison(PRE_FINETUNING_CONFIG, POST_FINETUNING_CONFIG)
             
     elif BENCHMARK_MODE == "post_only":
-        # Post only
+        # Nur Post
         benchmark = TransformersBenchmark(
             POST_FINETUNING_CONFIG,
             EVAL_API_CONFIG,
             use_api
         )
         if benchmark.load_questions():
-            print(f"\n📝 Starting post benchmark")
+            print(f"\n📝 Starte Post-Benchmark")
             print(f"   Model: {POST_FINETUNING_CONFIG['model_name']}")
             benchmark.run_benchmark("POST-FINETUNING")
             
     elif BENCHMARK_MODE == "pre_only":
-        # Pre only
+        # Nur Pre
         benchmark = TransformersBenchmark(
             PRE_FINETUNING_CONFIG,
             EVAL_API_CONFIG,
             use_api
         )
         if benchmark.load_questions():
-            print(f"\n📝 Starting pre benchmark")
+            print(f"\n📝 Starte Pre-Benchmark")
             print(f"   Model: {PRE_FINETUNING_CONFIG['model_name']}")
             benchmark.run_benchmark("PRE-FINETUNING")
             
     else:
-        print(f"❌ Unknown benchmark mode: {BENCHMARK_MODE}")
-        print("   Valid modes: comparison, post_only, pre_only")
+        print(f"❌ Unbekannter Benchmark-Modus: {BENCHMARK_MODE}")
+        print("   Gültige Modi: comparison, post_only, pre_only")
         return
     
-    # Final cleanup
+    # Final Cleanup
     aggressive_cleanup()
-    print_memory_status("\nEnd status: ")
+    print_memory_status("\nEnd-Status: ")
     
     # Re-enable PyTorch Compile
     os.environ.pop('TORCH_COMPILE_DISABLE', None)
-    print("\n✅ Finished - PyTorch Compile re-enabled")
+    print("\n✅ Fertig - PyTorch Compile wieder aktiviert")
 
 if __name__ == "__main__":
     main()

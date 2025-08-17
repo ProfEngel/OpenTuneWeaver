@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
 """
-OpenTuneWeaver UI - Graphical User Interface for the Fine-tuning Pipeline
-Version: 6.3 - With improved pipeline automation
+OpenTuneWeaver UI - Grafische Benutzeroberfläche für die Finetuning-Pipeline
+Version: 6.3 - Mit verbesserter Pipeline-Automatisierung
 
 Features:
-- Upload interface for documents
-- Extended settings page with model dropdown
-- Pipeline control via command line parameters
-- Live terminal with auto-scroll
-- Separate download buttons for documents and models
-- Improved file collection for downloads
-- Cleanup functionality
+- Upload-Interface für Dokumente
+- Erweiterte Einstellungsseite mit Modell-Dropdown
+- Pipeline-Steuerung über Kommandozeilenparameter
+- Live-Terminal mit Auto-Scroll
+- Getrennte Download-Buttons für Dokumente und Modelle
+- Verbesserte Dateiensammlung für Downloads
+- Aufräumen-Funktionalität
 """
 
 import gradio as gr
@@ -30,7 +30,7 @@ import threading
 import tempfile
 import signal
 
-# Available Gemma3 models
+# Verfügbare Gemma3-Modelle
 AVAILABLE_MODELS = [
     "unsloth/gemma-3-1b-it",
     "unsloth/gemma-3-4b-it",
@@ -40,13 +40,13 @@ AVAILABLE_MODELS = [
     "unsloth/gemma-3n-E4B-it"
 ]
 
-# Global variables
+# Globale Variablen
 progress_messages = []
 processing_active = False
 current_process = None
 
 def log_message(message: str, level: str = "INFO"):
-    """Adds a log message."""
+    """Fügt eine Log-Nachricht hinzu."""
     global progress_messages
     timestamp = datetime.now().strftime("%H:%M:%S")
     formatted_message = f"[{timestamp}] {level}: {message}"
@@ -55,27 +55,27 @@ def log_message(message: str, level: str = "INFO"):
     return formatted_message
 
 def get_terminal_output():
-    """Returns all log messages."""
+    """Gibt alle Log-Nachrichten zurück."""
     global progress_messages
-    return '\n'.join(progress_messages[-100:])  # Last 100 messages
+    return '\n'.join(progress_messages[-100:])  # Letzte 100 Nachrichten
 
 def clear_terminal():
-    """Clears terminal output."""
+    """Löscht Terminal-Ausgabe."""
     global progress_messages
     progress_messages = []
     return ""
 
-# ==================== FILE UPLOAD ====================
+# ==================== DATEI-UPLOAD ====================
 
 def save_uploaded_files(files: List) -> str:
-    """Saves uploaded files to the upload directory."""
+    """Speichert hochgeladene Dateien in das Upload-Verzeichnis."""
     if not files:
-        return "❌ No files selected"
+        return "❌ Keine Dateien ausgewählt"
 
     upload_dir = Path("../pipeline/modules/01_convert/UPLOAD")
     upload_dir.mkdir(parents=True, exist_ok=True)
 
-    # Delete old files
+    # Lösche alte Dateien
     for old_file in upload_dir.glob("*"):
         if old_file.is_file():
             old_file.unlink()
@@ -87,17 +87,17 @@ def save_uploaded_files(files: List) -> str:
                 file_path = Path(file.name)
                 target_path = upload_dir / file_path.name
                 shutil.copy2(file_path, target_path)
-                log_message(f"📁 File saved: {file_path.name}")
+                log_message(f"📁 Datei gespeichert: {file_path.name}")
                 saved_count += 1
             except Exception as e:
-                log_message(f"❌ Error saving file: {e}", "ERROR")
+                log_message(f"❌ Fehler beim Speichern: {e}", "ERROR")
 
-    return f"✅ {saved_count} files successfully uploaded"
+    return f"✅ {saved_count} Dateien erfolgreich hochgeladen"
 
-# ==================== CONFIGURATION ====================
+# ==================== KONFIGURATION ====================
 
 def load_existing_config():
-    """Loads existing configuration if available."""
+    """Lädt existierende Konfiguration falls vorhanden."""
     config_file = Path("../pipeline/pipeline_config.json")
     if config_file.exists():
         try:
@@ -105,9 +105,9 @@ def load_existing_config():
                 config = json.load(f)
             return config
         except Exception as e:
-            log_message(f"❌ Error loading configuration: {e}", "ERROR")
+            log_message(f"❌ Fehler beim Laden der Konfiguration: {e}", "ERROR")
     
-    # Default configuration
+    # Standard-Konfiguration
     return {
         "tokens": {"hf_token": "", "hf_write_token": ""},
         "api_configs": {
@@ -232,7 +232,7 @@ def save_config_from_ui(
     # Pipeline
     auto_cleanup, verbose_mode, continue_on_error
 ):
-    """Saves the configuration from the UI."""
+    """Speichert die Konfiguration aus der UI."""
     try:
         config = {
             "version": "6.3",
@@ -350,45 +350,45 @@ def save_config_from_ui(
         with open(config_file, 'w', encoding='utf-8') as f:
             json.dump(config, f, indent=2, ensure_ascii=False)
         
-        log_message("✅ Configuration saved")
-        return "✅ Configuration successfully saved!"
+        log_message("✅ Konfiguration gespeichert")
+        return "✅ Konfiguration erfolgreich gespeichert!"
         
     except Exception as e:
-        error_msg = f"❌ Error saving configuration: {e}"
+        error_msg = f"❌ Fehler beim Speichern der Konfiguration: {e}"
         log_message(error_msg, "ERROR")
         return error_msg
 
-# ==================== PIPELINE CONTROL (IMPROVED) ====================
+# ==================== PIPELINE-STEUERUNG (VERBESSERT) ====================
 
 def start_pipeline(pipeline_mode="full", cleanup_after=True):
-    """Starts the pipeline with command line parameters."""
+    """Startet die Pipeline mit Kommandozeilenparametern."""
     global processing_active, current_process
 
     if processing_active:
-        return "⚠️ Pipeline already running!"
+        return "⚠️ Pipeline läuft bereits!"
 
     def run_pipeline():
         global processing_active, current_process
         processing_active = True
-        log_message(f"🚀 Pipeline started in mode: {pipeline_mode}")
+        log_message(f"🚀 Pipeline gestartet im Modus: {pipeline_mode}")
 
         try:
-            # Change to pipeline directory
+            # Wechsle ins Pipeline-Verzeichnis
             pipeline_dir = Path("../pipeline")
             if not pipeline_dir.exists():
-                log_message("❌ Pipeline directory not found!", "ERROR")
+                log_message("❌ Pipeline-Verzeichnis nicht gefunden!", "ERROR")
                 processing_active = False
                 return
 
             original_dir = os.getcwd()
             os.chdir(pipeline_dir)
 
-            # Create command line arguments
+            # Erstelle Kommandozeilenargumente
             cmd_args = [
                 sys.executable, 
                 "-u",  # Unbuffered output
                 "run_pipeline.py",
-                "--auto",  # Automated mode
+                "--auto",  # Automatisierter Modus
                 "--mode", pipeline_mode,
                 "--use-existing-config"
             ]
@@ -396,9 +396,9 @@ def start_pipeline(pipeline_mode="full", cleanup_after=True):
             if cleanup_after:
                 cmd_args.append("--cleanup-after")
             
-            log_message(f"🖥️ Command: {' '.join(cmd_args)}")
+            log_message(f"🖥️ Kommando: {' '.join(cmd_args)}")
 
-            # Start run_pipeline.py with parameters
+            # Starte run_pipeline.py mit Parametern
             current_process = subprocess.Popen(
                 cmd_args,
                 stdout=subprocess.PIPE,
@@ -408,12 +408,12 @@ def start_pipeline(pipeline_mode="full", cleanup_after=True):
                 universal_newlines=True
             )
 
-            # Read output and display in terminal
+            # Lese Output und zeige im Terminal
             for line in iter(current_process.stdout.readline, ''):
                 if not line:
                     break
                 
-                # Log all outputs
+                # Log alle Ausgaben
                 clean_line = line.strip()
                 if clean_line:
                     if "🔴" in clean_line or "ERROR" in clean_line or "❌" in clean_line:
@@ -425,77 +425,77 @@ def start_pipeline(pipeline_mode="full", cleanup_after=True):
                     else:
                         log_message(clean_line, "INFO")
 
-            # Wait for pipeline to finish
+            # Warte auf Pipeline-Ende
             return_code = current_process.wait()
             
             os.chdir(original_dir)
 
             if return_code == 0:
-                log_message("🎉 Pipeline completed successfully!")
+                log_message("🎉 Pipeline erfolgreich abgeschlossen!")
             else:
-                log_message(f"❌ Pipeline failed (Code: {return_code})", "ERROR")
+                log_message(f"❌ Pipeline fehlgeschlagen (Code: {return_code})", "ERROR")
 
         except Exception as e:
-            log_message(f"❌ Pipeline error: {e}", "ERROR")
+            log_message(f"❌ Pipeline-Fehler: {e}", "ERROR")
         finally:
             processing_active = False
             current_process = None
             if 'original_dir' in locals():
                 os.chdir(original_dir)
 
-    # Start pipeline in separate thread
+    # Starte Pipeline in eigenem Thread
     pipeline_thread = threading.Thread(target=run_pipeline)
     pipeline_thread.daemon = True
     pipeline_thread.start()
 
-    return f"🚀 Pipeline started in mode '{pipeline_mode}' - Track progress in terminal"
+    return f"🚀 Pipeline gestartet im Modus '{pipeline_mode}' - Verfolgen Sie den Fortschritt im Terminal"
 
 def start_full_pipeline():
-    """Starts the complete pipeline (steps 1-8)."""
+    """Startet die komplette Pipeline (Schritte 1-8)."""
     return start_pipeline("full", cleanup_after=True)
 
 def start_data_pipeline():
-    """Starts only data processing (steps 1-5)."""
+    """Startet nur die Datenverarbeitung (Schritte 1-5)."""
     return start_pipeline("data", cleanup_after=False)
 
 def start_training_pipeline():
-    """Starts only training & benchmark (steps 6-7)."""
+    """Startet nur Training & Benchmark (Schritte 6-7)."""
     return start_pipeline("training", cleanup_after=False)
 
 def start_archive_only():
-    """Starts only archiving (step 8)."""
+    """Startet nur die Archivierung (Schritt 8)."""
     return start_pipeline("archive", cleanup_after=True)
 
 def stop_pipeline():
-    """Stops the running pipeline."""
+    """Stoppt die laufende Pipeline."""
     global processing_active, current_process
 
     if not processing_active or current_process is None:
-        return "⚠️ No active pipeline found"
+        return "⚠️ Keine aktive Pipeline gefunden"
 
     try:
-        # Try graceful termination
+        # Versuche graceful termination
         current_process.terminate()
         time.sleep(2)
         
-        # If still active, force kill
+        # Falls noch aktiv, force kill
         if current_process.poll() is None:
             current_process.kill()
         
-        log_message("⏹️ Pipeline stopped", "WARNING")
+        log_message("⏹️ Pipeline gestoppt", "WARNING")
         processing_active = False
         current_process = None
-        return "⏹️ Pipeline stopped"
+        return "⏹️ Pipeline gestoppt"
     except Exception as e:
-        log_message(f"❌ Error stopping pipeline: {e}", "ERROR")
-        return f"❌ Error stopping pipeline: {e}"
+        log_message(f"❌ Fehler beim Stoppen: {e}", "ERROR")
+        return f"❌ Fehler beim Stoppen: {e}"
 
-# ==================== IMPROVED DOWNLOAD FUNCTIONS ====================
+# ==================== VERBESSERTE DOWNLOAD-FUNKTIONEN ====================
 
 def create_documents_zip():
-    """Creates a ZIP file with all documents (without models)."""
+    """Erstellt eine ZIP-Datei mit allen Dokumenten (ohne Modelle)."""
     try:
-        log_message("📦 Creating documents ZIP...")
+        log_message("📦 Erstelle Dokumente-ZIP...")
 
         temp_dir = tempfile.mkdtemp()
         zip_path = Path(temp_dir) / f"opentuneweaver_documents_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
@@ -505,7 +505,7 @@ def create_documents_zip():
             modules_dir = Path("../pipeline/modules")
             pipeline_dir = Path("../pipeline")
             
-            # 1. Search in all module directories (INPUT, OUTPUT, others)
+            # 1. Suche in allen Module-Verzeichnissen (INPUT, OUTPUT, andere)
             if modules_dir.exists():
                 document_dirs = [
                     ("01_convert", ["OUTPUT", "INPUT", "UPLOAD"]),
@@ -519,7 +519,7 @@ def create_documents_zip():
                 for module_name, folders in document_dirs:
                     module_dir = modules_dir / module_name
                     if module_dir.exists():
-                        log_message(f"🔍 Searching module: {module_name}")
+                        log_message(f"🔍 Durchsuche Modul: {module_name}")
                         for folder in folders:
                             folder_path = module_dir / folder
                             if folder_path.exists():
@@ -534,12 +534,12 @@ def create_documents_zip():
                                         log_message(f"  📁 {file_path.name}")
                                 
                                 if found_in_folder > 0:
-                                    log_message(f"✅ {module_name}/{folder}: {found_in_folder} files")
+                                    log_message(f"✅ {module_name}/{folder}: {found_in_folder} Dateien")
 
-            # 2. Pipeline-wide outputs in data/OUTPUT
+            # 2. Pipeline-weite Ausgaben in data/OUTPUT
             data_output_dir = pipeline_dir / "data" / "OUTPUT"
             if data_output_dir.exists():
-                log_message("🔍 Searching data/OUTPUT...")
+                log_message("🔍 Durchsuche data/OUTPUT...")
                 for file_path in data_output_dir.rglob("*"):
                     if file_path.is_file():
                         rel_path = file_path.relative_to(data_output_dir)
@@ -548,7 +548,7 @@ def create_documents_zip():
                         total_files += 1
                         log_message(f"  📁 {file_path.name}")
 
-            # 3. Root-level files (metrics, reports)
+            # 3. Root-Level Dateien (Metriken, Reports)
             root_files = [
                 "pipeline_metrics.json",
                 "pipeline_report.md", 
@@ -563,10 +563,10 @@ def create_documents_zip():
                     total_files += 1
                     log_message(f"  📊 {filename}")
 
-            # 4. Add viewer and UI files
+            # 4. Viewer und UI-Dateien hinzufügen
             viewer_dir = pipeline_dir / "viewer"
             if viewer_dir.exists():
-                log_message("🔍 Adding viewer...")
+                log_message("🔍 Füge Viewer hinzu...")
                 for file_path in viewer_dir.rglob("*"):
                     if file_path.is_file():
                         rel_path = file_path.relative_to(viewer_dir)
@@ -574,10 +574,10 @@ def create_documents_zip():
                         zipf.write(file_path, arcname)
                         total_files += 1
 
-            # 5. UI directory 
+            # 5. UI-Verzeichnis 
             ui_dir = pipeline_dir.parent / "ui"
             if ui_dir.exists():
-                log_message("🔍 Adding UI...")
+                log_message("🔍 Füge UI hinzu...")
                 ui_files = ["otw_dataeditor.html"]
                 for filename in ui_files:
                     file_path = ui_dir / filename
@@ -585,12 +585,12 @@ def create_documents_zip():
                         zipf.write(file_path, f"ui/{filename}")
                         total_files += 1
 
-            # 6. Direct search for known file types (fallback)
-            if total_files < 5:  # If little was found, extended search
-                log_message("🔍 Extended search for documents...")
+            # 6. Direkte Suche nach bekannten Dateitypen (Fallback)
+            if total_files < 5:  # Wenn wenig gefunden wurde, erweiterte Suche
+                log_message("🔍 Erweiterte Suche nach Dokumenten...")
                 for pattern in ["*.md", "*.json", "*.txt", "*.csv", "*.html"]:
                     for file_path in pipeline_dir.rglob(pattern):
-                        # Skip already added and model files
+                        # Überspringe bereits hinzugefügte und Modell-Dateien
                         if (file_path.is_file() and 
                             "CustomModel" not in str(file_path) and
                             "__pycache__" not in str(file_path) and
@@ -603,9 +603,9 @@ def create_documents_zip():
                                 total_files += 1
                                 log_message(f"  🔎 {file_path.name}")
                             except:
-                                pass  # File might already be added
+                                pass  # Datei könnte bereits hinzugefügt sein
 
-            # 7. Images for the viewer
+            # 7. Images für den Viewer
             for img_pattern in ["*.png", "*.jpg", "*.jpeg", "*.gif", "*.svg"]:
                 for img_path in pipeline_dir.rglob(img_pattern):
                     if img_path.is_file() and "CustomModel" not in str(img_path):
@@ -618,26 +618,26 @@ def create_documents_zip():
                             pass
 
             if total_files == 0:
-                # Detailed diagnosis
-                log_message("❌ No files found - diagnosis:")
-                log_message(f"  Pipeline dir exists: {pipeline_dir.exists()}")
-                log_message(f"  Modules dir exists: {modules_dir.exists()}")
+                # Detaillierte Diagnose
+                log_message("❌ Keine Dateien gefunden - Diagnose:")
+                log_message(f"  Pipeline-Dir existiert: {pipeline_dir.exists()}")
+                log_message(f"  Modules-Dir existiert: {modules_dir.exists()}")
                 if modules_dir.exists():
-                    log_message(f"  Modules found: {[d.name for d in modules_dir.iterdir() if d.is_dir()]}")
-                return None, "❌ No documents found for download - see terminal for details"
+                    log_message(f"  Module gefunden: {[d.name for d in modules_dir.iterdir() if d.is_dir()]}")
+                return None, "❌ Keine Dokumente zum Download gefunden - siehe Terminal für Details"
 
-            log_message(f"✅ Documents ZIP created ({total_files} files)")
-            return str(zip_path), f"✅ Documents ZIP created ({total_files} files)"
+            log_message(f"✅ Dokumente-ZIP erstellt ({total_files} Dateien)")
+            return str(zip_path), f"✅ Dokumente-ZIP erstellt ({total_files} Dateien)"
 
     except Exception as e:
-        error_msg = f"❌ Error creating documents ZIP: {e}"
+        error_msg = f"❌ Fehler beim Erstellen der Dokumente-ZIP: {e}"
         log_message(error_msg, "ERROR")
         return None, error_msg
 
 def create_model_zip():
-    """Creates a ZIP file with all model files."""
+    """Erstellt eine ZIP-Datei mit allen Modell-Dateien."""
     try:
-        log_message("📦 Creating model ZIP...")
+        log_message("📦 Erstelle Modell-ZIP...")
 
         temp_dir = tempfile.mkdtemp()
         zip_path = Path(temp_dir) / f"opentuneweaver_model_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
@@ -645,7 +645,7 @@ def create_model_zip():
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             total_files = 0
             
-            # 1. CustomModel directory (main model)
+            # 1. CustomModel Verzeichnis (Hauptmodell)
             custom_model_paths = [
                 Path("../pipeline/modules/06_finetuning/CustomModel"),
                 Path("../pipeline/CustomModel")
@@ -653,7 +653,7 @@ def create_model_zip():
             
             for custom_model_dir in custom_model_paths:
                 if custom_model_dir.exists():
-                    log_message(f"🔍 Searching model directory: {custom_model_dir}")
+                    log_message(f"🔍 Durchsuche Modell-Verzeichnis: {custom_model_dir}")
                     for file_path in custom_model_dir.rglob("*"):
                         if file_path.is_file():
                             rel_path = file_path.relative_to(custom_model_dir)
@@ -662,10 +662,10 @@ def create_model_zip():
                             total_files += 1
                             log_message(f"  🤖 {file_path.name} ({file_path.stat().st_size / (1024*1024):.1f} MB)")
 
-            # 2. Finetuning OUTPUT (for additional model files)
+            # 2. Finetuning OUTPUT (für zusätzliche Modell-Dateien)
             finetuning_output = Path("../pipeline/modules/06_finetuning/OUTPUT")
             if finetuning_output.exists():
-                log_message("🔍 Searching finetuning OUTPUT...")
+                log_message("🔍 Durchsuche Finetuning OUTPUT...")
                 for file_path in finetuning_output.rglob("*"):
                     if (file_path.is_file() and 
                         file_path.suffix.lower() in ['.bin', '.safetensors', '.pt', '.pth', '.gguf', '.json', '.txt']):
@@ -675,13 +675,13 @@ def create_model_zip():
                         total_files += 1
                         log_message(f"  📄 {file_path.name}")
 
-            # 3. Adapter files (LoRA)
+            # 3. Adapter-Dateien (LoRA)
             adapter_patterns = ["adapter_*.safetensors", "adapter_config.json", "*.lora"]
             pipeline_dir = Path("../pipeline")
             for pattern in adapter_patterns:
                 for file_path in pipeline_dir.rglob(pattern):
                     if (file_path.is_file() and 
-                        "CustomModel" not in str(file_path.parent)):  # Avoid duplicates
+                        "CustomModel" not in str(file_path.parent)):  # Vermeiden Duplikate
                         rel_path = file_path.relative_to(pipeline_dir)
                         arcname = f"adapters/{rel_path}"
                         try:
@@ -691,7 +691,7 @@ def create_model_zip():
                         except:
                             pass
 
-            # 4. Training logs and configurations
+            # 4. Training-Logs und -Konfigurationen
             training_files = [
                 "training_args.json",
                 "trainer_state.json", 
@@ -712,7 +712,7 @@ def create_model_zip():
                         except:
                             pass
 
-            # 5. GGUF files (if available)
+            # 5. GGUF-Dateien (falls vorhanden)
             for gguf_path in pipeline_dir.rglob("*.gguf"):
                 if gguf_path.is_file():
                     rel_path = gguf_path.relative_to(pipeline_dir)
@@ -722,37 +722,37 @@ def create_model_zip():
                     log_message(f"  📦 {gguf_path.name}")
 
             if total_files == 0:
-                # Detailed diagnosis
-                log_message("❌ No model files found - diagnosis:")
+                # Detaillierte Diagnose
+                log_message("❌ Keine Modell-Dateien gefunden - Diagnose:")
                 for path in custom_model_paths:
                     log_message(f"  {path}: {'EXISTS' if path.exists() else 'NOT FOUND'}")
                     if path.exists():
                         files = list(path.rglob("*"))
-                        log_message(f"    Files: {len(files)} found")
-                        for f in files[:5]:  # Show first 5 files
+                        log_message(f"    Dateien: {len(files)} gefunden")
+                        for f in files[:5]:  # Erste 5 Dateien zeigen
                             log_message(f"      - {f.name}")
                 
-                return None, "❌ No model files found for download - see terminal for details"
+                return None, "❌ Keine Modell-Dateien zum Download gefunden - siehe Terminal für Details"
 
             file_size_mb = zip_path.stat().st_size / (1024 * 1024)
-            log_message(f"✅ Model ZIP created ({total_files} files, {file_size_mb:.1f} MB)")
-            return str(zip_path), f"✅ Model ZIP created ({total_files} files, {file_size_mb:.1f} MB)"
+            log_message(f"✅ Modell-ZIP erstellt ({total_files} Dateien, {file_size_mb:.1f} MB)")
+            return str(zip_path), f"✅ Modell-ZIP erstellt ({total_files} Dateien, {file_size_mb:.1f} MB)"
 
     except Exception as e:
-        error_msg = f"❌ Error creating model ZIP: {e}"
+        error_msg = f"❌ Fehler beim Erstellen der Modell-ZIP: {e}"
         log_message(error_msg, "ERROR")
         return None, error_msg
 
-# ==================== CLEANUP ====================
+# ==================== AUFRÄUMEN ====================
 
 def get_cleanup_info():
-    """Returns information about folders to be deleted."""
+    """Gibt Information über zu löschende Ordner zurück."""
     try:
         modules_dir = Path("../pipeline/modules")
         data_dir = Path("../pipeline/data")
         
         if not modules_dir.exists():
-            return "❌ Pipeline directory not found"
+            return "❌ Pipeline-Verzeichnis nicht gefunden"
 
         cleanup_info = []
         total_files = 0
@@ -783,7 +783,7 @@ def get_cleanup_info():
 
                         if file_count > 0:
                             size_mb = folder_size / (1024 * 1024)
-                            cleanup_info.append(f"📁 {module_name}/{folder}: {file_count} files ({size_mb:.1f} MB)")
+                            cleanup_info.append(f"📁 {module_name}/{folder}: {file_count} Dateien ({size_mb:.1f} MB)")
                             total_files += file_count
                             total_size += folder_size
 
@@ -799,7 +799,7 @@ def get_cleanup_info():
             
             if file_count > 0:
                 size_mb = folder_size / (1024 * 1024)
-                cleanup_info.append(f"📁 CustomModel: {file_count} files ({size_mb:.1f} MB)")
+                cleanup_info.append(f"📁 CustomModel: {file_count} Dateien ({size_mb:.1f} MB)")
                 total_files += file_count
                 total_size += folder_size
 
@@ -816,33 +816,33 @@ def get_cleanup_info():
 
                 if file_count > 0:
                     size_mb = folder_size / (1024 * 1024)
-                    cleanup_info.append(f"📁 data/OUTPUT: {file_count} files ({size_mb:.1f} MB)")
+                    cleanup_info.append(f"📁 data/OUTPUT: {file_count} Dateien ({size_mb:.1f} MB)")
                     total_files += file_count
                     total_size += folder_size
 
         if not cleanup_info:
-            return "✅ No files found for cleanup"
+            return "✅ Keine Dateien zum Aufräumen gefunden"
 
         total_size_mb = total_size / (1024 * 1024)
-        info_text = f"🗑️ Cleanup Overview:\n\n"
+        info_text = f"🗑️ Aufräum-Übersicht:\n\n"
         info_text += "\n".join(cleanup_info)
-        info_text += f"\n\n📊 Total: {total_files} files ({total_size_mb:.1f} MB)"
-        info_text += f"\n\n⚠️ WARNING: This action cannot be undone!"
+        info_text += f"\n\n📊 Gesamt: {total_files} Dateien ({total_size_mb:.1f} MB)"
+        info_text += f"\n\n⚠️ WARNUNG: Diese Aktion kann nicht rückgängig gemacht werden!"
 
         return info_text
 
     except Exception as e:
-        return f"❌ Error analyzing files: {e}"
+        return f"❌ Fehler beim Analysieren: {e}"
 
 def cleanup_pipeline_folders():
-    """Deletes all working directories."""
+    """Löscht alle Arbeitsverzeichnisse."""
     try:
-        log_message("🗑️ Starting cleanup...")
+        log_message("🗑️ Starte Aufräumen...")
         modules_dir = Path("../pipeline/modules")
         data_dir = Path("../pipeline/data")
 
         if not modules_dir.exists():
-            return "❌ Pipeline directory not found"
+            return "❌ Pipeline-Verzeichnis nicht gefunden"
 
         deleted_files = 0
         deleted_folders = 0
@@ -868,9 +868,9 @@ def cleanup_pipeline_folders():
                             shutil.rmtree(folder_path)
                             deleted_files += file_count
                             deleted_folders += 1
-                            log_message(f"🗑️ Deleted: {module_name}/{folder} ({file_count} files)")
+                            log_message(f"🗑️ Gelöscht: {module_name}/{folder} ({file_count} Dateien)")
 
-        # Clean up CustomModel
+        # CustomModel aufräumen
         custom_model_dir = Path("../pipeline/CustomModel")
         if custom_model_dir.exists():
             file_count = sum(1 for f in custom_model_dir.rglob("*") if f.is_file())
@@ -878,9 +878,9 @@ def cleanup_pipeline_folders():
                 shutil.rmtree(custom_model_dir)
                 deleted_files += file_count
                 deleted_folders += 1
-                log_message(f"🗑️ Deleted: CustomModel ({file_count} files)")
+                log_message(f"🗑️ Gelöscht: CustomModel ({file_count} Dateien)")
 
-        # Clean up data/OUTPUT
+        # data/OUTPUT aufräumen
         if data_dir.exists():
             data_output = data_dir / "OUTPUT"
             if data_output.exists():
@@ -889,23 +889,23 @@ def cleanup_pipeline_folders():
                     shutil.rmtree(data_output)
                     deleted_files += file_count
                     deleted_folders += 1
-                    log_message(f"🗑️ Deleted: data/OUTPUT ({file_count} files)")
+                    log_message(f"🗑️ Gelöscht: data/OUTPUT ({file_count} Dateien)")
 
         if deleted_files == 0:
-            return "✅ No files found for cleanup"
+            return "✅ Keine Dateien zum Aufräumen gefunden"
 
-        log_message(f"✅ Cleanup completed: {deleted_files} files in {deleted_folders} folders deleted")
-        return f"✅ Cleanup successful!\n\n📊 Deleted:\n- {deleted_files} files\n- {deleted_folders} folders\n\n🎯 Pipeline ready for restart"
+        log_message(f"✅ Aufräumen abgeschlossen: {deleted_files} Dateien in {deleted_folders} Ordnern gelöscht")
+        return f"✅ Aufräumen erfolgreich!\n\n📊 Gelöscht:\n- {deleted_files} Dateien\n- {deleted_folders} Ordner\n\n🎯 Pipeline bereit für Neustart"
 
     except Exception as e:
-        error_msg = f"❌ Error during cleanup: {e}"
+        error_msg = f"❌ Fehler beim Aufräumen: {e}"
         log_message(error_msg, "ERROR")
         return error_msg
 
-# ==================== MAIN INTERFACE ====================
+# ==================== HAUPTINTERFACE ====================
 
 def create_main_interface():
-    """Creates the main interface."""
+    """Erstellt das Hauptinterface."""
     
     with gr.Blocks(
         title="OpenTuneWeaver - Finetuning Pipeline UI",
@@ -957,7 +957,7 @@ def create_main_interface():
         """
     ) as interface:
 
-        # Header without logo
+        # Header ohne Logo
         gr.HTML("""
         <div class="header-gradient">
             <div style="font-size: 4em; margin-bottom: 10px;">🎯</div>
@@ -966,97 +966,97 @@ def create_main_interface():
         </div>
         """)
 
-        gr.Markdown("**Graphical User Interface for the complete fine-tuning pipeline**")
+        gr.Markdown("**Grafische Benutzeroberfläche für die komplette Finetuning-Pipeline**")
 
         with gr.Tabs():
 
-            # ==================== MAIN PAGE ====================
-            with gr.TabItem("🏠 Home"):
+            # ==================== HAUPTSEITE ====================
+            with gr.TabItem("🏠 Hauptseite"):
                 with gr.Row():
                     with gr.Column(scale=1):
-                        gr.Markdown("### 📁 Document Upload")
+                        gr.Markdown("### 📁 Dokument-Upload")
                         file_upload = gr.File(
-                            label="Select files (PDF, DOCX, TXT, MD, etc.)",
+                            label="Dateien auswählen (PDF, DOCX, TXT, MD, etc.)",
                             file_count="multiple",
                             file_types=[".pdf", ".docx", ".txt", ".md", ".html", ".xml", ".pptx", ".xlsx", ".rtf", ".odt"]
                         )
-                        upload_btn = gr.Button("📤 Upload files", variant="primary")
+                        upload_btn = gr.Button("📤 Dateien hochladen", variant="primary")
                         upload_status = gr.Textbox(
-                            label="Upload Status",
+                            label="Upload-Status",
                             interactive=False,
                             elem_classes=["status-info"]
                         )
 
-                        gr.Markdown("### 🚀 Pipeline Control")
-                        gr.Markdown("*The pipeline runs fully automated - all inputs are answered automatically*")
+                        gr.Markdown("### 🚀 Pipeline-Steuerung")
+                        gr.Markdown("*Die Pipeline läuft vollständig automatisiert - alle Eingaben werden automatisch beantwortet*")
                         with gr.Row():
-                            start_btn = gr.Button("🚀 Start Pipeline", variant="primary", size="lg")
-                            stop_btn = gr.Button("⏹️ Stop Pipeline", variant="stop")
+                            start_btn = gr.Button("🚀 Pipeline starten", variant="primary", size="lg")
+                            stop_btn = gr.Button("⏹️ Pipeline stoppen", variant="stop")
                         
                         pipeline_status = gr.Textbox(
-                            label="Pipeline Status",
+                            label="Pipeline-Status",
                             interactive=False,
                             elem_classes=["status-info"]
                         )
 
-                        gr.Markdown("### 📥 Download & Cleanup")
+                        gr.Markdown("### 📥 Download & Aufräumen")
                         with gr.Row():
-                            download_docs_btn = gr.Button("📄 Download Documents", variant="secondary")
-                            download_model_btn = gr.Button("🤖 Download Model", variant="secondary")
+                            download_docs_btn = gr.Button("📄 Dokumente herunterladen", variant="secondary")
+                            download_model_btn = gr.Button("🤖 Modell herunterladen", variant="secondary")
                         
                         with gr.Row():
-                            cleanup_btn = gr.Button("🗑️ Cleanup", variant="stop")
+                            cleanup_btn = gr.Button("🗑️ Aufräumen", variant="stop")
                         
                         download_status = gr.Textbox(
-                            label="Download Status",
+                            label="Download-Status",
                             interactive=False,
                             elem_classes=["status-info"]
                         )
                         
                         download_file = gr.File(
-                            label="Download File",
+                            label="Download-Datei",
                             visible=False
                         )
 
                     with gr.Column(scale=2):
-                        gr.Markdown("### 📊 Pipeline Overview")
+                        gr.Markdown("### 📊 Pipeline-Übersicht")
                         gr.Markdown("""
-                        **The OpenTuneWeaver Pipeline includes 8 steps:**
+                        **Die OpenTuneWeaver Pipeline umfasst 8 Schritte:**
                         
-                        1. **📄 Document Conversion** - Converting documents to Markdown
-                        2. **📚 Wiki Generation** - Creating wiki structures  
-                        3. **❓ Instruct QA Creation** - Generating question-answer pairs
-                        4. **🔧 Dataset Formatting** - Formatting for training
-                        5. **📊 Benchmark Creation** - Creating benchmark questions
-                        6. **🤖 Fine-tuning** - Training the model
-                        7. **🏆 Benchmarking** - Evaluating the trained model
-                        8. **📦 Results Archive** - Archiving all results
+                        1. **📄 Document Conversion** - Konvertierung von Dokumenten zu Markdown
+                        2. **📚 Wiki Generation** - Erstellung von Wiki-Strukturen  
+                        3. **❓ Instruct QA Creation** - Generierung von Frage-Antwort-Paaren
+                        4. **🔧 Dataset Formatting** - Formatierung für das Training
+                        5. **📊 Benchmark Creation** - Erstellung von Benchmark-Fragen
+                        6. **🤖 Fine-tuning** - Training des Modells
+                        7. **🏆 Benchmarking** - Evaluation des trainierten Modells
+                        8. **📦 Results Archive** - Archivierung aller Ergebnisse
                         
-                        **Usage:**
-                        1. Upload your documents
-                        2. Configure settings (see Settings tab)
-                        3. Start the pipeline (runs fully automatically)
-                        4. Track progress in the Terminal tab
-                        5. Download the results
+                        **Verwendung:**
+                        1. Laden Sie Ihre Dokumente hoch
+                        2. Konfigurieren Sie die Einstellungen (siehe Einstellungen-Tab)
+                        3. Starten Sie die Pipeline (läuft vollautomatisch)
+                        4. Verfolgen Sie den Fortschritt im Terminal-Tab
+                        5. Laden Sie die Ergebnisse herunter
                         
-                        **🤖 Automation:** The pipeline answers all prompts automatically:
-                        - Option 1 (Complete Pipeline)
-                        - No new configuration (uses UI settings)
-                        - Default values for all parameters
-                        - Automatic cleanup at the end
+                        **🤖 Automatisierung:** Die Pipeline beantwortet alle Eingabeaufforderungen automatisch:
+                        - Option 1 (Komplette Pipeline)
+                        - Keine neue Konfiguration (verwendet UI-Einstellungen)
+                        - Standard-Werte für alle Parameter
+                        - Automatische Bereinigung am Ende
                         
-                        **💡 Note:** If you close the UI window, the pipeline will be interrupted.
+                        **💡 Hinweis:** Wenn Sie das UI-Fenster schließen, wird die Pipeline unterbrochen.
                         """)
 
-            # ==================== SETTINGS ====================
-            with gr.TabItem("⚙️ Settings"):
-                gr.Markdown("### 🔧 Pipeline Configuration")
-                gr.Markdown("Here you can configure all pipeline settings.")
+            # ==================== EINSTELLUNGEN ====================
+            with gr.TabItem("⚙️ Einstellungen"):
+                gr.Markdown("### 🔧 Pipeline-Konfiguration")
+                gr.Markdown("Hier können Sie alle Einstellungen der Pipeline konfigurieren.")
 
                 with gr.Accordion("🔑 HuggingFace Tokens", open=True):
                     with gr.Row():
                         hf_token = gr.Textbox(
-                            label="HF Token (for model downloads)",
+                            label="HF Token (für Modell-Downloads)",
                             type="password",
                             placeholder="hf_..."
                         )
@@ -1066,7 +1066,7 @@ def create_main_interface():
                             placeholder="hf_..."
                         )
 
-                with gr.Accordion("🌐 API Configuration", open=True):
+                with gr.Accordion("🌐 API-Konfiguration", open=True):
                     with gr.Row():
                         api_base_url = gr.Textbox(
                             label="API Base URL",
@@ -1079,10 +1079,10 @@ def create_main_interface():
                             placeholder="ollama"
                         )
 
-                    gr.Markdown("**Model configuration for each step:**")
+                    gr.Markdown("**Modell-Konfiguration für jeden Schritt:**")
                     with gr.Row():
                         convert_model = gr.Textbox(
-                            label="📄 Convert Model",
+                            label="📄 Convert Modell",
                             value="gemma3:12b-it-qat"
                         )
                         convert_temp = gr.Slider(
@@ -1095,7 +1095,7 @@ def create_main_interface():
 
                     with gr.Row():
                         wiki_model = gr.Textbox(
-                            label="📚 Wiki Model",
+                            label="📚 Wiki Modell",
                             value="gemma3:12b-it-qat"
                         )
                         wiki_temp = gr.Slider(
@@ -1108,7 +1108,7 @@ def create_main_interface():
 
                     with gr.Row():
                         qa_model = gr.Textbox(
-                            label="❓ QA Model",
+                            label="❓ QA Modell",
                             value="gemma3:12b-it-qat"
                         )
                         qa_temp = gr.Slider(
@@ -1121,7 +1121,7 @@ def create_main_interface():
 
                     with gr.Row():
                         benchmark_model = gr.Textbox(
-                            label="📊 Benchmark Model",
+                            label="📊 Benchmark Modell",
                             value="gemma3:12b-it-qat"
                         )
                         benchmark_temp = gr.Slider(
@@ -1132,13 +1132,13 @@ def create_main_interface():
                             step=0.1
                         )
 
-                with gr.Accordion("🤖 Fine-tuning Configuration", open=True):
+                with gr.Accordion("🤖 Fine-tuning Konfiguration", open=True):
                     with gr.Row():
                         model_name = gr.Textbox(
-                            label="Model Name",
+                            label="Modell-Name",
                             value="OpenTuneWeaver-Model"
                         )
-                        # Changed: Dropdown instead of Textbox for Base Model
+                        # Geändert: Dropdown statt Textbox für Base Model
                         base_model = gr.Dropdown(
                             label="Base Model",
                             choices=AVAILABLE_MODELS,
@@ -1152,11 +1152,11 @@ def create_main_interface():
                             value="user/OpenTuneWeaver-Model"
                         )
                         custom_model_dir = gr.Textbox(
-                            label="CustomModel Directory",
+                            label="CustomModel Verzeichnis",
                             value="CustomModel"
                         )
 
-                    gr.Markdown("**Training Parameters:**")
+                    gr.Markdown("**Training-Parameter:**")
                     with gr.Row():
                         max_seq_length = gr.Slider(
                             label="Max Sequence Length",
@@ -1174,7 +1174,7 @@ def create_main_interface():
                             value=False
                         )
 
-                    gr.Markdown("**LoRA Parameters:**")
+                    gr.Markdown("**LoRA-Parameter:**")
                     with gr.Row():
                         lora_r = gr.Slider(
                             label="LoRA r",
@@ -1198,7 +1198,7 @@ def create_main_interface():
                             step=0.05
                         )
 
-                    gr.Markdown("**Training Settings:**")
+                    gr.Markdown("**Training-Einstellungen:**")
                     with gr.Row():
                         batch_size = gr.Slider(
                             label="Batch Size",
@@ -1224,7 +1224,7 @@ def create_main_interface():
                             step=10
                         )
                         num_epochs = gr.Slider(
-                            label="Number of Epochs",
+                            label="Anzahl Epochen",
                             minimum=1,
                             maximum=20,
                             value=3,
@@ -1247,25 +1247,25 @@ def create_main_interface():
                             step=0.01
                         )
 
-                    gr.Markdown("**Output Options:**")
+                    gr.Markdown("**Output-Optionen:**")
                     with gr.Row():
                         save_lora = gr.Checkbox(
-                            label="Save LoRA Adapter",
+                            label="LoRA Adapter speichern",
                             value=True
                         )
                         save_merged = gr.Checkbox(
-                            label="Save Merged Model",
+                            label="Merged Model speichern",
                             value=True
                         )
                         save_gguf = gr.Checkbox(
-                            label="Save GGUF Model",
+                            label="GGUF Model speichern",
                             value=False
                         )
 
-                with gr.Accordion("🏆 Benchmark Configuration", open=False):
+                with gr.Accordion("🏆 Benchmark-Konfiguration", open=False):
                     with gr.Row():
                         benchmark_mode = gr.Dropdown(
-                            label="Benchmark Mode",
+                            label="Benchmark Modus",
                             choices=["comparison", "post_only", "pre_only"],
                             value="comparison"
                         )
@@ -1315,103 +1315,103 @@ def create_main_interface():
                             step=0.05
                         )
 
-                with gr.Accordion("⚙️ Pipeline Settings", open=False):
+                with gr.Accordion("⚙️ Pipeline-Einstellungen", open=False):
                     with gr.Row():
                         auto_cleanup = gr.Checkbox(
-                            label="Automatic Cleanup",
+                            label="Automatisches Aufräumen",
                             value=False
                         )
                         verbose_mode = gr.Checkbox(
-                            label="Verbose Mode",
+                            label="Verbose Modus",
                             value=True
                         )
                         continue_on_error = gr.Checkbox(
-                            label="Continue on Error",
+                            label="Bei Fehlern fortfahren",
                             value=True
                         )
 
                 # Buttons
                 with gr.Row():
-                    load_config_btn = gr.Button("📋 Load Current Configuration", variant="secondary")
-                    save_config_btn = gr.Button("💾 Save Configuration", variant="primary")
+                    load_config_btn = gr.Button("📋 Aktuelle Konfiguration laden", variant="secondary")
+                    save_config_btn = gr.Button("💾 Konfiguration speichern", variant="primary")
 
                 config_status = gr.Textbox(
-                    label="Configuration Status",
+                    label="Konfigurations-Status",
                     interactive=False,
                     elem_classes=["status-info"]
                 )
 
             # ==================== TERMINAL ====================
             with gr.TabItem("🖥️ Terminal"):
-                gr.Markdown("### 🖥️ Live Terminal Output")
-                gr.Markdown("*The terminal shows all pipeline steps and automatic responses in real-time*")
+                gr.Markdown("### 🖥️ Live-Terminal Ausgabe")
+                gr.Markdown("*Das Terminal zeigt alle Pipeline-Schritte und automatischen Antworten in Echtzeit*")
                 with gr.Row():
-                    refresh_btn = gr.Button("🔄 Refresh", variant="secondary")
-                    clear_btn = gr.Button("🗑️ Clear", variant="secondary")
+                    refresh_btn = gr.Button("🔄 Aktualisieren", variant="secondary")
+                    clear_btn = gr.Button("🗑️ Löschen", variant="secondary")
 
                 terminal_output = gr.Textbox(
-                    label="Terminal Output",
-                    value="📋 OpenTuneWeaver Pipeline ready...\n💡 Upload files, configure settings and start the pipeline\n🤖 The pipeline runs fully automatically - all inputs are answered automatically",
+                    label="Terminal-Ausgabe",
+                    value="📋 OpenTuneWeaver Pipeline bereit...\n💡 Laden Sie Dateien hoch, konfigurieren Sie die Einstellungen und starten Sie die Pipeline\n🤖 Die Pipeline läuft vollautomatisch - alle Eingaben werden automatisch beantwortet",
                     interactive=False,
                     lines=30,
                     max_lines=30,
                     elem_classes=["terminal-output"]
                 )
 
-            # ==================== CLEANUP ====================
-            with gr.TabItem("🗑️ Cleanup"):
+            # ==================== AUFRÄUMEN ====================
+            with gr.TabItem("🗑️ Aufräumen"):
                 with gr.Column():
-                    gr.Markdown("### 🧹 Clean up pipeline directories")
-                    gr.Markdown("Delete all temporary files and results for a clean restart")
+                    gr.Markdown("### 🧹 Pipeline-Verzeichnisse aufräumen")
+                    gr.Markdown("Löschen Sie alle temporären Dateien und Ergebnisse für einen sauberen Neustart")
 
                     with gr.Row():
                         with gr.Column(scale=1):
-                            analyze_btn = gr.Button("🔍 Analyze directories", variant="secondary")
-                            cleanup_confirm_btn = gr.Button("🗑️ DELETE ALL", variant="stop")
+                            analyze_btn = gr.Button("🔍 Verzeichnisse analysieren", variant="secondary")
+                            cleanup_confirm_btn = gr.Button("🗑️ ALLES LÖSCHEN", variant="stop")
 
                             cleanup_result = gr.Textbox(
-                                label="Cleanup Result",
+                                label="Aufräum-Ergebnis",
                                 interactive=False,
                                 elem_classes=["status-info"]
                             )
 
                         with gr.Column(scale=2):
                             cleanup_info = gr.Textbox(
-                                label="Cleanup Analysis",
-                                value="📊 Click 'Analyze directories' to see what would be deleted",
+                                label="Aufräum-Analyse",
+                                value="📊 Klicken Sie auf 'Verzeichnisse analysieren' um zu sehen was gelöscht werden würde",
                                 interactive=False,
                                 lines=20
                             )
 
-                    gr.Markdown("### ⚠️ Important Notes")
+                    gr.Markdown("### ⚠️ Wichtige Hinweise")
                     gr.Markdown("""
-                    **What will be deleted:**
-                    - 📁 All INPUT/OUTPUT directories of modules
-                    - 📁 UPLOAD directory with uploaded files
-                    - 📁 CustomModel directory with trained models
-                    - 📁 data/OUTPUT directory with archived results
-                    - 📁 All benchmark directories
+                    **Was wird gelöscht:**
+                    - 📁 Alle INPUT/OUTPUT Verzeichnisse der Module
+                    - 📁 UPLOAD Verzeichnis mit hochgeladenen Dateien
+                    - 📁 CustomModel Verzeichnis mit trainierten Modellen
+                    - 📁 data/OUTPUT Verzeichnis mit archivierten Ergebnissen
+                    - 📁 Alle Benchmark-Verzeichnisse
 
-                    **What will be preserved:**
-                    - ✅ All Python scripts of the pipeline
-                    - ✅ Configuration files
-                    - ✅ This UI application
-                    - ✅ Viewer files
+                    **Was bleibt erhalten:**
+                    - ✅ Alle Python-Skripte der Pipeline
+                    - ✅ Konfigurationsdateien
+                    - ✅ Diese UI-Anwendung
+                    - ✅ Viewer-Dateien
 
-                    **⚠️ This action CANNOT be undone!**
-                    **Create a backup or download results before proceeding!**
+                    **⚠️ Diese Aktion kann NICHT rückgängig gemacht werden!**
+                    **Erstellen Sie vorher ein Backup oder laden Sie die Ergebnisse herunter!**
                     """)
 
-        # ==================== EVENT HANDLERS ====================
+        # ==================== EVENT-HANDLER ====================
 
-        # Upload handler
+        # Upload-Handler
         upload_btn.click(
             fn=save_uploaded_files,
             inputs=[file_upload],
             outputs=[upload_status]
         )
 
-        # Pipeline handlers
+        # Pipeline-Handler
         start_btn.click(
             fn=start_pipeline,
             outputs=[pipeline_status]
@@ -1422,7 +1422,7 @@ def create_main_interface():
             outputs=[pipeline_status]
         )
 
-        # Terminal handlers
+        # Terminal-Handler
         refresh_btn.click(
             fn=get_terminal_output,
             outputs=[terminal_output]
@@ -1433,7 +1433,7 @@ def create_main_interface():
             outputs=[terminal_output]
         )
 
-        # Separate download handlers
+        # Getrennte Download-Handler
         def handle_documents_download():
             zip_path, status = create_documents_zip()
             if zip_path:
@@ -1458,7 +1458,7 @@ def create_main_interface():
             outputs=[download_status, download_file, download_file]
         )
 
-        # Cleanup handlers
+        # Aufräum-Handler
         analyze_btn.click(
             fn=get_cleanup_info,
             outputs=[cleanup_info]
@@ -1474,7 +1474,7 @@ def create_main_interface():
             outputs=[cleanup_result]
         )
 
-        # Configuration handlers
+        # Konfigurations-Handler
         def load_config_to_ui():
             config = load_existing_config()
             
@@ -1483,12 +1483,12 @@ def create_main_interface():
             hf_token_val = tokens.get("hf_token", "")
             hf_write_token_val = tokens.get("hf_write_token", "")
             
-            # API Config (take first entry as reference)
+            # API Config (nehme ersten Eintrag als Referenz)
             api_config = config.get("api_configs", {}).get("01_convert", {})
             api_base_url_val = api_config.get("openai_base_url", "http://localhost:11434/v1")
             api_key_val = api_config.get("openai_api_key", "ollama")
             
-            # Models
+            # Modelle
             convert_config = config.get("api_configs", {}).get("01_convert", {})
             wiki_config = config.get("api_configs", {}).get("02_genwiki", {})
             qa_config = config.get("api_configs", {}).get("03_instructQA", {})
@@ -1543,7 +1543,7 @@ def create_main_interface():
                 pipe_config.get("auto_cleanup", False),
                 pipe_config.get("verbose", True),
                 pipe_config.get("continue_on_error", True),
-                "✅ Configuration loaded"
+                "✅ Konfiguration geladen"
             ]
 
         load_config_btn.click(
@@ -1586,7 +1586,7 @@ def create_main_interface():
             outputs=[config_status]
         )
 
-        # Auto-refresh for terminal
+        # Auto-Refresh für Terminal
         def auto_scroll_terminal():
             output = get_terminal_output()
             return output
@@ -1597,35 +1597,35 @@ def create_main_interface():
                 outputs=[terminal_output],
                 every=2
             )
-            log_message("✅ Auto-refresh activated (2 seconds)")
+            log_message("✅ Auto-Refresh aktiviert (2 Sekunden)")
         except:
-            log_message("⚠️ Auto-refresh not supported - use 'Refresh'")
+            log_message("⚠️ Auto-Refresh nicht unterstützt - verwenden Sie 'Aktualisieren'")
 
         return interface
 
 def main():
-    """Main function."""
+    """Hauptfunktion."""
     print("="*80)
     print(" 🎯 OPENTUNEWEAVER - FINETUNING PIPELINE UI")
     print("="*80)
-    log_message("🚀 Starting OpenTuneWeaver UI...")
-    log_message("✨ Features: Upload, Configuration, Pipeline, Terminal, separate downloads, Cleanup")
+    log_message("🚀 Starte OpenTuneWeaver UI...")
+    log_message("✨ Features: Upload, Konfiguration, Pipeline, Terminal, getrennte Downloads, Aufräumen")
 
-    # Create interface
+    # Erstelle Interface
     interface = create_main_interface()
 
-    # Start server
-    log_message("🌐 Starting web server...")
-    print("\n🌐 UI available at:")
-    print(" - Local: http://localhost:8080")
-    print(" - Network: http://YOUR_IP:8080")
+    # Starte Server
+    log_message("🌐 Starte Web-Server...")
+    print("\n🌐 UI verfügbar unter:")
+    print(" - Lokal: http://localhost:8080")
+    print(" - Netzwerk: http://YOUR_IP:8080")
     print("\n🎯 Features:")
-    print(" - 📤 File upload for all document formats")
-    print(" - ⚙️ Complete pipeline configuration with model dropdown")
-    print(" - 🖥️ Live terminal with auto-refresh and auto-scroll")
-    print(" - 📄 Separate downloads for documents and models")
-    print(" - 🤖 Fully automatic pipeline execution")
-    print(" - 🗑️ Comprehensive cleanup")
+    print(" - 📤 Datei-Upload für alle Dokumentformate")
+    print(" - ⚙️ Vollständige Pipeline-Konfiguration mit Modell-Dropdown")
+    print(" - 🖥️ Live-Terminal mit Auto-Refresh und Auto-Scroll")
+    print(" - 📄 Getrennter Download für Dokumente und Modelle")
+    print(" - 🤖 Vollautomatische Pipeline-Ausführung")
+    print(" - 🗑️ Umfassendes Aufräumen")
 
     try:
         interface.launch(
@@ -1638,14 +1638,14 @@ def main():
             inbrowser=False
         )
     except Exception as e:
-        print(f"\n❌ Server error: {e}")
+        print(f"\n❌ Server-Fehler: {e}")
 
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\n\n⏹️ OpenTuneWeaver UI terminated")
+        print("\n\n⏹️ OpenTuneWeaver UI beendet")
     except Exception as e:
-        print(f"\n💥 Unexpected error: {e}")
+        print(f"\n💥 Unerwarteter Fehler: {e}")
         import traceback
         traceback.print_exc()

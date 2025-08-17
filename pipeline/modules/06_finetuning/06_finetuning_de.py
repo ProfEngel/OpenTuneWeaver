@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Gemma 3N Fine-tuning Script - With central configuration
+Gemma 3N Finetuning Script - Mit zentraler Konfiguration
 Fine-tuning script using central pipeline_config.json
 """
 
@@ -13,31 +13,31 @@ from datetime import datetime
 from pathlib import Path
 
 # ========================================
-# LOAD CENTRAL CONFIGURATION
+# ZENTRALE KONFIGURATION LADEN
 # ========================================
-sys.path.append(str(Path(__file__).parent.parent.parent))  # To main directory
+sys.path.append(str(Path(__file__).parent.parent.parent))  # Zum Hauptverzeichnis
 from config_loader import PipelineConfigLoader
 
-# Load configuration for this module
+# Lade Konfiguration für dieses Modul
 config_loader = PipelineConfigLoader()
 ft_config = config_loader.get_finetuning_config()
 tokens = config_loader.get_tokens()
 
-# Show loaded configuration
+# Zeige geladene Konfiguration
 print("=" * 60)
-print("📋 CONFIGURATION LOADED (06_finetuning)")
+print("📋 KONFIGURATION GELADEN (06_finetuning)")
 print("=" * 60)
 config_loader.print_config_summary()
-print(f"\n  🎯 Model: {ft_config.get('model_name', 'Unknown')}")
+print(f"\n  🎯 Modell: {ft_config.get('model_name', 'Unknown')}")
 print(f"  🤖 Base: {ft_config.get('base_model', 'Unknown')}")
-print(f"  📊 Profile: {ft_config.get('training_profile', 'Unknown')}")
+print(f"  📊 Profil: {ft_config.get('training_profile', 'Unknown')}")
 print(f"  🔄 Epochs: {ft_config.get('num_train_epochs', 0)}")
 print(f"  💾 Merged: {'✅' if ft_config.get('save_merged') else '❌'}")
 print(f"  🎯 GGUF: {'✅' if ft_config.get('save_gguf') else '❌'}")
 print(f"  🔑 HF-Token: {'✅' if tokens.get('hf_token') else '❌'}")
 print("=" * 60)
 
-# Set environment variables for HF tokens
+# Setze Environment-Variablen für HF-Tokens
 if tokens.get('hf_token'):
     os.environ["HF_TOKEN"] = tokens['hf_token']
     os.environ["HUGGINGFACE_TOKEN"] = tokens['hf_token']
@@ -52,9 +52,9 @@ from transformers import TextStreamer
 from trl import SFTTrainer, SFTConfig
 from huggingface_hub import HfApi
 
-# Configuration Class with values from central config
+# Configuration Class mit Werten aus zentraler Config
 class Config:
-    # Load from central config
+    # Aus zentraler Config laden
     MODEL_NAME = ft_config.get('base_model', 'unsloth/gemma-3n-E2B-it')
     OUTPUT_MODEL_NAME = ft_config.get('model_name', 'FoxLM-e2b')
     HF_REPO_ID = ft_config.get('hf_repo_id', f"user/{ft_config.get('model_name', 'model')}")
@@ -129,10 +129,10 @@ def check_model_in_cache(model_name):
                 model_files = [f for f in os.listdir(latest_snapshot) if f.endswith('.safetensors')]
                 if model_files:
                     total_size = sum(os.path.getsize(os.path.join(latest_snapshot, f)) for f in model_files) / (1024**3)
-                    print(f"✅ Model already in cache: {model_name} ({total_size:.1f} GB)")
+                    print(f"✅ Model bereits im Cache: {model_name} ({total_size:.1f} GB)")
                     return True
     
-    print(f"📥 Model will be downloaded on first load: {model_name}")
+    print(f"📥 Model wird beim ersten Laden heruntergeladen: {model_name}")
     return False
 
 def detect_gpu_and_optimize(config):
@@ -436,14 +436,14 @@ def show_memory_stats(config=None):
         return 0, 0
 
 def test_inference(model, tokenizer, config):
-    """Test the trained model with language-agnostic capability"""
+    """Test the trained model"""
     print("\nTesting inference...")
     
     # Setup tokenizer for inference
     tokenizer = get_chat_template(tokenizer, chat_template=config.CHAT_TEMPLATE)
     
-    # Test question (can be in any language - model will respond appropriately)
-    test_message = "What is the meaning of life?"
+    # Test question
+    test_message = "Was ist der Sinn des Lebens?"
     
     print(f"\n--- Inference Test ---")
     print(f"User: {test_message}")
@@ -480,7 +480,7 @@ def test_inference(model, tokenizer, config):
 def save_model(model, tokenizer, config):
     """Save the trained model locally"""
     if not config.SAVE_LOCAL:
-        print("🚫 Local saving skipped")
+        print("🚫 Lokale Speicherung übersprungen")
         return
     
     # Create directory
@@ -488,22 +488,22 @@ def save_model(model, tokenizer, config):
     os.makedirs(config.CUSTOM_MODEL_DIR, exist_ok=True)
     os.makedirs(custom_model_path, exist_ok=True)
     
-    print(f"\n💾 Saving model: {custom_model_path}")
+    print(f"\n💾 Speichere Modell: {custom_model_path}")
     
     saved_formats = []
     
     try:
         # Save LoRA adapters
         if config.SAVE_LORA:
-            print("📌 Saving LoRA adapters...")
+            print("📌 Speichere LoRA Adapter...")
             model.save_pretrained(custom_model_path)
             tokenizer.save_pretrained(custom_model_path)
             saved_formats.append("LoRA Adapter")
-            print("✅ LoRA adapters saved!")
+            print("✅ LoRA Adapter gespeichert!")
         
         # Save merged model
         if config.SAVE_MERGED:
-            print("🔗 Saving merged model...")
+            print("🔗 Speichere Merged Model...")
             try:
                 merged_path = f"{custom_model_path}_merged"
                 model.save_pretrained_merged(
@@ -515,14 +515,14 @@ def save_model(model, tokenizer, config):
                     safe_serialization=True
                 )
                 saved_formats.append("Merged Model (16bit)")
-                print("✅ Merged model saved!")
+                print("✅ Merged Model gespeichert!")
                 
                 # GGUF conversion if requested
                 if config.SAVE_GGUF and config.GGUF_QUANTIZATIONS:
-                    print(f"🎯 Creating GGUF files: {', '.join(config.GGUF_QUANTIZATIONS)}")
+                    print(f"🎯 Erstelle GGUF-Dateien: {', '.join(config.GGUF_QUANTIZATIONS)}")
                     
                     for quantization in config.GGUF_QUANTIZATIONS:
-                        print(f"   🔄 Converting to {quantization}...")
+                        print(f"   🔄 Konvertiere zu {quantization}...")
                         
                         # Find convert script
                         convert_script_paths = [
@@ -559,21 +559,21 @@ def save_model(model, tokenizer, config):
                                         print(f"   ✅ {quantization}: {os.path.basename(output_file)} ({size_gb:.1f} GB)")
                                         saved_formats.append(f"GGUF {quantization}")
                                 else:
-                                    print(f"   ❌ {quantization}: Conversion failed")
+                                    print(f"   ❌ {quantization}: Konvertierung fehlgeschlagen")
                                     
                             except Exception as e:
-                                print(f"   ❌ {quantization} error: {e}")
+                                print(f"   ❌ {quantization} Fehler: {e}")
                         else:
-                            print(f"   ❌ convert-hf-to-gguf.py not found")
-                            print("   💡 Install llama.cpp for GGUF conversion")
+                            print(f"   ❌ convert-hf-to-gguf.py nicht gefunden")
+                            print("   💡 Installiere llama.cpp für GGUF-Konvertierung")
                 
             except Exception as e:
                 print(f"⚠️ Merged model save failed: {e}")
         
         # Summary
-        print(f"\n✅ Local saving completed!")
-        print(f"📁 Save location: {config.CUSTOM_MODEL_DIR}/")
-        print(f"📋 Saved formats:")
+        print(f"\n✅ Lokale Speicherung abgeschlossen!")
+        print(f"📁 Speicherort: {config.CUSTOM_MODEL_DIR}/")
+        print(f"📋 Gespeicherte Formate:")
         for fmt in saved_formats:
             print(f"   • {fmt}")
         
@@ -606,28 +606,28 @@ def create_model_info_file(config, saved_formats):
     with open(info_file, 'w', encoding='utf-8') as f:
         json.dump(model_info, f, indent=2, ensure_ascii=False)
     
-    print(f"📋 Model info saved: {info_file}")
+    print(f"📋 Modell-Info gespeichert: {info_file}")
     
     # Create global info file
     global_info_file = "latest_model_info.json"
     with open(global_info_file, 'w', encoding='utf-8') as f:
         json.dump(model_info, f, indent=2, ensure_ascii=False)
     
-    print(f"📋 Global model info created: {global_info_file}")
+    print(f"📋 Globale Modell-Info erstellt: {global_info_file}")
 
 def upload_to_hub(model, tokenizer, config):
     """Upload model to Hugging Face Hub"""
     if not config.UPLOAD_TO_HF:
-        print("🚫 HF upload skipped")
+        print("🚫 HF Upload übersprungen")
         return
     
     upload_token = config.HF_WRITE_TOKEN or config.HF_TOKEN
     
     if not upload_token:
-        print("❌ No HF token available. Upload skipped.")
+        print("❌ Kein HF-Token verfügbar. Upload übersprungen.")
         return
     
-    print(f"\n☁️ Uploading to Hugging Face Hub: {config.HF_REPO_ID}")
+    print(f"\n☁️ Uploade zu Hugging Face Hub: {config.HF_REPO_ID}")
     
     try:
         # Test authentication
@@ -641,7 +641,7 @@ def upload_to_hub(model, tokenizer, config):
         
         # Upload LoRA adapters
         if config.SAVE_LORA:
-            print("📌 Uploading LoRA adapters...")
+            print("📌 Uploade LoRA Adapter...")
             model.push_to_hub(config.HF_REPO_ID, token=upload_token)
             tokenizer.push_to_hub(config.HF_REPO_ID, token=upload_token)
             print("✅ LoRA adapters uploaded!")
@@ -649,7 +649,7 @@ def upload_to_hub(model, tokenizer, config):
         # Upload merged model
         if config.SAVE_MERGED:
             try:
-                print("🔗 Uploading merged model...")
+                print("🔗 Uploade Merged Model...")
                 model.push_to_hub_merged(
                     config.HF_REPO_ID,
                     tokenizer,
@@ -660,21 +660,21 @@ def upload_to_hub(model, tokenizer, config):
             except Exception as merged_error:
                 print(f"⚠️ Merged model upload failed: {merged_error}")
         
-        print("✅ Upload to Hub successfully completed!")
+        print("✅ Upload zu Hub erfolgreich abgeschlossen!")
         
     except Exception as e:
-        print(f"❌ Error uploading to Hub: {e}")
+        print(f"❌ Fehler beim Upload zu Hub: {e}")
 
 def main():
     """Main function"""
-    print("🎯 Gemma 3N Fine-tuning - WITH CENTRAL CONFIG")
+    print("🎯 Gemma 3N Fine-tuning - MIT ZENTRALER CONFIG")
     print("=" * 60)
     
     # Initialize configuration
     config = Config()
     
     # Check if model is cached
-    print(f"\n🗄️ Cache check for {config.MODEL_NAME}...")
+    print(f"\n🗄️ Cache-Check für {config.MODEL_NAME}...")
     check_model_in_cache(config.MODEL_NAME)
     
     # Auto-detect GPU and optimize
@@ -688,7 +688,7 @@ def main():
     except:
         gguf_available = False
         if config.SAVE_GGUF:
-            print("⚠️ GGUF not available - disabling")
+            print("⚠️ GGUF nicht verfügbar - wird deaktiviert")
             config.SAVE_GGUF = False
             config.GGUF_QUANTIZATIONS = []
     
@@ -718,21 +718,21 @@ def main():
         upload_to_hub(model, tokenizer, config)
         
         print("\n" + "=" * 60)
-        print("🎉 Fine-tuning pipeline successfully completed!")
+        print("🎉 Fine-tuning Pipeline erfolgreich abgeschlossen!")
         print("=" * 60)
         
         # Final summary
         if config.SAVE_LOCAL:
-            print(f"📁 Local files: ./{config.CUSTOM_MODEL_DIR}/{config.OUTPUT_MODEL_NAME}/")
+            print(f"📁 Lokale Dateien: ./{config.CUSTOM_MODEL_DIR}/{config.OUTPUT_MODEL_NAME}/")
         if config.UPLOAD_TO_HF:
             print(f"☁️ HF Repository: https://huggingface.co/{config.HF_REPO_ID}")
         
-        print("\n💡 For evaluation:")
+        print("\n💡 Für Evaluierung:")
         print("   python 07_benchmark.py")
         print("=" * 60)
         
     except Exception as e:
-        print(f"❌ Error in training pipeline: {e}")
+        print(f"❌ Fehler in Training Pipeline: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)
