@@ -158,7 +158,6 @@ pip install --upgrade --no-cache-dir --no-deps git+https://github.com/unslothai/
 ## What's Next? 🌟
 
 **Short to medium-term roadmap:**
-- 🌐 **English Localization**: Complete UI and documentation in English
 - 🌍 **Multilingual Support**: Spanish, French, additional languages
 - 🤖 **Extended Model Support**: 
   - GPT-OSS family
