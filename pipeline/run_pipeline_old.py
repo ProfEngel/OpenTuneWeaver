@@ -1565,7 +1565,8 @@ def get_api_config(module_id):
             result = subprocess.run(
                 [sys.executable, os.path.basename(step['script'])],
                 cwd=working_dir,
-                env=env
+                env=env,
+                timeout=14400 # 4 Stunden Timeout
             )
             
             print("=" * 60)
@@ -1618,6 +1619,13 @@ def get_api_config(module_id):
                 self.metrics['errors'].append(f"Step {step['id']} failed: {step['name']}")
                 return False
                 
+        except subprocess.TimeoutExpired:
+            print("❌ Timeout nach 4 Stunden")
+            step_metrics['error'] = "Timeout after 4 hours"
+            step_metrics['duration_seconds'] = 14400
+            self.metrics['steps'][f"step_{step['id']}"] = step_metrics
+            self.metrics['errors'].append(f"Step {step['id']} timeout: {step['name']}")
+            return False
         except KeyboardInterrupt:
             print("\n⚠️ Abgebrochen")
             step_metrics['error'] = "User interrupted"
