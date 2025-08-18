@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # ============================================
-# OpenTuneWeaver RunPod Setup (Fixed Paths)
-# Version: 3.0
+# OpenTuneWeaver RunPod Setup (Safe Path Fix)
+# Version: 2.5
 # ============================================
 
 set -e # Exit on error
@@ -33,7 +33,7 @@ warning() {
 # ============================================
 
 log "${BLUE}========================================${NC}"
-log "${BLUE}🚀 OpenTuneWeaver RunPod Installation v3.0${NC}"
+log "${BLUE}🚀 OpenTuneWeaver RunPod Installation v2.5${NC}"
 log "${BLUE}========================================${NC}"
 
 # System Info
@@ -150,28 +150,43 @@ fi
 log "✅ Python environment setup complete"
 
 # ============================================
-# SCHRITT 6: NO MORE SYMLINKS! 
+# SCHRITT 6: Safe Path Fixes (KORRIGIERT)
 # ============================================
 
-log "${BLUE}🔧 Setting up proper directory structure...${NC}"
+log "${BLUE}🔧 Safe path fixes...${NC}"
 
-# Move the new app.py to root directory if it doesn't exist
-if [ ! -f "app.py" ]; then
-    if [ -f "ui/app_new.py" ]; then
-        log "Moving app_new.py to root as app.py..."
-        cp ui/app_new.py app.py
-        log "✅ app.py placed in root directory"
-    elif [ -f "ui/app.py" ]; then
-        log "Moving ui/app.py to root..."
-        cp ui/app.py app.py
-        log "✅ app.py placed in root directory"
-    fi
+# Backup original files
+if [ -f "ui/app.py" ]; then
+    cp ui/app.py ui/app.py.backup
+    log "Created backup of app.py"
 fi
 
-# Ensure app.py is executable
-chmod +x app.py 2>/dev/null || true
+# Create symbolic link for pipeline access from UI
+cd ui
+if [ ! -L "pipeline" ]; then
+    ln -sf ../pipeline pipeline
+    log "✅ Created symbolic link ui/pipeline -> ../pipeline"
+fi
+cd ..
 
-log "✅ Directory structure ready (no symlinks needed)"
+# Safe path corrections in app.py (nur einfache Ersetzungen)
+if [ -f "ui/app.py" ]; then
+    # Nur einfache Pfad-Ersetzungen - keine komplexen sed-Operationen
+    sed -i 's|"../pipeline/|"pipeline/|g' ui/app.py
+    sed -i 's|Path("../pipeline")|Path("pipeline")|g' ui/app.py
+    log "✅ Applied safe path corrections to ui/app.py"
+fi
+
+# Safe corrections for other files
+if [ -f "pipeline/run_pipeline.py" ]; then
+    sed -i 's|Path("../|Path("|g' pipeline/run_pipeline.py
+    log "✅ Fixed pipeline/run_pipeline.py paths"
+fi
+
+if [ -f "pipeline/config_loader.py" ]; then
+    sed -i 's|Path.cwd().parent.parent.parent|Path.cwd().parent|g' pipeline/config_loader.py
+    log "✅ Fixed pipeline/config_loader.py paths"
+fi
 
 # ============================================
 # SCHRITT 7: Build llama.cpp (CPU-ONLY)
@@ -256,8 +271,8 @@ if ollama pull gemma3:12b-it-qat; then
     export OLLAMA_MODEL="gemma3:12b-it-qat"
 else
     warning "Failed to download gemma3:12b-it-qat, falling back to llama3.2:3b"
-    ollama pull llama3.2:3b
-    export OLLAMA_MODEL="llama3.2:3b"
+    ollama pull gemma3n:latest
+    export OLLAMA_MODEL="gemma3n:latest"
 fi
 
 # Verify model is available
@@ -272,7 +287,7 @@ log "${BLUE}📝 Creating pipeline configuration...${NC}"
 
 cat > /workspace/OpenTuneWeaver/pipeline/pipeline_config.json << EOF
 {
-  "version": "3.0-runpod",
+  "version": "2.5-runpod",
   "created": "$(date -Iseconds)",
   "tokens": {
     "hf_token": "",
@@ -371,12 +386,12 @@ mkdir -p viewer/images
 log "✅ Directory structure created"
 
 # ============================================
-# SCHRITT 12: Create Startup Scripts
+# SCHRITT 12: Create Simple Startup Scripts
 # ============================================
 
 log "${BLUE}📝 Creating startup scripts...${NC}"
 
-# Updated startup script for app.py in root
+# Simple, reliable startup script
 cat > /workspace/start_otw.sh << 'EOF'
 #!/bin/bash
 
@@ -414,9 +429,17 @@ for i in {1..30}; do
     fi
 done
 
-# Start OpenTuneWeaver UI from root directory
+# Verify UI structure
+echo "🔍 Verifying UI structure..."
+cd /workspace/OpenTuneWeaver/ui
+if [ ! -L "pipeline" ]; then
+    echo "🔧 Creating pipeline symlink..."
+    ln -sf ../pipeline pipeline
+    echo "✅ Pipeline symlink created"
+fi
+
+# Start OpenTuneWeaver UI
 echo "Starting OpenTuneWeaver UI on port 8080..."
-cd /workspace/OpenTuneWeaver
 python3 app.py --server_name 0.0.0.0 --server_port 8080
 EOF
 
@@ -426,14 +449,11 @@ chmod +x /workspace/start_otw.sh
 cat > /workspace/debug_otw.sh << 'EOF'
 #!/bin/bash
 
-echo "🔍 OpenTuneWeaver Debug Information v3.0"
+echo "🔍 OpenTuneWeaver Debug Information v2.5"
 echo "========================================"
 
 echo "📁 Directory structure:"
 ls -la /workspace/OpenTuneWeaver/ | head -10
-
-echo -e "\nApp location:"
-ls -la /workspace/OpenTuneWeaver/app.py 2>/dev/null || echo "app.py not found in root"
 
 echo -e "\nUI directory:"
 ls -la /workspace/OpenTuneWeaver/ui/ 2>/dev/null || echo "UI directory not found"
@@ -441,8 +461,11 @@ ls -la /workspace/OpenTuneWeaver/ui/ 2>/dev/null || echo "UI directory not found
 echo -e "\nPipeline directory:"
 ls -la /workspace/OpenTuneWeaver/pipeline/ | head -5 2>/dev/null || echo "Pipeline directory not found"
 
+echo -e "\nSymbolic links:"
+find /workspace/OpenTuneWeaver/ui/ -type l -ls 2>/dev/null || echo "No symbolic links found"
+
 echo -e "\nApp.py syntax check:"
-cd /workspace/OpenTuneWeaver 2>/dev/null && python3 -m py_compile app.py 2>/dev/null && echo "✅ app.py syntax OK" || echo "❌ app.py syntax error"
+cd /workspace/OpenTuneWeaver/ui 2>/dev/null && python3 -m py_compile app.py 2>/dev/null && echo "✅ app.py syntax OK" || echo "❌ app.py syntax error"
 
 echo -e "\nOllama status:"
 if curl -s http://localhost:11434/api/tags 2>/dev/null; then
@@ -458,7 +481,7 @@ EOF
 
 chmod +x /workspace/debug_otw.sh
 
-log "✅ Startup scripts created"
+log "✅ Simple startup scripts created"
 
 # ============================================
 # SCHRITT 13: Final Installation Test
@@ -488,12 +511,8 @@ except ImportError as e:
     sys.exit(1)
 "
 
-# Test app.py syntax if it exists
-if [ -f "app.py" ]; then
-    python3 -m py_compile app.py 2>/dev/null && log "✅ app.py syntax verification passed" || warning "app.py syntax verification failed"
-else
-    warning "app.py not found in root directory"
-fi
+# Test app.py syntax
+cd ui 2>/dev/null && python3 -m py_compile app.py 2>/dev/null && log "✅ app.py syntax verification passed" || warning "app.py syntax verification failed"
 
 # Test Ollama connection
 if curl -s http://localhost:11434/api/tags > /dev/null; then
@@ -507,14 +526,14 @@ fi
 # ============================================
 
 log "${GREEN}========================================${NC}"
-log "${GREEN}✅ Installation Complete! (Version 3.0)${NC}"
+log "${GREEN}✅ Installation Complete! (Safe Version)${NC}"
 log "${GREEN}========================================${NC}"
 
 echo ""
-echo "📁 Structure:"
-echo "  ✅ app.py is now in OpenTuneWeaver root directory"
-echo "  ✅ No symlinks needed - direct path access"
-echo "  ✅ Works with both local and RunPod environments"
+echo "🛡️ Safe Path Fixes Applied:"
+echo "  ✅ UI symbolic link: ui/pipeline -> ../pipeline"
+echo "  ✅ Simple app.py path corrections (no complex modifications)"
+echo "  ✅ No risky sed operations on Python code"
 echo ""
 echo "📋 Quick Start Commands:"
 echo "  Start OpenTuneWeaver:  /workspace/start_otw.sh"
