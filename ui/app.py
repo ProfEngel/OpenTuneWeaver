@@ -2,9 +2,10 @@
 
 """
 OpenTuneWeaver UI - Graphical User Interface for the Fine-tuning Pipeline
-Version: 9.0 - Enhanced with Auto-updating Pipeline Status and Step Selection
+Version: 9.1 - Enhanced with Auto-Path Detection for RunPod/Local
 
 Features:
+- Auto-detects correct pipeline path (local or RunPod)
 - Auto-updating pipeline progress with statistics
 - Step selection on main page
 - Mobile-responsive design
@@ -17,53 +18,6 @@ Features:
 - Separate download buttons for documents and models
 - Comprehensive help page with explanations
 - Cleanup functionality on separate page
-
-IMPORTANT: For status updates to work, add this method to run_pipeline.py:
-
-Add to the SimplifiedPipelineRunner class:
-
-    def write_status_update(self, step_id, status, stats=None, duration=None):
-        '''Writes status update to JSON file for UI'''
-        status_file = Path('pipeline_status.json')
-        
-        # Read existing status or create new
-        if status_file.exists():
-            with open(status_file, 'r') as f:
-                current_status = json.load(f)
-        else:
-            current_status = {}
-        
-        # Update status (use string keys for JSON compatibility)
-        step_key = str(step_id)
-        if step_key not in current_status:
-            current_status[step_key] = {
-                'name': STEPS[step_id-1]['name'],
-                'icon': ['📄','📚','❓','🔧','📊','🤖','🏆','📦'][step_id-1],
-                'status': 'pending',
-                'stats': {},
-                'duration': None
-            }
-        
-        current_status[step_key]['status'] = status
-        if stats:
-            current_status[step_key]['stats'] = stats
-        if duration:
-            current_status[step_key]['duration'] = duration
-        
-        # Write back
-        with open(status_file, 'w') as f:
-            json.dump(current_status, f)
-
-And in the run_step method, add these calls:
-
-    # At the beginning of run_step (after print statements):
-    self.write_status_update(step['id'], 'running')
-    
-    # At the end when successful (before return True):
-    self.write_status_update(step['id'], 'completed', step_metrics, step_duration)
-    
-    # On failure (before return False):
-    self.write_status_update(step['id'], 'failed')
 """
 
 import gradio as gr
@@ -82,19 +36,39 @@ import threading
 import tempfile
 import signal
 
-# ===== FIX: Ensure correct working directory =====
-def ensure_correct_working_directory():
-    """Ensures the script runs from the ui directory."""
-    script_dir = Path(__file__).parent.resolve()
-    if script_dir.name != 'ui':
-        print(f"Warning: Expected to run from 'ui' directory, but running from {script_dir}")
-        print(f"Changing working directory to: {script_dir}")
-    os.chdir(script_dir)
-    print(f"Working directory set to: {os.getcwd()}")
+# ==================== AUTO-PATH DETECTION ====================
 
-# Call this immediately after imports
-ensure_correct_working_directory()
-# ===== END FIX =====
+def find_pipeline_path():
+    """
+    Automatically finds the correct pipeline path.
+    Works both locally (../pipeline) and on RunPod (./pipeline or symlink).
+    """
+    possible_paths = [
+        Path("pipeline"),           # RunPod: symlink in ui directory
+        Path("../pipeline"),        # Local: sibling directory
+        Path("./pipeline"),         # Alternative RunPod setup
+        Path("/workspace/OpenTuneWeaver/pipeline"),  # Absolute RunPod path
+    ]
+    
+    for path in possible_paths:
+        if path.exists() and path.is_dir():
+            # Verify it's the right pipeline directory
+            if (path / "run_pipeline.py").exists() or (path / "modules").exists():
+                print(f"✅ Found pipeline at: {path.resolve()}")
+                return path
+    
+    # Fallback to ../pipeline for local development
+    print("⚠️ Pipeline not found, using default: ../pipeline")
+    return Path("../pipeline")
+
+# Global pipeline path
+PIPELINE_PATH = find_pipeline_path()
+
+def get_pipeline_file(relative_path):
+    """Helper function to get correct pipeline file path."""
+    return PIPELINE_PATH / relative_path
+
+# ==================== CONFIGURATION ====================
 
 # Available Gemma3 models
 AVAILABLE_MODELS = [
@@ -194,7 +168,7 @@ def write_pipeline_status(step_id, status, stats=None, duration=None):
 
 def get_pipeline_status_file():
     """Returns the path to the pipeline status file."""
-    return Path("../pipeline/pipeline_status.json")
+    return get_pipeline_file("pipeline_status.json")
 
 def reset_pipeline_status():
     """Resets the pipeline status."""
@@ -402,7 +376,7 @@ def save_uploaded_files(files: List) -> str:
     if not files:
         return "❌ No files selected"
 
-    upload_dir = Path("../pipeline/modules/01_convert/UPLOAD")
+    upload_dir = get_pipeline_file("modules/01_convert/UPLOAD")
     upload_dir.mkdir(parents=True, exist_ok=True)
 
     # Delete old files
@@ -481,7 +455,7 @@ def update_step_selection(steps):
 
 def load_existing_config():
     """Loads existing configuration if available."""
-    config_file = Path("../pipeline/pipeline_config.json")
+    config_file = get_pipeline_file("pipeline_config.json")
     if config_file.exists():
         try:
             with open(config_file, 'r', encoding='utf-8') as f:
@@ -626,7 +600,7 @@ def save_config_from_quick_settings(
             config["finetuning"]["lora_alpha"] = preset["lora_alpha"]
         
         # Save config
-        config_file = Path("../pipeline/pipeline_config.json")
+        config_file = get_pipeline_file("pipeline_config.json")
         config_file.parent.mkdir(parents=True, exist_ok=True)
         
         with open(config_file, 'w', encoding='utf-8') as f:
@@ -772,7 +746,7 @@ def save_config_from_ui(
             }
         }
 
-        config_file = Path("../pipeline/pipeline_config.json")
+        config_file = get_pipeline_file("pipeline_config.json")
         config_file.parent.mkdir(parents=True, exist_ok=True)
         
         with open(config_file, 'w', encoding='utf-8') as f:
@@ -832,15 +806,16 @@ def start_pipeline():
         log_message(f"🚀 Pipeline started with steps: {selected_steps}")
 
         try:
-            # Change to pipeline directory
-            pipeline_dir = Path("../pipeline")
+            # Use the detected pipeline directory
+            pipeline_dir = PIPELINE_PATH.resolve()
             if not pipeline_dir.exists():
-                log_message("❌ Pipeline directory not found!", "ERROR")
+                log_message(f"❌ Pipeline directory not found at: {pipeline_dir}", "ERROR")
                 processing_active = False
                 return
 
             original_dir = os.getcwd()
             os.chdir(pipeline_dir)
+            log_message(f"📁 Changed to pipeline directory: {pipeline_dir}")
 
             # Create command line arguments
             cmd_args = [
@@ -951,8 +926,8 @@ def create_documents_zip():
 
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             total_files = 0
-            modules_dir = Path("../pipeline/modules")
-            pipeline_dir = Path("../pipeline")
+            modules_dir = get_pipeline_file("modules")
+            pipeline_dir = PIPELINE_PATH
             
             # Search in all module directories
             if modules_dir.exists():
@@ -1002,8 +977,8 @@ def create_model_zip():
             
             # CustomModel directory
             custom_model_paths = [
-                Path("../pipeline/modules/06_finetuning/CustomModel"),
-                Path("../pipeline/CustomModel")
+                get_pipeline_file("modules/06_finetuning/CustomModel"),
+                get_pipeline_file("CustomModel")
             ]
             
             for custom_model_dir in custom_model_paths:
@@ -1032,8 +1007,8 @@ def create_model_zip():
 def get_cleanup_info():
     """Returns information about folders to be deleted."""
     try:
-        modules_dir = Path("../pipeline/modules")
-        data_dir = Path("../pipeline/data")
+        modules_dir = get_pipeline_file("modules")
+        data_dir = get_pipeline_file("data")
         
         if not modules_dir.exists():
             return "❌ Pipeline directory not found"
@@ -1089,8 +1064,8 @@ def cleanup_pipeline_folders():
     """Deletes all working directories."""
     try:
         log_message("🗑️ Starting cleanup...")
-        modules_dir = Path("../pipeline/modules")
-        data_dir = Path("../pipeline/data")
+        modules_dir = get_pipeline_file("modules")
+        data_dir = get_pipeline_file("data")
 
         if not modules_dir.exists():
             return "❌ Pipeline directory not found"
@@ -1122,7 +1097,7 @@ def cleanup_pipeline_folders():
                             log_message(f"🗑️ Deleted: {module_name}/{folder} ({file_count} files)")
 
         # Clean up CustomModel
-        custom_model_dir = Path("../pipeline/CustomModel")
+        custom_model_dir = get_pipeline_file("CustomModel")
         if custom_model_dir.exists():
             file_count = sum(1 for f in custom_model_dir.rglob("*") if f.is_file())
             if file_count > 0:
@@ -1807,10 +1782,16 @@ def create_main_interface():
 def main():
     """Main function."""
     print("="*80)
-    print(" 🎯 OPENTUNEWEAVER - FINETUNING PIPELINE UI v9.0")
+    print(" 🎯 OPENTUNEWEAVER - FINETUNING PIPELINE UI v9.1")
     print("="*80)
+    
+    # Show detected pipeline path
+    print(f"📁 Pipeline Path: {PIPELINE_PATH.resolve()}")
+    print(f"📍 Working Directory: {Path.cwd()}")
+    print(f"🔍 Running on: {'RunPod' if '/workspace' in str(Path.cwd()) else 'Local'}")
+    
     log_message("🚀 Starting OpenTuneWeaver UI...")
-    log_message("✨ Enhanced with Auto-updating Status and Step Selection")
+    log_message("✨ Auto-Path Detection Active")
 
     # Create interface
     interface = create_main_interface()
@@ -1820,13 +1801,12 @@ def main():
     print("\n🌐 UI available at:")
     print(" - Local: http://localhost:8080")
     print(" - Network: http://YOUR_IP:8080")
-    print("\n🎯 New Features:")
-    print(" - 📊 Auto-updating pipeline status with statistics")
-    print(" - ✅ Step selection (run individual or multiple steps)")
+    print("\n🎯 Features:")
+    print(" - 🔍 Auto-detects pipeline path (local/RunPod)")
+    print(" - 📊 Auto-updating pipeline status")
+    print(" - ✅ Step selection (run individual steps)")
     print(" - 📱 Mobile-responsive design")
-    print(" - 🔄 Manual refresh button for status")
-    print(" - 📈 Shows progress, duration, and statistics per step")
-    print(" - 🎯 Better subtitle: Your All-In-One Solution")
+    print(" - 📈 Shows progress, duration, and statistics")
 
     try:
         interface.launch(
