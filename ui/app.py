@@ -82,6 +82,20 @@ import threading
 import tempfile
 import signal
 
+# ===== FIX: Ensure correct working directory =====
+def ensure_correct_working_directory():
+    """Ensures the script runs from the ui directory."""
+    script_dir = Path(__file__).parent.resolve()
+    if script_dir.name != 'ui':
+        print(f"Warning: Expected to run from 'ui' directory, but running from {script_dir}")
+        print(f"Changing working directory to: {script_dir}")
+    os.chdir(script_dir)
+    print(f"Working directory set to: {os.getcwd()}")
+
+# Call this immediately after imports
+ensure_correct_working_directory()
+# ===== END FIX =====
+
 # Available Gemma3 models
 AVAILABLE_MODELS = [
     "unsloth/gemma-3-1b-it",
