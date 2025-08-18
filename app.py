@@ -420,11 +420,32 @@ def load_existing_config():
         try:
             with open(config_file, 'r', encoding='utf-8') as f:
                 config = json.load(f)
+            # Ensure all required keys exist
+            if "benchmark" in config:
+                if "pre_model" not in config["benchmark"]:
+                    config["benchmark"]["pre_model"] = {
+                        "name": config.get("finetuning", {}).get("base_model", "unsloth/gemma-3n-E2B-it"),
+                        "type": "transformers",
+                        "load_in_4bit": False,
+                        "max_seq_length": 2048
+                    }
+                if "post_model" not in config["benchmark"]:
+                    model_name = config.get("finetuning", {}).get("model_name", "OpenTuneWeaver-Model")
+                    custom_dir = config.get("finetuning", {}).get("custom_model_dir", "CustomModel")
+                    config["benchmark"]["post_model"] = {
+                        "name": f"{custom_dir}/{model_name}",
+                        "type": "unknown",
+                        "load_in_4bit": False,
+                        "max_seq_length": 2048,
+                        "base_model": None
+                    }
+                if "questions_file" not in config["benchmark"]:
+                    config["benchmark"]["questions_file"] = "BENCHMARKFRAGEN/benchmark_fragen_complete.json"
             return config
         except Exception as e:
             log_message(f"❌ Error loading configuration: {e}", "ERROR")
     
-    # Default configuration
+    # Default configuration with complete structure
     return {
         "tokens": {"hf_token": "", "hf_write_token": ""},
         "api_configs": {
@@ -470,23 +491,51 @@ def load_existing_config():
             "lora_r": 8,
             "lora_alpha": 8,
             "lora_dropout": 0,
+            "bias": "none",
+            "random_state": 3407,
             "per_device_train_batch_size": 1,
             "gradient_accumulation_steps": 16,
             "warmup_steps": 200,
             "num_train_epochs": 3,
+            "max_steps": -1,
             "learning_rate": 5e-5,
+            "logging_steps": 5,
+            "optim": "adamw_8bit",
+            "weight_decay": 0.03,
+            "lr_scheduler_type": "cosine",
+            "seed": 3407,
             "save_lora": True,
             "save_merged": True,
-            "save_gguf": False
+            "save_gguf": False,
+            "upload_to_hf": False,
+            "gguf_quantizations": ["q8_0"],
+            "temperature": 1.0,
+            "top_p": 0.95,
+            "top_k": 64,
+            "max_new_tokens": 128
         },
         "benchmark": {
             "mode": "comparison",
+            "pre_model": {
+                "name": "unsloth/gemma-3n-E2B-it",
+                "type": "transformers",
+                "load_in_4bit": False,
+                "max_seq_length": 2048
+            },
+            "post_model": {
+                "name": "CustomModel/OpenTuneWeaver-Model",
+                "type": "unknown",
+                "load_in_4bit": False,
+                "max_seq_length": 2048,
+                "base_model": None
+            },
             "evaluator": {
                 "type": "api",
                 "api_base_url": "http://localhost:11434/v1",
                 "api_key": "ollama",
                 "model": "gemma3:12b-it-qat"
             },
+            "questions_file": "BENCHMARKFRAGEN/benchmark_fragen_complete.json",
             "max_new_tokens": 256,
             "temperature": 0.3,
             "top_p": 0.9,
@@ -496,7 +545,8 @@ def load_existing_config():
         "pipeline": {
             "auto_cleanup": False,
             "verbose": True,
-            "continue_on_error": True
+            "continue_on_error": True,
+            "save_metrics": True
         }
     }
 
@@ -530,6 +580,52 @@ def save_config_from_quick_settings(
             config["finetuning"]["warmup_steps"] = preset["warmup_steps"]
             config["finetuning"]["lora_r"] = preset["lora_r"]
             config["finetuning"]["lora_alpha"] = preset["lora_alpha"]
+        
+        # Ensure benchmark section has all required fields
+        if "benchmark" not in config:
+            config["benchmark"] = {}
+        
+        # Update pre_model and post_model based on finetuning settings
+        base_model = config["finetuning"].get("base_model", "unsloth/gemma-3n-E2B-it")
+        custom_dir = config["finetuning"].get("custom_model_dir", "CustomModel")
+        
+        config["benchmark"]["pre_model"] = {
+            "name": base_model,
+            "type": "transformers",
+            "load_in_4bit": False,
+            "max_seq_length": 2048
+        }
+        
+        config["benchmark"]["post_model"] = {
+            "name": f"{custom_dir}/{model_name}",
+            "type": "unknown",
+            "load_in_4bit": False,
+            "max_seq_length": 2048,
+            "base_model": None
+        }
+        
+        # Ensure other benchmark fields exist
+        if "mode" not in config["benchmark"]:
+            config["benchmark"]["mode"] = "comparison"
+        if "evaluator" not in config["benchmark"]:
+            config["benchmark"]["evaluator"] = {
+                "type": "api",
+                "api_base_url": "http://localhost:11434/v1",
+                "api_key": "ollama",
+                "model": "gemma3:12b-it-qat"
+            }
+        if "questions_file" not in config["benchmark"]:
+            config["benchmark"]["questions_file"] = "BENCHMARKFRAGEN/benchmark_fragen_complete.json"
+        if "max_new_tokens" not in config["benchmark"]:
+            config["benchmark"]["max_new_tokens"] = 256
+        if "temperature" not in config["benchmark"]:
+            config["benchmark"]["temperature"] = 0.3
+        if "top_p" not in config["benchmark"]:
+            config["benchmark"]["top_p"] = 0.9
+        if "top_k" not in config["benchmark"]:
+            config["benchmark"]["top_k"] = 50
+        if "repetition_penalty" not in config["benchmark"]:
+            config["benchmark"]["repetition_penalty"] = 1.1
         
         # Save config
         config_file = get_pipeline_file("pipeline_config.json")

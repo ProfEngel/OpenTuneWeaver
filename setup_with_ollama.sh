@@ -321,28 +321,62 @@ cat > /workspace/OpenTuneWeaver/pipeline/pipeline_config.json << EOF
     "lora_r": 8,
     "lora_alpha": 8,
     "lora_dropout": 0,
+    "bias": "none",
+    "random_state": 3407,
     "per_device_train_batch_size": 1,
     "gradient_accumulation_steps": 8,
     "warmup_steps": 100,
     "num_train_epochs": 3,
+    "max_steps": -1,
     "learning_rate": 5e-5,
+    "logging_steps": 5,
+    "optim": "adamw_8bit",
+    "weight_decay": 0.03,
+    "lr_scheduler_type": "cosine",
+    "seed": 3407,
     "save_lora": true,
     "save_merged": true,
-    "save_gguf": false
+    "save_gguf": false,
+    "upload_to_hf": false,
+    "gguf_quantizations": ["q8_0"],
+    "temperature": 1.0,
+    "top_p": 0.95,
+    "top_k": 64,
+    "max_new_tokens": 128
   },
   "benchmark": {
     "mode": "comparison",
+    "pre_model": {
+      "name": "unsloth/gemma-3n-E2B-it",
+      "type": "transformers",
+      "load_in_4bit": false,
+      "max_seq_length": 2048
+    },
+    "post_model": {
+      "name": "CustomModel/OTW-Model",
+      "type": "unknown",
+      "load_in_4bit": false,
+      "max_seq_length": 2048,
+      "base_model": null
+    },
     "evaluator": {
       "type": "api",
       "api_base_url": "http://localhost:11434/v1",
       "api_key": "ollama",
       "model": "${OLLAMA_MODEL:-gemma3:12b-it-qat}"
-    }
+    },
+    "questions_file": "BENCHMARKFRAGEN/benchmark_fragen_complete.json",
+    "max_new_tokens": 256,
+    "temperature": 0.3,
+    "top_p": 0.9,
+    "top_k": 50,
+    "repetition_penalty": 1.1
   },
   "pipeline": {
     "auto_cleanup": false,
     "verbose": true,
-    "continue_on_error": true
+    "continue_on_error": true,
+    "save_metrics": true
   }
 }
 EOF
