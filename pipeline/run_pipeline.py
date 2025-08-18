@@ -91,6 +91,37 @@ STEPS = [
 
 class SimplifiedPipelineRunner:
     """Simplified Pipeline Runner with central configuration and metrics collection"""
+    def write_status_update(self, step_id, status, stats=None, duration=None):
+        '''Writes status update to JSON file for UI'''
+        status_file = Path('pipeline_status.json')
+        
+        # Read existing status or create new
+        if status_file.exists():
+            with open(status_file, 'r') as f:
+                current_status = json.load(f)
+        else:
+            current_status = {}
+        
+        # Update status (use string keys for JSON compatibility)
+        step_key = str(step_id)
+        if step_key not in current_status:
+            current_status[step_key] = {
+                'name': STEPS[step_id-1]['name'],
+                'icon': ['📄','📚','❓','🔧','📊','🤖','🏆','📦'][step_id-1],
+                'status': 'pending',
+                'stats': {},
+                'duration': None
+            }
+        
+        current_status[step_key]['status'] = status
+        if stats:
+            current_status[step_key]['stats'] = stats
+        if duration:
+            current_status[step_key]['duration'] = duration
+        
+        # Write back
+        with open(status_file, 'w') as f:
+            json.dump(current_status, f)
 
     def __init__(self):
         self.start_time = datetime.now()
@@ -1515,6 +1546,8 @@ def get_api_config(module_id):
         print(f"\n{'='*60}")
         print(f"📋 STEP {step['id']}/8: {step['name'].upper()}")
         print(f"{'='*60}")
+
+        self.write_status_update(step['id'], 'running')
         
         # Initialize step metrics
         step_metrics = {
@@ -1610,12 +1643,14 @@ def get_api_config(module_id):
                     step_metrics['benchmark_categories'] = len(bm_stats['categories'])
                 
                 self.metrics['steps'][f"step_{step['id']}"] = step_metrics
+                self.write_status_update(step['id'], 'completed', step_metrics, step_duration)
                 return True
             else:
                 print(f"❌ {step['name']} failed (Code: {result.returncode})")
                 step_metrics['error'] = f"Return code: {result.returncode}"
                 self.metrics['steps'][f"step_{step['id']}"] = step_metrics
                 self.metrics['errors'].append(f"Step {step['id']} failed: {step['name']}")
+                self.write_status_update(step['id'], 'failed')
                 return False
                 
         except KeyboardInterrupt:

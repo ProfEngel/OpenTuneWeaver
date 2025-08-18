@@ -159,8 +159,9 @@ pip install --upgrade --no-cache-dir --no-deps git+https://github.com/unslothai/
 
 **Short to medium-term roadmap:**
 - 🌍 **Multilingual Support**: Spanish, French, additional languages
+- 🌍 **Reasoning Model/ GPRO Support**: generating reasoning datasets and training in GPRO
 - 🤖 **Extended Model Support**: 
-  - GPT-OSS family
+  - GPT-OSS family (Reasoning with harmony-parsing and tokenization library)
   - Qwen 2.5/3.0 series  
   - Mixtral and other MoE models
   - Phi-4 and Microsoft models
