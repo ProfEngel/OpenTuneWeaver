@@ -1,23 +1,8 @@
 #!/usr/bin/env python3
 
 """
-OpenTuneWeaver UI - Graphical User Interface for the Fine-tuning Pipeline
-Version: 9.1 - Enhanced with Auto-Path Detection for RunPod/Local
-
-Features:
-- Auto-detects correct pipeline path (local or RunPod)
-- Auto-updating pipeline progress with statistics
-- Step selection on main page
-- Mobile-responsive design
-- Visual pipeline progress overview with live status
-- Quick settings on main page with presets
-- Upload interface for documents
-- Expert settings page with full configuration
-- Pipeline control via command line parameters
-- Live terminal with auto-scroll
-- Separate download buttons for documents and models
-- Comprehensive help page with explanations
-- Cleanup functionality on separate page
+OpenTuneWeaver UI - Improved Path Detection for RunPod
+Version: 9.2 - Fixed Path Handling
 """
 
 import gradio as gr
@@ -36,41 +21,283 @@ import threading
 import tempfile
 import signal
 
-# ==================== AUTO-PATH DETECTION ====================
+# ==================== IMPROVED PATH DETECTION ====================
 
 def find_pipeline_path():
     """
     Automatically finds the correct pipeline path.
-    Works both locally (../pipeline) and on RunPod (./pipeline or symlink).
+    Improved to handle RunPod symbolic links correctly.
     """
+    # Get current directory (where app.py is located)
+    current_dir = Path(__file__).parent.resolve()
+    
+    # Check for installation type marker
+    installation_marker = current_dir / ".installation_type"
+    is_runpod = installation_marker.exists() and installation_marker.read_text().strip() == "runpod"
+    
+    if is_runpod:
+        print("🚀 RunPod installation detected")
+    
+    # Define possible paths in priority order
     possible_paths = [
-        Path("pipeline"),           # RunPod: symlink in ui directory
-        Path("../pipeline"),        # Local: sibling directory
-        Path("./pipeline"),         # Alternative RunPod setup
-        Path("/workspace/OpenTuneWeaver/pipeline"),  # Absolute RunPod path
+        # First check for symbolic link in current directory (RunPod)
+        current_dir / "pipeline",
+        # Then check parent directory (standard setup)
+        current_dir.parent / "pipeline",
+        # Absolute path for RunPod
+        Path("/workspace/OpenTuneWeaver/pipeline"),
+        # Fallback to relative paths
+        Path("../pipeline"),
+        Path("pipeline"),
     ]
     
     for path in possible_paths:
-        if path.exists() and path.is_dir():
-            # Verify it's the right pipeline directory
-            if (path / "run_pipeline.py").exists() or (path / "modules").exists():
-                print(f"✅ Found pipeline at: {path.resolve()}")
-                return path
+        try:
+            # Resolve symbolic links and check if path exists
+            if path.exists():
+                resolved_path = path.resolve()
+                
+                # Verify it's the actual pipeline directory
+                if (resolved_path / "run_pipeline.py").exists() or (resolved_path / "modules").exists():
+                    print(f"✅ Found pipeline at: {resolved_path}")
+                    print(f"   Original path: {path}")
+                    print(f"   Is symlink: {path.is_symlink()}")
+                    
+                    # Return the resolved path to avoid symlink issues
+                    return resolved_path
+        except Exception as e:
+            print(f"⚠️ Error checking path {path}: {e}")
+            continue
     
-    # Fallback to ../pipeline for local development
-    print("⚠️ Pipeline not found, using default: ../pipeline")
-    return Path("../pipeline")
+    # Last resort: try to find pipeline directory relative to script location
+    script_dir = Path(__file__).parent.resolve()
+    
+    # Check if we're inside OpenTuneWeaver structure
+    if "OpenTuneWeaver" in str(script_dir):
+        # Navigate up to OpenTuneWeaver root
+        parts = script_dir.parts
+        otw_index = parts.index("OpenTuneWeaver")
+        otw_root = Path(*parts[:otw_index+1])
+        pipeline_path = otw_root / "pipeline"
+        
+        if pipeline_path.exists() and (pipeline_path / "modules").exists():
+            print(f"✅ Found pipeline via directory structure: {pipeline_path}")
+            return pipeline_path
+    
+    # Final fallback
+    fallback = current_dir.parent / "pipeline"
+    print(f"⚠️ Pipeline not found, using fallback: {fallback}")
+    return fallback
 
-# Global pipeline path
+# Global pipeline path - use resolved path
 PIPELINE_PATH = find_pipeline_path()
 
+# Verify pipeline path is correct
+if not PIPELINE_PATH.exists():
+    print(f"❌ ERROR: Pipeline path does not exist: {PIPELINE_PATH}")
+    print("Creating minimal structure to prevent errors...")
+    PIPELINE_PATH.mkdir(parents=True, exist_ok=True)
+elif not (PIPELINE_PATH / "modules").exists():
+    print(f"⚠️ WARNING: Pipeline modules directory not found at: {PIPELINE_PATH / 'modules'}")
+
 def get_pipeline_file(relative_path):
-    """Helper function to get correct pipeline file path."""
-    return PIPELINE_PATH / relative_path
+    """
+    Helper function to get correct pipeline file path.
+    Always uses the resolved pipeline path.
+    """
+    full_path = PIPELINE_PATH / relative_path
+    
+    # Create parent directories if they don't exist (but NOT the pipeline directory itself)
+    if not full_path.exists() and full_path.suffix:  # It's a file
+        full_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    return full_path
 
-# ==================== CONFIGURATION ====================
+def get_pipeline_status_file():
+    """Returns the path to the pipeline status file."""
+    # Always use the actual pipeline directory, not a subdirectory in ui
+    return PIPELINE_PATH / "pipeline_status.json"
 
-# Available Gemma3 models
+def save_uploaded_files(files: List) -> str:
+    """Saves uploaded files to the upload directory."""
+    if not files:
+        return "❌ No files selected"
+
+    # Use the correct pipeline path
+    upload_dir = PIPELINE_PATH / "modules" / "01_convert" / "UPLOAD"
+    
+    # Create directory if it doesn't exist
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    
+    print(f"📁 Upload directory: {upload_dir}")
+
+    # Delete old files
+    for old_file in upload_dir.glob("*"):
+        if old_file.is_file():
+            old_file.unlink()
+
+    saved_count = 0
+    for file in files:
+        if file is not None:
+            try:
+                file_path = Path(file.name)
+                target_path = upload_dir / file_path.name
+                shutil.copy2(file_path, target_path)
+                print(f"📁 File saved: {file_path.name} -> {target_path}")
+                saved_count += 1
+            except Exception as e:
+                print(f"❌ Error saving file: {e}")
+
+    return f"✅ {saved_count} files successfully uploaded to {upload_dir.relative_to(PIPELINE_PATH.parent)}"
+
+def save_config_from_quick_settings(
+    model_name, hf_token, preset_name, save_lora, save_merged, save_gguf
+):
+    """Saves configuration from quick settings."""
+    try:
+        # Load existing config as base
+        config = load_existing_config()
+        
+        # Update with quick settings
+        config["tokens"]["hf_token"] = hf_token
+        config["tokens"]["hf_write_token"] = hf_token
+        config["finetuning"]["model_name"] = model_name
+        config["finetuning"]["save_lora"] = save_lora
+        config["finetuning"]["save_merged"] = save_merged
+        config["finetuning"]["save_gguf"] = save_gguf
+        
+        # Apply preset settings if not Expert
+        if preset_name in FINETUNING_PRESETS and preset_name != "Expert":
+            preset = FINETUNING_PRESETS[preset_name]
+            config["finetuning"]["max_seq_length"] = preset["max_seq_length"]
+            config["finetuning"]["num_train_epochs"] = preset["num_train_epochs"]
+            config["finetuning"]["learning_rate"] = preset["learning_rate"]
+            config["finetuning"]["per_device_train_batch_size"] = preset["batch_size"]
+            config["finetuning"]["gradient_accumulation_steps"] = preset["gradient_accumulation_steps"]
+            config["finetuning"]["warmup_steps"] = preset["warmup_steps"]
+            config["finetuning"]["lora_r"] = preset["lora_r"]
+            config["finetuning"]["lora_alpha"] = preset["lora_alpha"]
+        
+        # Save config in the pipeline directory
+        config_file = PIPELINE_PATH / "pipeline_config.json"
+        
+        print(f"💾 Saving config to: {config_file}")
+        
+        with open(config_file, 'w', encoding='utf-8') as f:
+            json.dump(config, f, indent=2, ensure_ascii=False)
+        
+        print(f"✅ Quick settings saved with preset: {preset_name}")
+        return f"✅ Settings saved! Using preset: {preset_name}"
+        
+    except Exception as e:
+        error_msg = f"❌ Error saving settings: {e}"
+        print(error_msg)
+        return error_msg
+
+def start_pipeline():
+    """Starts the pipeline with selected steps."""
+    global processing_active, current_process, selected_steps
+
+    if processing_active:
+        return "⚠️ Pipeline already running!", create_pipeline_overview()
+
+    # Reset pipeline status
+    reset_pipeline_status()
+    
+    mode = get_pipeline_mode()
+    
+    if mode == "none":
+        return "❌ No steps selected!", create_pipeline_overview()
+
+    def run_pipeline():
+        global processing_active, current_process
+        processing_active = True
+        print(f"🚀 Pipeline started with steps: {selected_steps}")
+
+        try:
+            # Use the resolved pipeline directory
+            pipeline_dir = PIPELINE_PATH
+            
+            if not pipeline_dir.exists():
+                print(f"❌ Pipeline directory not found at: {pipeline_dir}")
+                processing_active = False
+                return
+            
+            if not (pipeline_dir / "run_pipeline.py").exists():
+                print(f"❌ run_pipeline.py not found at: {pipeline_dir / 'run_pipeline.py'}")
+                processing_active = False
+                return
+
+            original_dir = os.getcwd()
+            os.chdir(pipeline_dir)
+            print(f"📁 Changed to pipeline directory: {pipeline_dir}")
+
+            # Create command line arguments
+            cmd_args = [
+                sys.executable, 
+                "-u",  # Unbuffered output
+                "run_pipeline.py",
+                "--auto",  # Automated mode
+                "--mode", mode,
+                "--use-existing-config"
+            ]
+            
+            # Add step parameters for custom mode
+            if mode == "custom":
+                cmd_args.extend(["--start", str(min(selected_steps))])
+                cmd_args.extend(["--end", str(max(selected_steps))])
+            elif mode == "single":
+                cmd_args.extend(["--step", str(selected_steps[0])])
+            
+            print(f"🖥️ Command: {' '.join(cmd_args)}")
+
+            # Start run_pipeline.py with parameters
+            current_process = subprocess.Popen(
+                cmd_args,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                bufsize=1,
+                universal_newlines=True
+            )
+
+            # Read output and display in terminal
+            for line in iter(current_process.stdout.readline, ''):
+                if not line:
+                    break
+                
+                # Log all outputs
+                clean_line = line.strip()
+                if clean_line:
+                    print(clean_line)
+
+            # Wait for pipeline to finish
+            return_code = current_process.wait()
+            
+            os.chdir(original_dir)
+
+            if return_code == 0:
+                print("🎉 Pipeline completed successfully!")
+            else:
+                print(f"❌ Pipeline failed (Code: {return_code})")
+
+        except Exception as e:
+            print(f"❌ Pipeline error: {e}")
+        finally:
+            processing_active = False
+            current_process = None
+            if 'original_dir' in locals():
+                os.chdir(original_dir)
+
+    # Start pipeline in separate thread
+    pipeline_thread = threading.Thread(target=run_pipeline)
+    pipeline_thread.daemon = True
+    pipeline_thread.start()
+
+    step_list = ', '.join(str(s) for s in sorted(selected_steps))
+    return f"🚀 Pipeline started - Steps: {step_list}", create_pipeline_overview()
+
+# Add remaining required constants and functions
 AVAILABLE_MODELS = [
     "unsloth/gemma-3-1b-it",
     "unsloth/gemma-3-4b-it",
@@ -80,7 +307,6 @@ AVAILABLE_MODELS = [
     "unsloth/gemma-3n-E4B-it"
 ]
 
-# Finetuning presets
 FINETUNING_PRESETS = {
     "Test": {
         "description": "Quick test run (minimal resources)",
