@@ -77,6 +77,7 @@ def get_ui_file(relative_path):
 # ==================== CONSTANTS ====================
 
 AVAILABLE_MODELS = [
+    "unsloth/gemma-3-270m-it",
     "unsloth/gemma-3-1b-it",
     "unsloth/gemma-3-4b-it",
     "unsloth/gemma-3-12b-it",
