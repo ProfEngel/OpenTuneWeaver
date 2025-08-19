@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 """
-OpenTuneWeaver UI - Universal Path Handling with Expert Mode
-Version: 11.0 - Enhanced with Expert Settings and Help Page
+OpenTuneWeaver UI - Universal Path Handling
+Version: 10.0 - Root Directory Version
 Location: Place this file in OpenTuneWeaver/ root directory
 """
 
@@ -642,152 +642,6 @@ def save_config_from_quick_settings(
         log_message(error_msg, "ERROR")
         return error_msg
 
-def save_config_from_ui(
-    # Tokens
-    hf_token, hf_write_token,
-    # API Configs
-    api_base_url, api_key,
-    convert_model, wiki_model, qa_model, benchmark_model,
-    convert_temp, wiki_temp, qa_temp, benchmark_temp,
-    # Fine-tuning
-    model_name, base_model, hf_repo_id, custom_model_dir,
-    max_seq_length, load_in_4bit, full_finetuning,
-    lora_r, lora_alpha, lora_dropout,
-    batch_size, grad_accumulation, warmup_steps, num_epochs,
-    learning_rate, weight_decay,
-    save_lora, save_merged, save_gguf,
-    # Benchmark
-    benchmark_mode, evaluator_model, max_new_tokens,
-    eval_temp, top_p, top_k, repetition_penalty,
-    # Pipeline
-    auto_cleanup, verbose_mode, continue_on_error
-):
-    """Saves the configuration from the expert UI."""
-    try:
-        config = {
-            "version": "11.0",
-            "created": datetime.now().isoformat(),
-            "last_modified": datetime.now().isoformat(),
-            "tokens": {
-                "hf_token": hf_token,
-                "hf_write_token": hf_write_token or hf_token
-            },
-            "api_configs": {
-                "01_convert": {
-                    "use_openai_api": True,
-                    "openai_base_url": api_base_url,
-                    "openai_api_key": api_key,
-                    "openai_model_name": convert_model,
-                    "temperature": convert_temp
-                },
-                "02_genwiki": {
-                    "use_openai_api": True,
-                    "openai_base_url": api_base_url,
-                    "openai_api_key": api_key,
-                    "openai_model_name": wiki_model,
-                    "temperature": wiki_temp
-                },
-                "03_instructQA": {
-                    "use_openai_api": True,
-                    "openai_base_url": api_base_url,
-                    "openai_api_key": api_key,
-                    "openai_model_name": qa_model,
-                    "temperature": qa_temp
-                },
-                "05_bmcreator": {
-                    "use_openai_api": True,
-                    "openai_base_url": api_base_url,
-                    "openai_api_key": api_key,
-                    "openai_model_name": benchmark_model,
-                    "temperature": benchmark_temp
-                }
-            },
-            "finetuning": {
-                "model_name": model_name,
-                "base_model": base_model,
-                "hf_repo_id": hf_repo_id,
-                "dataset_path": "INPUT/dataset.json",
-                "chat_template": "gemma-3",
-                "custom_model_dir": custom_model_dir,
-                "max_seq_length": int(max_seq_length),
-                "load_in_4bit": load_in_4bit,
-                "full_finetuning": full_finetuning,
-                "lora_r": int(lora_r),
-                "lora_alpha": int(lora_alpha),
-                "lora_dropout": lora_dropout,
-                "bias": "none",
-                "random_state": 3407,
-                "per_device_train_batch_size": int(batch_size),
-                "gradient_accumulation_steps": int(grad_accumulation),
-                "warmup_steps": int(warmup_steps),
-                "num_train_epochs": int(num_epochs),
-                "max_steps": -1,
-                "learning_rate": learning_rate,
-                "logging_steps": 5,
-                "optim": "adamw_8bit",
-                "weight_decay": weight_decay,
-                "lr_scheduler_type": "cosine",
-                "seed": 3407,
-                "save_lora": save_lora,
-                "save_merged": save_merged,
-                "save_gguf": save_gguf,
-                "upload_to_hf": False,
-                "gguf_quantizations": ["q8_0"],
-                "temperature": 1.0,
-                "top_p": 0.95,
-                "top_k": 64,
-                "max_new_tokens": 128
-            },
-            "benchmark": {
-                "mode": benchmark_mode,
-                "pre_model": {
-                    "name": base_model,
-                    "type": "transformers",
-                    "load_in_4bit": False,
-                    "max_seq_length": 2048
-                },
-                "post_model": {
-                    "name": f"{custom_model_dir}/{model_name}",
-                    "type": "unknown",
-                    "load_in_4bit": False,
-                    "max_seq_length": 2048,
-                    "base_model": None
-                },
-                "evaluator": {
-                    "type": "api",
-                    "api_base_url": api_base_url,
-                    "api_key": api_key,
-                    "model": evaluator_model
-                },
-                "questions_file": "BENCHMARKFRAGEN/benchmark_fragen_complete.json",
-                "max_new_tokens": int(max_new_tokens),
-                "temperature": eval_temp,
-                "top_p": top_p,
-                "top_k": int(top_k),
-                "repetition_penalty": repetition_penalty
-            },
-            "pipeline": {
-                "auto_cleanup": auto_cleanup,
-                "verbose": verbose_mode,
-                "continue_on_error": continue_on_error,
-                "save_metrics": True
-            }
-        }
-
-        config_file = get_pipeline_file("pipeline_config.json")
-        config_file.parent.mkdir(parents=True, exist_ok=True)
-        
-        with open(config_file, 'w', encoding='utf-8') as f:
-            json.dump(config, f, indent=2, ensure_ascii=False)
-        
-        log_message("✅ Expert configuration saved")
-        return "✅ Expert configuration successfully saved!"
-        
-    except Exception as e:
-        error_msg = f"❌ Error saving configuration: {e}"
-        log_message(error_msg, "ERROR")
-        return error_msg
-
 # ==================== PIPELINE CONTROL ====================
 
 def get_pipeline_mode():
@@ -1197,13 +1051,6 @@ def create_main_interface():
             border: 1px solid #e5e7eb;
             margin: 10px 0;
         }
-        .help-section {
-            background-color: #fefce8;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #fde68a;
-            margin: 10px 0;
-        }
         """
     ) as interface:
 
@@ -1365,135 +1212,6 @@ def create_main_interface():
                     elem_classes=["terminal-output"]
                 )
 
-            # ==================== EXPERT SETTINGS ====================
-            with gr.TabItem("🔬 Expert Settings"):
-                gr.Markdown("### 🔧 Expert Configuration")
-                gr.Markdown("Advanced settings for experienced users. For beginners, use the Quick Settings on the Home page.")
-
-                with gr.Accordion("🔑 HuggingFace Tokens", open=True):
-                    with gr.Row():
-                        hf_token = gr.Textbox(
-                            label="HF Token (for model downloads)",
-                            type="password",
-                            placeholder="hf_..."
-                        )
-                        hf_write_token = gr.Textbox(
-                            label="HF Write Token (optional)",
-                            type="password",
-                            placeholder="hf_..."
-                        )
-
-                with gr.Accordion("🌐 API Configuration", open=False):
-                    with gr.Row():
-                        api_base_url = gr.Textbox(
-                            label="API Base URL",
-                            value="http://localhost:11434/v1",
-                            placeholder="http://localhost:11434/v1"
-                        )
-                        api_key = gr.Textbox(
-                            label="API Key",
-                            value="ollama",
-                            placeholder="ollama"
-                        )
-
-                    gr.Markdown("**Model configuration for each step:**")
-                    with gr.Row():
-                        convert_model = gr.Textbox(label="📄 Convert Model", value="gemma3:12b-it-qat")
-                        convert_temp = gr.Slider(label="Temperature", minimum=0.0, maximum=2.0, value=0.1, step=0.1)
-
-                    with gr.Row():
-                        wiki_model = gr.Textbox(label="📚 Wiki Model", value="gemma3:12b-it-qat")
-                        wiki_temp = gr.Slider(label="Temperature", minimum=0.0, maximum=2.0, value=0.3, step=0.1)
-
-                    with gr.Row():
-                        qa_model = gr.Textbox(label="❓ QA Model", value="gemma3:12b-it-qat")
-                        qa_temp = gr.Slider(label="Temperature", minimum=0.0, maximum=2.0, value=0.7, step=0.1)
-
-                    with gr.Row():
-                        benchmark_model = gr.Textbox(label="📊 Benchmark Model", value="gemma3:12b-it-qat")
-                        benchmark_temp = gr.Slider(label="Temperature", minimum=0.0, maximum=2.0, value=0.5, step=0.1)
-
-                with gr.Accordion("🤖 Fine-tuning Configuration", open=False):
-                    with gr.Row():
-                        model_name = gr.Textbox(label="Model Name", value="OpenTuneWeaver-Model")
-                        base_model = gr.Dropdown(
-                            label="Base Model",
-                            choices=AVAILABLE_MODELS,
-                            value="unsloth/gemma-3n-E2B-it",
-                            interactive=True
-                        )
-
-                    with gr.Row():
-                        hf_repo_id = gr.Textbox(label="HuggingFace Repo ID", value="user/OpenTuneWeaver-Model")
-                        custom_model_dir = gr.Textbox(label="CustomModel Directory", value="CustomModel")
-
-                    gr.Markdown("**Training Parameters:**")
-                    with gr.Row():
-                        max_seq_length = gr.Slider(label="Max Sequence Length", minimum=512, maximum=16384, value=8192, step=512)
-                        load_in_4bit = gr.Checkbox(label="Load in 4-bit", value=True)
-                        full_finetuning = gr.Checkbox(label="Full Fine-tuning", value=False)
-
-                    gr.Markdown("**LoRA Parameters:**")
-                    with gr.Row():
-                        lora_r = gr.Slider(label="LoRA r", minimum=1, maximum=64, value=8, step=1)
-                        lora_alpha = gr.Slider(label="LoRA Alpha", minimum=1, maximum=64, value=8, step=1)
-                        lora_dropout = gr.Slider(label="LoRA Dropout", minimum=0.0, maximum=0.5, value=0.0, step=0.05)
-
-                    gr.Markdown("**Training Settings:**")
-                    with gr.Row():
-                        batch_size = gr.Slider(label="Batch Size", minimum=1, maximum=16, value=1, step=1)
-                        grad_accumulation = gr.Slider(label="Gradient Accumulation Steps", minimum=1, maximum=64, value=16, step=1)
-
-                    with gr.Row():
-                        warmup_steps = gr.Slider(label="Warmup Steps", minimum=0, maximum=1000, value=200, step=10)
-                        num_epochs = gr.Slider(label="Number of Epochs", minimum=1, maximum=20, value=3, step=1)
-
-                    with gr.Row():
-                        learning_rate = gr.Slider(label="Learning Rate", minimum=1e-6, maximum=1e-3, value=5e-5, step=1e-6)
-                        weight_decay = gr.Slider(label="Weight Decay", minimum=0.0, maximum=0.3, value=0.03, step=0.01)
-
-                    gr.Markdown("**Output Options:**")
-                    with gr.Row():
-                        save_lora = gr.Checkbox(label="Save LoRA Adapter", value=True)
-                        save_merged = gr.Checkbox(label="Save Merged Model", value=True)
-                        save_gguf = gr.Checkbox(label="Save GGUF Model", value=False)
-
-                with gr.Accordion("🏆 Benchmark Configuration", open=False):
-                    with gr.Row():
-                        benchmark_mode = gr.Dropdown(
-                            label="Benchmark Mode",
-                            choices=["comparison", "post_only", "pre_only"],
-                            value="comparison"
-                        )
-                        evaluator_model = gr.Textbox(label="Evaluator Model", value="gemma3:12b-it-qat")
-
-                    with gr.Row():
-                        max_new_tokens = gr.Slider(label="Max New Tokens", minimum=50, maximum=1000, value=256, step=10)
-                        eval_temp = gr.Slider(label="Evaluation Temperature", minimum=0.0, maximum=2.0, value=0.3, step=0.1)
-
-                    with gr.Row():
-                        top_p = gr.Slider(label="Top P", minimum=0.1, maximum=1.0, value=0.9, step=0.05)
-                        top_k = gr.Slider(label="Top K", minimum=1, maximum=100, value=50, step=1)
-
-                    repetition_penalty = gr.Slider(label="Repetition Penalty", minimum=1.0, maximum=2.0, value=1.1, step=0.05)
-
-                with gr.Accordion("⚙️ Pipeline Settings", open=False):
-                    with gr.Row():
-                        auto_cleanup = gr.Checkbox(label="Automatic Cleanup", value=False)
-                        verbose_mode = gr.Checkbox(label="Verbose Mode", value=True)
-                        continue_on_error = gr.Checkbox(label="Continue on Error", value=True)
-
-                # Buttons
-                with gr.Row():
-                    load_config_btn = gr.Button("📋 Load Current Configuration", variant="secondary")
-                    save_config_btn = gr.Button("💾 Save Configuration", variant="primary")
-
-                config_status = gr.Textbox(
-                    label="Configuration Status",
-                    interactive=False,
-                    elem_classes=["status-info"]
-                )
-
             # ==================== CLEANUP ====================
             with gr.TabItem("🗑️ Cleanup"):
                 with gr.Column():
@@ -1518,144 +1236,6 @@ def create_main_interface():
                                 interactive=False,
                                 lines=20
                             )
-
-                    gr.Markdown("""
-                    ### ⚠️ Important Notes
-                    
-                    **What will be deleted:**
-                    - 📁 All INPUT/OUTPUT directories
-                    - 📁 Uploaded documents
-                    - 📁 Trained models
-                    - 📁 Generated datasets
-                    - 📁 Benchmark results
-                    
-                    **⚠️ This action CANNOT be undone!**
-                    **Download your results before cleanup!**
-                    """)
-
-            # ==================== HELP PAGE ====================
-            with gr.TabItem("📚 Help"):
-                gr.Markdown("### 📖 OpenTuneWeaver Guide")
-                
-                with gr.Accordion("🎯 Quick Start", open=True):
-                    gr.Markdown("""
-                    **Getting started in 5 steps:**
-                    
-                    1. **Upload Documents**: Upload your training documents (PDF, DOCX, TXT, MD)
-                    2. **Set Model Name**: Choose a name for your fine-tuned model
-                    3. **Add HF Token**: Enter your HuggingFace token for model downloads
-                    4. **Select Preset**: Choose Test, Development, or Production
-                    5. **Start Pipeline**: Click "Start Pipeline" and wait for completion
-                    
-                    **Example:**
-                    - Model Name: `MyCustomAssistant`
-                    - HF Token: `hf_AbCdEfGhIjKlMnOpQrStUvWxYz`
-                    - Preset: `Development` (balanced speed/quality)
-                    - Save Options: ✅ LoRA, ✅ Merged Model
-                    """)
-                
-                with gr.Accordion("🔧 Presets Explained", open=True):
-                    gr.Markdown("""
-                    ### Fine-tuning Presets
-                    
-                    **🧪 Test Preset**
-                    - Purpose: Quick testing and validation
-                    - Training Time: ~15-30 minutes
-                    - Quality: Basic, for testing pipeline
-                    - Settings: 1 epoch, 2048 seq length, LoRA r=4
-                    - Use When: Testing new documents or pipeline setup
-                    
-                    **🔨 Development Preset**
-                    - Purpose: Development and iteration
-                    - Training Time: ~1-2 hours
-                    - Quality: Good, suitable for development
-                    - Settings: 2 epochs, 4096 seq length, LoRA r=8
-                    - Use When: Developing and testing your model
-                    
-                    **🏭 Production Preset**
-                    - Purpose: Final production models
-                    - Training Time: ~2-4 hours
-                    - Quality: Best possible results
-                    - Settings: 3 epochs, 8192 seq length, LoRA r=16
-                    - Use When: Creating final production models
-                    
-                    **🔬 Expert Preset**
-                    - Purpose: Custom configuration
-                    - Use the Expert Settings page for full control
-                    """)
-                
-                with gr.Accordion("📋 Pipeline Steps Explained", open=False):
-                    gr.Markdown("""
-                    ### What each step does:
-                    
-                    **1. Document Conversion** 📄
-                    - Converts uploaded files to clean text
-                    - Supports PDF, DOCX, TXT, MD, HTML, etc.
-                    - Removes formatting and extracts content
-                    
-                    **2. Wiki Generation** 📚
-                    - Creates Wikipedia-style articles from documents
-                    - Generates structured knowledge base
-                    - Improves model understanding
-                    
-                    **3. QA Creation** ❓
-                    - Generates question-answer pairs
-                    - Creates training examples
-                    - Builds comprehension tests
-                    
-                    **4. Dataset Formatting** 🔧
-                    - Formats data for training
-                    - Creates JSON training file
-                    - Validates data structure
-                    
-                    **5. Benchmark Creation** 📊
-                    - Creates evaluation questions
-                    - Builds test dataset
-                    - Prepares comparison metrics
-                    
-                    **6. Fine-tuning** 🤖
-                    - Trains the model on your data
-                    - Applies LoRA adapters
-                    - Creates custom model
-                    
-                    **7. Benchmarking** 🏆
-                    - Tests model performance
-                    - Compares before/after
-                    - Generates metrics
-                    
-                    **8. Results Archive** 📦
-                    - Packages all results
-                    - Creates downloadable archive
-                    - Saves training history
-                    """)
-                
-                with gr.Accordion("💡 Tips & Tricks", open=False):
-                    gr.Markdown("""
-                    ### Best Practices:
-                    
-                    **Document Preparation:**
-                    - Use high-quality, clean documents
-                    - Mix different types of content
-                    - Include at least 10-20 pages of text
-                    - Remove unnecessary headers/footers
-                    
-                    **Model Selection:**
-                    - Start with smaller models (E2B) for testing
-                    - Use larger models (E4B) for production
-                    - Consider VRAM requirements
-                    
-                    **Training Tips:**
-                    - Start with Test preset to verify setup
-                    - Use Development for iterating
-                    - Only use Production for final models
-                    - Monitor terminal for progress
-                    
-                    **Troubleshooting:**
-                    - Check terminal output for errors
-                    - Ensure Ollama is running for API calls
-                    - Verify HuggingFace token is valid
-                    - Use Cleanup tab if restarting
-                    """)
 
         # ==================== EVENT HANDLERS ====================
 
@@ -1753,118 +1333,6 @@ def create_main_interface():
             outputs=[cleanup_result]
         )
 
-        # Expert Configuration handlers
-        def load_config_to_ui():
-            config = load_existing_config()
-            
-            # Extract all values from config
-            tokens = config.get("tokens", {})
-            hf_token_val = tokens.get("hf_token", "")
-            hf_write_token_val = tokens.get("hf_write_token", "")
-            
-            # API Config
-            api_config = config.get("api_configs", {}).get("01_convert", {})
-            api_base_url_val = api_config.get("openai_base_url", "http://localhost:11434/v1")
-            api_key_val = api_config.get("openai_api_key", "ollama")
-            
-            # Models
-            convert_config = config.get("api_configs", {}).get("01_convert", {})
-            wiki_config = config.get("api_configs", {}).get("02_genwiki", {})
-            qa_config = config.get("api_configs", {}).get("03_instructQA", {})
-            benchmark_config = config.get("api_configs", {}).get("05_bmcreator", {})
-            
-            # Fine-tuning
-            ft_config = config.get("finetuning", {})
-            
-            # Benchmark
-            bench_config = config.get("benchmark", {})
-            
-            # Pipeline
-            pipe_config = config.get("pipeline", {})
-            
-            return [
-                hf_token_val, hf_write_token_val,
-                api_base_url_val, api_key_val,
-                convert_config.get("openai_model_name", "gemma3:12b-it-qat"),
-                wiki_config.get("openai_model_name", "gemma3:12b-it-qat"),
-                qa_config.get("openai_model_name", "gemma3:12b-it-qat"),
-                benchmark_config.get("openai_model_name", "gemma3:12b-it-qat"),
-                convert_config.get("temperature", 0.1),
-                wiki_config.get("temperature", 0.3),
-                qa_config.get("temperature", 0.7),
-                benchmark_config.get("temperature", 0.5),
-                ft_config.get("model_name", "OpenTuneWeaver-Model"),
-                ft_config.get("base_model", "unsloth/gemma-3n-E2B-it"),
-                ft_config.get("hf_repo_id", "user/OpenTuneWeaver-Model"),
-                ft_config.get("custom_model_dir", "CustomModel"),
-                ft_config.get("max_seq_length", 8192),
-                ft_config.get("load_in_4bit", True),
-                ft_config.get("full_finetuning", False),
-                ft_config.get("lora_r", 8),
-                ft_config.get("lora_alpha", 8),
-                ft_config.get("lora_dropout", 0.0),
-                ft_config.get("per_device_train_batch_size", 1),
-                ft_config.get("gradient_accumulation_steps", 16),
-                ft_config.get("warmup_steps", 200),
-                ft_config.get("num_train_epochs", 3),
-                ft_config.get("learning_rate", 5e-5),
-                ft_config.get("weight_decay", 0.03),
-                ft_config.get("save_lora", True),
-                ft_config.get("save_merged", True),
-                ft_config.get("save_gguf", False),
-                bench_config.get("mode", "comparison"),
-                bench_config.get("evaluator", {}).get("model", "gemma3:12b-it-qat"),
-                bench_config.get("max_new_tokens", 256),
-                bench_config.get("temperature", 0.3),
-                bench_config.get("top_p", 0.9),
-                bench_config.get("top_k", 50),
-                bench_config.get("repetition_penalty", 1.1),
-                pipe_config.get("auto_cleanup", False),
-                pipe_config.get("verbose", True),
-                pipe_config.get("continue_on_error", True),
-                "✅ Configuration loaded"
-            ]
-
-        load_config_btn.click(
-            fn=load_config_to_ui,
-            outputs=[
-                hf_token, hf_write_token,
-                api_base_url, api_key,
-                convert_model, wiki_model, qa_model, benchmark_model,
-                convert_temp, wiki_temp, qa_temp, benchmark_temp,
-                model_name, base_model, hf_repo_id, custom_model_dir,
-                max_seq_length, load_in_4bit, full_finetuning,
-                lora_r, lora_alpha, lora_dropout,
-                batch_size, grad_accumulation, warmup_steps, num_epochs,
-                learning_rate, weight_decay,
-                save_lora, save_merged, save_gguf,
-                benchmark_mode, evaluator_model, max_new_tokens,
-                eval_temp, top_p, top_k, repetition_penalty,
-                auto_cleanup, verbose_mode, continue_on_error,
-                config_status
-            ]
-        )
-
-        save_config_btn.click(
-            fn=save_config_from_ui,
-            inputs=[
-                hf_token, hf_write_token,
-                api_base_url, api_key,
-                convert_model, wiki_model, qa_model, benchmark_model,
-                convert_temp, wiki_temp, qa_temp, benchmark_temp,
-                model_name, base_model, hf_repo_id, custom_model_dir,
-                max_seq_length, load_in_4bit, full_finetuning,
-                lora_r, lora_alpha, lora_dropout,
-                batch_size, grad_accumulation, warmup_steps, num_epochs,
-                learning_rate, weight_decay,
-                save_lora, save_merged, save_gguf,
-                benchmark_mode, evaluator_model, max_new_tokens,
-                eval_temp, top_p, top_k, repetition_penalty,
-                auto_cleanup, verbose_mode, continue_on_error
-            ],
-            outputs=[config_status]
-        )
-
         # Auto-refresh for pipeline overview and terminal
         def auto_refresh():
             overview = create_pipeline_overview()
@@ -1886,7 +1354,7 @@ def create_main_interface():
 def main():
     """Main function."""
     print("="*80)
-    print(" 🎯 OPENTUNEWEAVER - FINETUNING PIPELINE UI v11.0")
+    print(" 🎯 OPENTUNEWEAVER - FINETUNING PIPELINE UI v10.0")
     print("="*80)
     
     # Show configuration
@@ -1896,7 +1364,7 @@ def main():
     print(f"🌐 Environment: {'RunPod' if IS_RUNPOD else 'Local'}")
     
     log_message("🚀 Starting OpenTuneWeaver UI...")
-    log_message("✨ Enhanced with Expert Settings and Help Page")
+    log_message("✨ Running from project root directory")
 
     # Create interface
     interface = create_main_interface()
@@ -1908,8 +1376,7 @@ def main():
     print(" - Network: http://YOUR_IP:8080")
     print("\n🎯 Features:")
     print(" - 📁 Direct access to pipeline and ui folders")
-    print(" - 🔬 Expert Settings for advanced configuration")
-    print(" - 📚 Comprehensive Help documentation")
+    print(" - 🔍 Works in both local and RunPod environments")
     print(" - 📊 Auto-updating pipeline status")
     print(" - ✅ Step selection (run individual steps)")
     print(" - 📱 Mobile-responsive design")
