@@ -1,140 +1,129 @@
+#!/usr/bin/env python3
+"""
+04_format.py - Konvertiert qa_instruct_dataset.json zu dataset.json im korrekten Format für Fine-tuning
+"""
+
 import json
 import os
-import sys
 from pathlib import Path
 
-# ========================================
-# LOAD CENTRAL CONFIGURATION
-# ========================================
-sys.path.append(str(Path(__file__).parent.parent.parent))  # To main directory
-from config_loader import PipelineConfigLoader
+def load_qa_dataset(file_path):
+    """Loads the QA dataset file"""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        return data
+    except FileNotFoundError:
+        print(f"❌ Error: File {file_path} not found!")
+        return None
+    except json.JSONDecodeError as e:
+        print(f"❌ Error parsing JSON file: {e}")
+        return None
 
-# Load configuration (04_format doesn't need API config, but we load for consistency)
-config_loader = PipelineConfigLoader()
-pipeline_config = config_loader.get_pipeline_config()
-
-# Show loaded configuration
-print("=" * 60)
-print("📋 CONFIGURATION LOADED (04_format)")
-print("=" * 60)
-print("  📋 Format script - No API required")
-print("  ✅ Pipeline config loaded")
-print("=" * 60)
-
-def create_gemma3_conversation(instruction, output):
-    """Creates a conversation in Gemma-3 format"""
-    conversation = [
-        {
-            "content": [
-                {
-                    "text": instruction,
-                    "type": "text"
-                }
-            ],
-            "role": "user"
-        },
-        {
-            "content": [
-                {
-                    "text": output,
-                    "type": "text"
-                }
-            ],
-            "role": "model"
-        }
-    ]
+def format_conversation_entry(qa_entry):
+    """Formats a single QA entry for fine-tuning"""
+    instruction = qa_entry.get("instruction", "").strip()
+    output = qa_entry.get("output", "").strip()
+    
+    if not instruction or not output:
+        return None
+    
+    # Generate Gemini format for text field
+    text_content = f"<start_of_turn>user\n{instruction}<end_of_turn>\n<start_of_turn>model\n{output}<end_of_turn>\n"
+    
+    # Generate structured conversation format
+    conversation = {
+        "conversations": [
+            {
+                "content": [{"text": instruction, "type": "text"}],
+                "role": "user"
+            },
+            {
+                "content": [{"text": output, "type": "text"}],
+                "role": "assistant"  # IMPORTANT: "assistant" instead of "model"!
+            }
+        ],
+        "text": text_content
+    }
+    
     return conversation
 
-def create_gemma3_text(instruction, output):
-    """Creates the formatted text for Gemma-3 training"""
-    text = f"<start_of_turn>user\n{instruction}<end_of_turn>\n<start_of_turn>model\n{output}<end_of_turn>\n"
-    return text
-
-def process_qa_dataset():
-    """Processes QA datasets and converts them to Gemma-3 format"""
-    # Define directory paths
-    input_dir = Path("INPUT")
-    output_dir = Path("OUTPUT")
+def convert_dataset(input_file, output_file):
+    """Konvertiert den gesamten Datensatz"""
+    print(f"📂 Lade QA-Datensatz von: {input_file}")
     
-    # Create OUTPUT directory if it doesn't exist
-    output_dir.mkdir(exist_ok=True)
+    # Lade die Eingabedatei
+    qa_data = load_qa_dataset(input_file)
+    if qa_data is None:
+        return False
     
-    # Find all JSON files in INPUT folder
-    json_files = list(input_dir.glob("*.json"))
+    # Extrahiere die Dateneinträge
+    qa_entries = qa_data.get("data", [])
+    if not qa_entries:
+        print("❌ Keine Dateneinträge im 'data'-Feld gefunden!")
+        return False
     
-    if not json_files:
-        print("No JSON files found in INPUT folder.")
-        return
+    print(f"📊 Gefunden: {len(qa_entries)} QA-Paare")
     
-    # Collector for all datasets
-    all_entries = []
+    # Konvertiere jeden Eintrag
+    formatted_conversations = []
+    skipped_count = 0
     
-    # Process each JSON file
-    for json_file in json_files:
-        print(f"Processing {json_file.name}...")
-        
-        try:
-            with open(json_file, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            # Extract data from qa_instruct_dataset format
-            if 'data' in data:
-                qa_pairs = data['data']
-                
-                # Convert each Q&A pair
-                for qa in qa_pairs:
-                    instruction = qa.get("instruction", "")
-                    output = qa.get("output", "")
-                    
-                    # Skip empty entries
-                    if not instruction.strip() or not output.strip():
-                        continue
-                    
-                    # Create Gemma-3 format
-                    conversations = create_gemma3_conversation(instruction, output)
-                    text = create_gemma3_text(instruction, output)
-                    
-                    # Entry in desired format
-                    entry = {
-                        "conversations": conversations,
-                        "text": text
-                    }
-                    
-                    all_entries.append(entry)
-                
-                print(f"  {len(qa_pairs)} Q&A pairs processed from {json_file.name}")
-            
-        except json.JSONDecodeError as e:
-            print(f"Error reading {json_file.name}: {e}")
-        except Exception as e:
-            print(f"Unexpected error with {json_file.name}: {e}")
+    for i, qa_entry in enumerate(qa_entries):
+        formatted_entry = format_conversation_entry(qa_entry)
+        if formatted_entry:
+            formatted_conversations.append(formatted_entry)
+        else:
+            skipped_count += 1
+            print(f"⚠️  Überspringe Eintrag {i+1}: Fehlende instruction oder output")
     
-    # Save dataset as JSONL (one JSON line per entry)
-    output_file = output_dir / "dataset.json"
+    print(f"✅ Erfolgreich formatiert: {len(formatted_conversations)} Einträge")
+    if skipped_count > 0:
+        print(f"⚠️  Übersprungen: {skipped_count} Einträge")
     
+    # Speichere die formatierten Daten
     try:
         with open(output_file, 'w', encoding='utf-8') as f:
-            for entry in all_entries:
-                json.dump(entry, f, ensure_ascii=False)
+            for entry in formatted_conversations:
+                json.dump(entry, f, ensure_ascii=False, separators=(',', ':'))
                 f.write('\n')
         
-        print(f"\nSuccessfully saved: {output_file}")
-        print(f"Total {len(all_entries)} entries created in Gemma-3 format")
+        print(f"💾 Datensatz gespeichert: {output_file}")
+        print(f"📊 Anzahl Einträge: {len(formatted_conversations)}")
+        return True
         
-        # Show example output
-        if all_entries:
-            print("\nExample entry:")
-            example = all_entries[0]
-            print(f"Conversations: {json.dumps(example['conversations'], ensure_ascii=False, indent=2)}")
-            print(f"Text: {repr(example['text'][:100])}...")
-            
     except Exception as e:
-        print(f"Error saving: {e}")
+        print(f"❌ Fehler beim Speichern: {e}")
+        return False
+
+def main():
+    """Hauptfunktion"""
+    print("🔄 Starte Datensatz-Konvertierung...")
+    
+    # Dateipfade
+    input_file = "INPUT/qa_instruct_dataset.json"
+    output_file = "OUTPUT/dataset.json"
+    
+    # Erstelle OUTPUT-Ordner falls er nicht existiert
+    os.makedirs("OUTPUT", exist_ok=True)
+    
+    # Prüfe ob Eingabedatei existiert
+    if not os.path.exists(input_file):
+        print(f"❌ Eingabedatei nicht gefunden: {input_file}")
+        print("📁 Stelle sicher, dass sich die Datei im aktuellen Verzeichnis befindet.")
+        return
+    
+    # Konvertiere den Datensatz
+    success = convert_dataset(input_file, output_file)
+    
+    if success:
+        print("\n🎉 Konvertierung erfolgreich abgeschlossen!")
+        print(f"📁 Output-Datei: {output_file}")
+        print("\n📋 Nächste Schritte:")
+        print("   1. Überprüfe die dataset.json Datei")
+        print("   2. Starte das Fine-tuning mit der neuen Datei")
+    else:
+        print("\n❌ Konvertierung fehlgeschlagen!")
 
 if __name__ == "__main__":
-    print("🚀 Starting dataset formatting (04_format)")
-    print("📝 Converting Q&A pairs to Gemma-3 format")
-    print("📂 Input: INPUT/")
-    print("📂 Output: OUTPUT/dataset.json")
-    print("")
-    process_qa_dataset()
+    main()
