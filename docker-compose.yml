@@ -1,0 +1,158 @@
+version: '3.8'
+
+services:
+  # OpenTuneWeaver with external API
+  opentuneweaver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: opentuneweaver:universal
+    container_name: opentuneweaver
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # API Configuration - Change these to your API endpoint
+      - OPENAI_API_BASE=${OPENAI_API_BASE:-http://host.docker.internal:11434/v1}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-ollama}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gemma3:12b-it-qat}
+      # Alternative names
+      - API_BASE_URL=${API_BASE_URL:-http://host.docker.internal:11434/v1}
+      - API_KEY=${API_KEY:-ollama}
+      - MODEL_NAME=${MODEL_NAME:-gemma3:12b-it-qat}
+      # HuggingFace tokens (optional)
+      - HF_TOKEN=${HF_TOKEN:-}
+      - HF_WRITE_TOKEN=${HF_WRITE_TOKEN:-}
+      # Gradio settings
+      - GRADIO_SERVER_NAME=0.0.0.0
+      - GRADIO_SERVER_PORT=8080
+      - GRADIO_SHARE=false
+      # CUDA settings
+      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
+    volumes:
+      # Persistent data volumes
+      - ./data:/app/OpenTuneWeaver/pipeline/data
+      - ./models:/app/OpenTuneWeaver/pipeline/modules/06_finetuning/CustomModel
+      - ./logs:/app/OpenTuneWeaver/logs
+      - ./cache:/app/OpenTuneWeaver/cache
+      # Optional: Mount local documents
+      # - ./documents:/app/OpenTuneWeaver/pipeline/modules/01_convert/UPLOAD
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - otw-network
+
+  # Optional: Local Ollama service
+  # Uncomment if you want to run Ollama in Docker
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: ollama
+  #   restart: unless-stopped
+  #   ports:
+  #     - "11434:11434"
+  #   volumes:
+  #     - ollama_data:/root/.ollama
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: all
+  #             capabilities: [gpu]
+  #   environment:
+  #     - OLLAMA_KEEP_ALIVE=24h
+  #     - OLLAMA_HOST=0.0.0.0
+  #   networks:
+  #     - otw-network
+
+  # Optional: vLLM service
+  # Uncomment if you want to use vLLM instead of Ollama
+  # vllm:
+  #   image: vllm/vllm-openai:latest
+  #   container_name: vllm
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - ~/.cache/huggingface:/root/.cache/huggingface
+  #   environment:
+  #     - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: all
+  #             capabilities: [gpu]
+  #   command: >
+  #     --model mistralai/Mistral-7B-Instruct-v0.2
+  #     --host 0.0.0.0
+  #     --port 8000
+  #   networks:
+  #     - otw-network
+
+networks:
+  otw-network:
+    driver: bridge
+
+volumes:
+  ollama_data:
+    driver: local
+
+# ============================================
+# Usage Instructions:
+# ============================================
+# 
+# 1. Create a .env file with your configuration:
+#    ```
+#    OPENAI_API_BASE=http://your-api-host:11434/v1
+#    OPENAI_API_KEY=your-api-key
+#    OPENAI_MODEL=your-model-name
+#    HF_TOKEN=your-huggingface-token
+#    ```
+#
+# 2. Build and start the container:
+#    ```
+#    docker-compose up -d
+#    ```
+#
+# 3. Access OpenTuneWeaver at:
+#    http://localhost:8080
+#
+# 4. View logs:
+#    ```
+#    docker-compose logs -f opentuneweaver
+#    ```
+#
+# 5. Stop the container:
+#    ```
+#    docker-compose down
+#    ```
+#
+# ============================================
+# Configuration Options:
+# ============================================
+#
+# For Ollama (local or remote):
+#   OPENAI_API_BASE=http://ollama-host:11434/v1
+#   OPENAI_API_KEY=ollama
+#   OPENAI_MODEL=llama3.2:3b
+#
+# For vLLM:
+#   OPENAI_API_BASE=http://vllm-host:8000/v1
+#   OPENAI_API_KEY=token-abc123
+#   OPENAI_MODEL=mistralai/Mistral-7B-Instruct-v0.2
+#
+# For OpenAI:
+#   OPENAI_API_BASE=https://api.openai.com/v1
+#   OPENAI_API_KEY=sk-...
+#   OPENAI_MODEL=gpt-4
+#
+# ============================================
