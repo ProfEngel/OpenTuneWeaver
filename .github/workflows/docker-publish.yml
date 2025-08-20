@@ -23,9 +23,9 @@ on:
 
 env:
   # Docker Hub Configuration
-  DOCKERHUB_REPO: profengel/opentuneweaver
+  DOCKERHUB_REPO: matmax/opentuneweaver
   # GitHub Container Registry Configuration  
-  GHCR_REPO: ghcr.io/profengel/opentuneweaver
+  GHCR_REPO: ghcr.io/matmax/opentuneweaver
 
 jobs:
   build-and-push:
@@ -212,21 +212,21 @@ jobs:
           ### Docker Hub
           \`\`\`bash
           # Standard version
-          docker pull profengel/opentuneweaver:$VERSION
-          docker pull profengel/opentuneweaver:latest
+          docker pull matmax/opentuneweaver:$VERSION
+          docker pull matmax/opentuneweaver:latest
           
           # CUDA-enabled version
-          docker pull profengel/opentuneweaver:cuda
+          docker pull matmax/opentuneweaver:cuda
           \`\`\`
           
           ### GitHub Container Registry
           \`\`\`bash
           # Standard version
-          docker pull ghcr.io/profengel/opentuneweaver:$VERSION
-          docker pull ghcr.io/profengel/opentuneweaver:latest
+          docker pull ghcr.io/matmax/opentuneweaver:$VERSION
+          docker pull ghcr.io/matmax/opentuneweaver:latest
           
           # CUDA-enabled version
-          docker pull ghcr.io/profengel/opentuneweaver:cuda
+          docker pull ghcr.io/matmax/opentuneweaver:cuda
           \`\`\`
           
           ## 🚀 Quick Start
@@ -251,7 +251,7 @@ jobs:
           \`\`\`
           
           ## 📋 What's Changed
-          See the full changelog in the [commits](https://github.com/ProfEngel/OpenTuneWeaver/commits/$VERSION).
+          See the full changelog in the [commits](https://github.com/matmax/OpenTuneWeaver/commits/$VERSION).
           EOF
 
       - name: Create GitHub Release
