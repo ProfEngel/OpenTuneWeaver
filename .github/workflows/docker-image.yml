@@ -1,0 +1,265 @@
+name: Docker Build and Publish
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+    tags:
+      - 'v*.*.*'
+      - 'v*.*'
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Version tag for manual build (e.g., v1.0.0)'
+        required: false
+        type: string
+
+env:
+  # Docker Hub Configuration
+  DOCKERHUB_REPO: profengel/opentuneweaver
+  # GitHub Container Registry Configuration  
+  GHCR_REPO: ghcr.io/profengel/opentuneweaver
+
+jobs:
+  build-and-push:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      # Step 1: Checkout Repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Step 2: Set up QEMU for multi-platform builds
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      # Step 3: Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          install: true
+
+      # Step 4: Log in to Docker Hub
+      - name: Log in to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Step 5: Log in to GitHub Container Registry
+      - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 6: Generate metadata for Docker images
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.DOCKERHUB_REPO }}
+            ${{ env.GHCR_REPO }}
+          flavor: |
+            latest=auto
+            prefix=
+            suffix=
+          tags: |
+            # Branch-based tags
+            type=ref,event=branch
+            type=ref,event=pr
+            # Semantic versioning
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            # Latest tag for main branch
+            type=raw,value=latest,enable={{is_default_branch}}
+            # Custom tags
+            type=raw,value=universal
+            type=raw,value=stable,enable=${{ github.ref == 'refs/heads/main' }}
+            # Date-based tag
+            type=raw,value={{date 'YYYYMMDD'}},enable={{is_default_branch}}
+            # SHA-based tag for tracking
+            type=sha,format=short,prefix={{branch}}-
+
+      # Step 7: Prepare build arguments
+      - name: Prepare build arguments
+        id: build_args
+        run: |
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+          echo "VCS_REF=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+
+      # Step 8: Build and push standard image
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            BUILD_DATE=${{ steps.build_args.outputs.BUILD_DATE }}
+            VCS_REF=${{ steps.build_args.outputs.VCS_REF }}
+            VERSION=${{ steps.build_args.outputs.VERSION }}
+
+      # Step 9: Build and push CUDA variant (amd64 only)
+      - name: Build and push CUDA variant
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/Dockerfile.cuda
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.DOCKERHUB_REPO }}:cuda
+            ${{ env.DOCKERHUB_REPO }}:latest-cuda
+            ${{ env.DOCKERHUB_REPO }}:${{ steps.build_args.outputs.VCS_REF }}-cuda
+            ${{ env.GHCR_REPO }}:cuda
+            ${{ env.GHCR_REPO }}:latest-cuda
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            BUILD_DATE=${{ steps.build_args.outputs.BUILD_DATE }}
+            VCS_REF=${{ steps.build_args.outputs.VCS_REF }}
+            VERSION=${{ steps.build_args.outputs.VERSION }}
+
+      # Step 10: Update Docker Hub description
+      - name: Update Docker Hub description
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ${{ env.DOCKERHUB_REPO }}
+          readme-filepath: ./docker/DOCKER_README.md
+          short-description: "OpenTuneWeaver - Universal LLM Fine-tuning Pipeline with External API Support"
+
+  test-images:
+    name: Test Docker Images
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    
+    strategy:
+      matrix:
+        variant: [latest, universal, cuda]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Test Docker image
+        run: |
+          echo "Testing image: ${{ env.DOCKERHUB_REPO }}:${{ matrix.variant }}"
+          
+          # Pull the image
+          docker pull ${{ env.DOCKERHUB_REPO }}:${{ matrix.variant }}
+          
+          # Run basic test
+          docker run --rm \
+            -e OPENAI_API_BASE=http://test:11434/v1 \
+            -e OPENAI_API_KEY=test \
+            -e OPENAI_MODEL=test \
+            ${{ env.DOCKERHUB_REPO }}:${{ matrix.variant }} \
+            python3 -c "import torch, transformers, gradio; print('Dependencies OK')" || true
+
+  create-release:
+    name: Create GitHub Release
+    needs: [build-and-push, test-images]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          cat > release_notes.md << EOF
+          # OpenTuneWeaver $VERSION
+          
+          ## 🐳 Docker Images
+          
+          This release is available as Docker images:
+          
+          ### Docker Hub
+          \`\`\`bash
+          # Standard version
+          docker pull profengel/opentuneweaver:$VERSION
+          docker pull profengel/opentuneweaver:latest
+          
+          # CUDA-enabled version
+          docker pull profengel/opentuneweaver:cuda
+          \`\`\`
+          
+          ### GitHub Container Registry
+          \`\`\`bash
+          # Standard version
+          docker pull ghcr.io/profengel/opentuneweaver:$VERSION
+          docker pull ghcr.io/profengel/opentuneweaver:latest
+          
+          # CUDA-enabled version
+          docker pull ghcr.io/profengel/opentuneweaver:cuda
+          \`\`\`
+          
+          ## 🚀 Quick Start
+          
+          1. Create a \`.env\` file:
+          \`\`\`bash
+          OPENAI_API_BASE=http://your-api:11434/v1
+          OPENAI_API_KEY=your-key
+          OPENAI_MODEL=your-model
+          \`\`\`
+          
+          2. Run with Docker Compose:
+          \`\`\`bash
+          docker-compose up -d
+          \`\`\`
+          
+          Or with Docker:
+          \`\`\`bash
+          docker run -d -p 8080:8080 \\
+            --env-file .env \\
+            profengel/opentuneweaver:$VERSION
+          \`\`\`
+          
+          ## 📋 What's Changed
+          See the full changelog in the [commits](https://github.com/ProfEngel/OpenTuneWeaver/commits/$VERSION).
+          EOF
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: release_notes.md
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref, '-beta') || contains(github.ref, '-alpha') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
