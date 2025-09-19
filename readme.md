@@ -237,6 +237,7 @@ OpenTuneWeaver is committed to democratizing AI development while maintaining su
 **Perfect for individuals, students, and researchers who want to support our mission:**
 
 #### One-Time Donations
+- **☕ Coffee for ProfEngel - $5**: Fuel late-night coding session for ProfEngel, the founder
 - **☕ Coffee for the Team - $30**: Fuel late-night coding sessions
 - **💻 Workstation Day - $110**: Power a full day of concentrated development  
 - **🚀 GPU Hour Sponsor - $550**: Supercharge development with serious computational power
@@ -250,31 +251,35 @@ OpenTuneWeaver is committed to democratizing AI development while maintaining su
 
 **Professional licensing for businesses and organizations using OpenTuneWeaver commercially:**
 
-#### 🥉 Bronze Enterprise
-- **One-Time**: €500 (1 seat, 12 months updates)
+### 🏢 Enterprise Licensing (Required for Commercial Use)
+
+**Professional licensing for businesses and organizations using OpenTuneWeaver commercially:**
+
+#### 🥉 Bronze Enterprise - Small Companies
+- **One-Time**: €499 (1 seat, 12 months updates)
 - **Monthly**: €100/month (multi-seat usage)
-- Small company logo in README.md
-- Commercial usage rights
-- Basic priority support
+- **Target:** Small companies (≤49 employees, ≤€1M annual revenue)
+- Bronze company logo in README.md
+- Commercial usage rights for qualifying small companies
 
-#### 🥈 Silver Enterprise  
-- **One-Time**: €1,500 (3 seats, 12 months updates)
+#### 🥈 Silver Enterprise - Medium Companies  
+- **One-Time**: €1,499 (3 seats, 12 months updates)
 - **Monthly**: €300/month (extended teams)
-- Medium company logo in README.md + documentation
+- **Target:** Medium companies (50-249 employees, €1-50M annual revenue)
+- Silver company logo in README.md + documentation
 - Enhanced analytics and insights
-- Feature request priority
 
-#### 🥇 Gold Enterprise
+#### 🥇 Gold Enterprise - Large Companies & Consultants
 - **One-Time**: €4,999 (unlimited seats + client usage, 12 months updates)
 - **Monthly**: €1,000/month (enterprise-scale)
-- Large premium logo placement across all platforms
+- **Target:** Large companies (250+ employees or €50M+ annual revenue) & Consultants training LLMs for external clients
+- Large premium logo placement in our ReadME.md
 - Unlimited commercial usage including client projects
 - Direct development roadmap influence
-- 24-hour priority response on critical issues
 
 ### Why These Prices Matter
 
-Traditional LLM fine-tuning services cost **€5,000-€10,000+ per project**. OpenTuneWeaver provides enterprise-grade capabilities at a fraction of these costs, making advanced AI accessible to organizations of all sizes while supporting continued open-source development.
+Traditional LLM fine-tuning services cost **€5,000-€10,000+ per project**. OpenTuneWeaver provides enterprise-grade capabilities at a fraction of these costs, making advanced AI accessible to organizations of all sizes while supporting continued open-source development. OpenTuneWeaver is the first and only AllInOne-Solution for EndUsers to finetune your local LLM with all of your data.
 
 **Ready to support democratized AI development?**  
 [![Sponsor](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=ff69b4)](https://github.com/sponsors/ProfEngel)
@@ -294,8 +299,8 @@ Traditional LLM fine-tuning services cost **€5,000-€10,000+ per project**. O
 
 ### Development Investment
 **⏰ Timeline:**
-- **50+ Development Days** already invested
-- **70% Project Completion** achieved
+- **80+ Development Days** already invested
+- **91% Project Completion** achieved
 - **3.2 Month Equivalent** full-time development effort
 
 **🎯 Required Expertise:**
