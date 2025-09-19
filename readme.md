@@ -7,13 +7,13 @@
 ![GitHub language count](https://img.shields.io/github/languages/count/ProfEngel/OpenTuneWeaver)
 ![GitHub top language](https://img.shields.io/github/languages/top/ProfEngel/OpenTuneWeaver)
 ![GitHub last commit](https://img.shields.io/github/last-commit/ProfEngel/OpenTuneWeaver?color=red)
+[![Sponsor](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=ff69b4)](https://github.com/sponsors/ProfEngel)
 [![YouTube](https://img.shields.io/badge/YouTube-MatMaxEngel-red?logo=youtube&logoColor=white)](https://www.youtube.com/user/MatMaxEngel)
 [![Website](https://img.shields.io/badge/Website-opentuneweaver.com-blue?logo=googlechrome&logoColor=white)](https://opentuneweaver.com/)
 
 <div align="center">
   <img src="assets/otw_logo_banner.png" alt="OpenTuneWeaver Logo" width="900">
 </div>
-
 
 ![OpenTuneWeaver Demo](assets/OTW_demo.gif)
 
@@ -25,6 +25,14 @@
 </div>
 
 This project is part-funded by the **Ministry of Science, Research and Arts Baden-Württemberg (MWK)** and **Stifterverband Deutschland** as part of digital [Fellowship-Program](https://www.stifterverband.org/bwdigifellows/2024_engel_leiblein).
+
+## 💖 Support OpenTuneWeaver
+
+Help us democratize AI development for education and research! Your support enables us to continue building accessible, enterprise-grade AI tools that cost a fraction of traditional fine-tuning services (€5,000-€10,000+).
+
+[![Sponsor](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=ff69b4)](https://github.com/sponsors/ProfEngel)
+
+**[Become a sponsor and join our mission!](https://github.com/sponsors/ProfEngel)** 🚀
 
 > **🚀 Get Started with OpenTuneWeaver**
 > 
@@ -199,44 +207,97 @@ These media appearances reflect the growing recognition of OpenTuneWeaver's inno
 **Press Contact:**  
 For additional interviews or press inquiries: [research@opentuneweaver.com](mailto:research@opentuneweaver.com)
 
+## 💖 Sponsorship & Support
+
+OpenTuneWeaver is committed to democratizing AI development while maintaining sustainability. Your support helps us continue building accessible, enterprise-grade tools at a fraction of traditional costs.
+
+### 🎯 Community Support (Voluntary)
+
+**Perfect for individuals, students, and researchers who want to support our mission:**
+
+#### One-Time Donations
+- **☕ Coffee for the Team - $30**: Fuel late-night coding sessions
+- **💻 Workstation Day - $110**: Power a full day of concentrated development  
+- **🚀 GPU Hour Sponsor - $550**: Supercharge development with serious computational power
+
+#### Monthly Support
+- **☕ Coffee Supporter - $10/month**: Basic community support
+- **📚 Education Champion - $25/month**: Enhanced educational resources access
+- **🔬 Research Supporter - $50/month**: Early access to experimental features
+
+### 🏢 Enterprise Licensing (Required for Commercial Use)
+
+**Professional licensing for businesses and organizations using OpenTuneWeaver commercially:**
+
+#### 🥉 Bronze Enterprise
+- **One-Time**: €500 (1 seat, 12 months updates)
+- **Monthly**: €100/month (multi-seat usage)
+- Small company logo in README.md
+- Commercial usage rights
+- Basic priority support
+
+#### 🥈 Silver Enterprise  
+- **One-Time**: €1,500 (3 seats, 12 months updates)
+- **Monthly**: €300/month (extended teams)
+- Medium company logo in README.md + documentation
+- Enhanced analytics and insights
+- Feature request priority
+
+#### 🥇 Gold Enterprise
+- **One-Time**: €4,999 (unlimited seats + client usage, 12 months updates)
+- **Monthly**: €1,000/month (enterprise-scale)
+- Large premium logo placement across all platforms
+- Unlimited commercial usage including client projects
+- Direct development roadmap influence
+- 24-hour priority response on critical issues
+
+### Why These Prices Matter
+
+Traditional LLM fine-tuning services cost **€5,000-€10,000+ per project**. OpenTuneWeaver provides enterprise-grade capabilities at a fraction of these costs, making advanced AI accessible to organizations of all sizes while supporting continued open-source development.
+
+**Ready to support democratized AI development?**  
+[![Sponsor](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=ff69b4)](https://github.com/sponsors/ProfEngel)
+
+**Enterprise licensing questions?** Contact: mathias@opentuneweaver.com
+
+---
+
 ## License 📜
 
-This project is licensed under the **Apache License 2.0**. 
+This project is licensed under the **Apache License 2.0**.
 
 **Usage Rights:**
 - ✅ **Private Use**: Completely free
 - ✅ **Educational Institutions**: Free for research and teaching
 - ✅ **Open Source Projects**: Free use with attribution
-- ⚠️ **Commercial Use**: Enterprise plan required
+- ⚠️ **Commercial Use**: Enterprise license required
 
-For commercial use, contact our [Sales Team](mailto:sales@opentuneweaver.com) for an Enterprise Plan.
+For commercial licensing, see our [sponsorship tiers above](#-sponsorship--support) or contact mathias@opentuneweaver.com.
 
-Full license terms can be found in the [LICENSE](LICENSE) file.
-
-***
+Full license terms can be found in the LICENSE file.
 
 ## Acknowledgments 🙏
 
 OpenTuneWeaver would not be possible without these excellent open-source frameworks:
 
 **Core Frameworks:**
-- [Unsloth](https://github.com/unslothai/unsloth) - Efficient LLM fine-tuning
-- [Gradio](https://gradio.app/) - No-code web interface
-- [Transformers](https://github.com/huggingface/transformers) - HuggingFace Model Hub
-- [Ollama](https://ollama.ai/) - Local LLM inference
+- Unsloth - Efficient LLM fine-tuning
+- Gradio - No-code web interface
+- Transformers - HuggingFace Model Hub
+- Ollama - Local LLM inference
 
 **Document Processing:**
-- [Docling (IBM)](https://github.com/DS4SD/docling) - Intelligent PDF processing
-- [Marker](https://github.com/VikParuchuri/marker) - PDF-to-Markdown conversion
+- Docling (IBM) - Intelligent PDF processing
+- Marker - PDF-to-Markdown conversion
 
 **Training & Optimization:**
-- [LoRA/QLoRA](https://github.com/microsoft/LoRA) - Parameter-efficient fine-tuning
-- [BitsAndBytes](https://github.com/TimDettmers/bitsandbytes) - GPU quantization
-- [PEFT](https://github.com/huggingface/peft) - Parameter-efficient fine-tuning
+- LoRA/QLoRA - Parameter-efficient fine-tuning
+- BitsAndBytes - GPU quantization
+- PEFT - Parameter-efficient fine-tuning
 
 **Vision & Multimodal:**
-- [Google Gemma](https://ai.google.dev/gemma) - Vision-Language models
-- [OpenAI CLIP](https://github.com/openai/CLIP) - Image-text understanding
+- Google Gemma - Vision-Language models
+- OpenAI CLIP - Image-text understanding
 
 **Thanks to the entire open-source community!** 🎉
 
