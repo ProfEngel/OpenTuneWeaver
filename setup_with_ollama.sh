@@ -250,37 +250,37 @@ done
 log "${BLUE}📥 Downloading Ollama models (this will take a while)...${NC}"
 
 # Download the desired larger model
-#log "Downloading gemma3:12b-it-qat (this may take 10-15 minutes)..."
-#if ollama pull gemma3:12b-it-qat; then
-#    log "✅ gemma3:12b-it-qat downloaded successfully"
-#    export OLLAMA_MODEL="gemma3:12b-it-qat"
-#else
-#    warning "Failed to download gemma3:12b-it-qat, falling back to gemma3:4b-it-qat"
-#    ollama pull gemma3:4b-it-qat
+log "Downloading gemma3:12b-it-qat (this may take 10-15 minutes)..."
+if ollama pull gemma3:12b-it-qat; then
+    log "✅ gemma3:12b-it-qat downloaded successfully"
+    export OLLAMA_MODEL="gemma3:12b-it-qat"
+else
+    warning "Failed to download gemma3:12b-it-qat, falling back to gemma3:4b-it-qat"
+    ollama pull gemma3:4b-it-qat
+    export OLLAMA_MODEL="gemma3:4b-it-qat"
+fi
+
+# Download the desired larger model
+#log "Downloading gemma3:4b-it-qat (this may take 10-15 minutes)..."
+#if ollama pull gemma3:4b-it-qat; then
+#    log "✅ gemma3:4b-it-qat downloaded successfully"
 #    export OLLAMA_MODEL="gemma3:4b-it-qat"
+#else
+#    warning "Failed to download gemma3:4b-it-qat, falling back to gemma3:12b-it-qat"
+#    ollama pull gemma3:12b-it-qat
+#    export OLLAMA_MODEL="gemma3:12b-it-qat"
 #fi
 
 # Download the desired larger model
-log "Downloading gemma3:4b-it-qat (this may take 10-15 minutes)..."
-if ollama pull gemma3:4b-it-qat; then
-    log "✅ gemma3:4b-it-qat downloaded successfully"
-    export OLLAMA_MODEL="gemma3:4b-it-qat"
-else
-    warning "Failed to download gemma3:4b-it-qat, falling back to gemma3:12b-it-qat"
-    ollama pull gemma3:12b-it-qat
-    export OLLAMA_MODEL="gemma3:12b-it-qat"
-fi
-
-# Download the desired larger model
-log "Downloading gpt-oss:20b (this may take 10-15 minutes)..."
-if ollama pull gpt-oss:20b; then
-    log "✅ gpt-oss:20b downloaded successfully"
-    export OLLAMA_MODEL="gpt-oss:20b"
-else
-    warning "Failed to download gpt-oss:20b, falling back to gemma3:12b-it-qat"
-    ollama pull gemma3:12b-it-qat
-    export OLLAMA_MODEL="gemma3:12b-it-qat"
-fi
+#log "Downloading gpt-oss:20b (this may take 10-15 minutes)..."
+#if ollama pull gpt-oss:20b; then
+#    log "✅ gpt-oss:20b downloaded successfully"
+#    export OLLAMA_MODEL="gpt-oss:20b"
+#else
+#    warning "Failed to download gpt-oss:20b, falling back to gemma3:12b-it-qat"
+#    ollama pull gemma3:12b-it-qat
+#    export OLLAMA_MODEL="gemma3:12b-it-qat"
+#fi
 
 # Verify model is available
 log "Available models:"
@@ -305,28 +305,28 @@ cat > /workspace/OpenTuneWeaver/pipeline/pipeline_config.json << EOF
       "use_openai_api": true,
       "openai_base_url": "http://localhost:11434/v1",
       "openai_api_key": "ollama",
-      "openai_model_name": "${OLLAMA_MODEL:-gemma3:4b-it-qat}",
+      "openai_model_name": "${OLLAMA_MODEL:-gemma3:12b-it-qat}",
       "temperature": 0.1
     },
     "02_genwiki": {
       "use_openai_api": true,
       "openai_base_url": "http://localhost:11434/v1",
       "openai_api_key": "ollama",
-      "openai_model_name": "${OLLAMA_MODEL:-gpt-oss:20b}",
+      "openai_model_name": "${OLLAMA_MODEL:-gemma3:12b-it-qat}",
       "temperature": 0.3
     },
     "03_instructQA": {
       "use_openai_api": true,
       "openai_base_url": "http://localhost:11434/v1",
       "openai_api_key": "ollama",
-      "openai_model_name": "${OLLAMA_MODEL:-gpt-oss:20b}",
+      "openai_model_name": "${OLLAMA_MODEL:-gemma3:12b-it-qat}",
       "temperature": 0.7
     },
     "05_bmcreator": {
       "use_openai_api": true,
       "openai_base_url": "http://localhost:11434/v1",
       "openai_api_key": "ollama",
-      "openai_model_name": "${OLLAMA_MODEL:-gpt-oss:20b}",
+      "openai_model_name": "${OLLAMA_MODEL:-gemma3:12b-it-qat}",
       "temperature": 0.5
     }
   },
@@ -385,7 +385,7 @@ cat > /workspace/OpenTuneWeaver/pipeline/pipeline_config.json << EOF
       "type": "api",
       "api_base_url": "http://localhost:11434/v1",
       "api_key": "ollama",
-      "model": "${OLLAMA_MODEL:-gpt-oss:20b}"
+      "model": "${OLLAMA_MODEL:-gemma3:12b-it-qat}"
     },
     "questions_file": "BENCHMARKFRAGEN/benchmark_fragen_complete.json",
     "max_new_tokens": 256,

@@ -21,10 +21,10 @@ config = config_loader.get_api_config()
 USE_OPENAI_API = config.get("use_openai_api", True)
 OPENAI_BASE_URL = config.get("openai_base_url", "http://localhost:11434/v1")
 OPENAI_API_KEY = config.get("openai_api_key", "ollama")
-OPENAI_MODEL_NAME = config.get("openai_model_name", "gpt-oss:20b")
+OPENAI_MODEL_NAME = config.get("openai_model_name", "gemma3:12b-it-qat")
 OLLAMA_SERVER_URL = config.get("ollama_server_url", "http://localhost:11434")
 OLLAMA_API_KEY = config.get("ollama_api_key", "ollama")
-OLLAMA_MODEL_NAME = config.get("ollama_model_name", "gpt-oss:20b")
+OLLAMA_MODEL_NAME = config.get("ollama_model_name", "gemma3:12b-it-qat")
 OLLAMA_CHAT_ENDPOINT = f"{OLLAMA_SERVER_URL}/api/chat"
 
 # Show loaded configuration
