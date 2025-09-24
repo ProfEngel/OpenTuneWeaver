@@ -109,6 +109,8 @@ Open Ports: 8080,11434
 **Installation:**
  Go to your pod and fire up the Jupyter Hub of the pod. Open a terminal window in the hub and put the following in.
 
+native installation (not recommended)
+
 ```
 
 cd /workspace
@@ -119,7 +121,9 @@ chmod +x setup_with_ollama.sh
 
 ```
 
- or better with venv
+ or better with venv...
+
+venv installation (recommended)
 
 ```
 
