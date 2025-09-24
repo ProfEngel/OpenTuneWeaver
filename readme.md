@@ -172,9 +172,8 @@ pip install --upgrade --no-cache-dir --no-deps git+https://github.com/unslothai/
 - 🌍 **Reasoning Model/ GPRO Support**: generating reasoning datasets and training in GPRO
 - 🤖 **Extended Model Support**: 
   - GPT-OSS family (Reasoning with harmony-parsing and tokenization library)
-  - Qwen 2.5/3.0 series  
-  - Mixtral and other MoE models
-  - Phi-4 and Microsoft models
+  - Qwen 3.0 series
+  - furthcoming SOTA OpenWeight or OpenSource LLM look here [ArtificalAnalysis AI](https://artificialanalysis.ai/)
 - 🎨 **UI-Refresh**: Modern, robust, and cleaner user interface design
 - 🐳 **Docker Support**: Simplified production deployment with containerization
 - ⚙️ **User-friendly VLM/LLM Pipeline Switching**: Easy model selection and configuration within the pipeline
@@ -370,7 +369,7 @@ If you use OpenTuneWeaver in your research, please cite our paper:
 
 ```
 
-@article{opentuneweaver2024,
+@article{opentuneweaver2025,
 title={OpenTuneWeaver: Semantically-structured, Curatable LLM Fine-tuning Pipeline for Research and Education},
 author={Engel, Prof. Dr. Mathias},
 journal={arXiv preprint},
