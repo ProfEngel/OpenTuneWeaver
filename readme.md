@@ -14,8 +14,8 @@
 <div align="center">
   <img src="assets/otw_logo_banner.png" alt="OpenTuneWeaver Logo" width="900">
 </div>
-
-![OpenTuneWeaver Demo](assets/OTW_demo.gif)
+![OTW pipeline overview](assets/8.png)
+*Pipeline status and progress.*
 
 **OpenTuneWeaver is a semantically-structured, curatable all-in-one LLM fine-tuning pipeline that automatically creates structured wiki entries, InstructQA datasets, and benchmarkable, deployment-ready models from any raw data (PDF, DOCX, etc.).** The system revolutionizes LLM fine-tuning through **semantic chunking**, **curatable dataset creation**, and **end-to-end automation** without requiring technical expertise.
 
@@ -25,6 +25,8 @@
 </div>
 
 This project is part-funded by the **Ministry of Science, Research and Arts Baden-Württemberg (MWK)** and **Stifterverband Deutschland** as part of digital [Fellowship-Program](https://www.stifterverband.org/bwdigifellows/2024_engel_leiblein).
+
+![OpenTuneWeaver Demo](assets/OTW_demo.gif)
 
 ## 💖 Support OpenTuneWeaver
 
@@ -41,7 +43,8 @@ Help us democratize AI development for education and research! Your support enab
 >  
 > **🎓 Academic Institutions**: Free for research and teaching activities
 >
-> **💼 Commercial Use?** → **(Enterprise Plan Required) see Github Sponsor**  
+> **💼 Commercial Use?** → **(Enterprise Plan Required) see Github Sponsor** 
+> ✅ Test it 30 days for free before you pay 
 > 🎯 One-time payment with **1 year of updates included**  
 > 🔄 Optional update extensions available after first year  
 > 📞 Check out our Plans (down the page or in the Github Sponsor) for pricing & enterprise features
@@ -66,6 +69,8 @@ With the OTW-Viewer, all generated documents (converted Markdown files, lexicon 
 ***
 
 ## How to Install 🚀
+
+Full Installation Guide here [Installation and Use-Guide](howto.md) or here...
 
 ### System Requirements
 
