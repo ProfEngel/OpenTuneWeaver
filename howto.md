@@ -165,4 +165,4 @@ The run produces:
 - License: Apache‑2.0 (see repository).
 - Thanks to the open‑source ecosystems around Transformers, Unsloth, Docling/Marker, Ollama, and others.
 
-```
+---
