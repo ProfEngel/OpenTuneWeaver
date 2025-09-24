@@ -119,6 +119,18 @@ chmod +x setup_with_ollama.sh
 
 ```
 
+ or better with venv
+
+```
+
+cd /workspace
+git clone https://github.com/ProfEngel/OpenTuneWeaver.git
+cp OpenTuneWeaver/setup_with_ollama_venv.sh .
+chmod +x setup_with_ollama_venv.sh
+./setup_with_ollama_venv.sh
+
+```
+
 **After installation:**
 wait until the installation is done (approx. 5-10 min.), then press y for starting the ui. The ui starts on port http://your(runpod)IP:8080
 
