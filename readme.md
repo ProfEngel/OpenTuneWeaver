@@ -14,6 +14,7 @@
 <div align="center">
   <img src="assets/otw_logo_banner.png" alt="OpenTuneWeaver Logo" width="900">
 </div>
+
 ![OTW pipeline overview](assets/8.png)
 *Pipeline status and progress.*
 

@@ -30,10 +30,10 @@ This guide covers end‑to‑end setup of OpenTuneWeaver (OTW) on Runpod, launch
 Select a recent PyTorch template (CUDA 12.x, Python 3.11). Configure adequate storage and expose the required HTTP ports.
 
 ![GPU/instance selection](assets/1.png)
-*Choose a suitable GPU/instance.*
+*Choose a suitable GPU/instance. I would prefer a GPU with at least 20 GB VRAM.*
 
 ![Template overrides: storage & ports](assets/2.png)
-*Set Container/Volume Disk and expose ports `8888,8080,11434`.*
+*Set Container/Volume Disk (both 100 GB) and expose ports `8888,8080,11434`.`11434` is optional, because Ollama is only for the localhost.*
 
 ---
 
@@ -51,7 +51,7 @@ Create a new Terminal from the Launcher.
 ---
 
 ## 3. Clone the project and run setup
-In the terminal, move to `/workspace`, clone the repository, and execute the setup script:
+In the terminal, you are normally in the `/workspace`-location, clone the repository, and execute the setup script:
 
 ```
 
@@ -64,7 +64,7 @@ chmod +x setup_with_ollama.sh
 ```
 
 ![Terminal: setup commands](assets/5.png)
-*Clone and run the setup.*
+*Clone and run the setup. This usually only needs to be done once and takes between 5-15 minutes to initialize, depending on your internet connection and hardware performance.*
 
 Wait until dependency checks and downloads complete. At the end, the script prompts to start the OTW UI.
 
@@ -74,12 +74,12 @@ Wait until dependency checks and downloads complete. At the end, the script prom
 ---
 
 ## 4. Start OTW (Port 8080)
-After confirmation, the UI runs on port 8080. Open it from the Connect tab via the HTTP Service link.
+After confirmation, the UI runs on port 8080. Open it from the Connect tab via the HTTP Service link or if you installed it locally than open it from your http://localhost:8080.
 
 ![Connect tab: HTTP Service 8080](assets/7.png)
 *Open the OTW UI on port 8080.*
 
-The OTW landing page shows the eight pipeline stages and progress.
+The OTW landing page shows the eight pipeline stages and progress. Here you'll also see the quick settings for fine-tuning, which can be adjusted granularly in the Expert Settings tab. Files (docx, pdf, xlsx, txt, etc.) can be uploaded under the quick settings. Once everything is correct, the pipeline can be started. The refresh status shows the current status of the pipeline. This can be viewed in detail in the Terminal tab.
 
 ![OTW pipeline overview](assets/8.png)
 *Pipeline status and progress.*
@@ -89,27 +89,31 @@ The OTW landing page shows the eight pipeline stages and progress.
 ## 5. Basic configuration in the UI
 Enter a model name, paste the Hugging Face Access Token (READ), and choose a preset (e.g., “Production” with 8k seq‑len, 3 epochs, LoRA rank 16). Select desired export formats (LoRA, Merged, GGUF).
 
-![Model name, token, preset & export options](assets/9.png)
-*Set base model/preset and export format.*
+![Hugging Face: Access Token](assets/9.png)
+*Create/copy the HF Access Token.*
 
 If no token exists yet, create one in the Hugging Face account settings and paste it into the token field.
 
-![Hugging Face: Access Token](assets/10.png)
-*Create/copy the HF Access Token.*
-
+1. Create an account on [huggingface.co](https://huggingface.co)
+2. Go to [Settings > Access Tokens](https://huggingface.co/settings/tokens)
+3. Create a new token with **Read** permission (and **Write** for model upload)
+4. Note down the token for installation
 ---
 
 ## 6. Upload documents
 Upload source files (PDF, DOCX, TXT, MD). OTW converts documents to high‑quality Markdown, generates semantic wiki entries, and builds Instruct‑QA pairs.
 
-![Example documents](assets/11.png)
-*Sample files ready for upload.*
+![Example documents for the Training-Pipeline](assets/10.png)
+*Check your data (docx, xlsx,txt, etc.) and upload the to the pipeline.*
 
 ---
 
 ## 7. Run the pipeline
 - Choose the desired steps (default: 1–8).
 - Click “Start Pipeline”.
+
+![Pipeline-Settings](assets/11.png)
+*All needed Changes for your finetuned model.*
 
 OTW executes:
 1. Document Conversion  
@@ -122,6 +126,17 @@ OTW executes:
 8. Results Archive
 
 Status, logs, and intermediate artifacts are visible in the UI. Curation can be performed between steps and runs can be repeated for quality.
+
+---
+
+---
+
+## 7. Check the detailed status in the terminal-tab
+
+The current status can be granularly refreshed at any time in the Terminal tab. This can also be done directly in the Jupyter Notebook terminal.
+
+![Terminal Tab](assets/12.png)
+*Refresh the Terminal Tab or go to your Jupyter-Notebook-Terminal.*
 
 ---
 
