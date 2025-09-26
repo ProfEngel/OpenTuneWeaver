@@ -278,21 +278,18 @@ OpenTuneWeaver is committed to democratizing AI development while maintaining su
 
 #### 🥉 Bronze Enterprise - Small Companies
 - **One-Time**: €499 (1 seat, 12 months updates)
-- **Monthly**: €100/month (multi-seat usage)
 - **Target:** Small companies (≤49 employees, ≤€1M annual revenue)
 - Bronze company logo in README.md
 - Commercial usage rights for qualifying small companies
 
 #### 🥈 Silver Enterprise - Medium Companies  
 - **One-Time**: €1,499 (3 seats, 12 months updates)
-- **Monthly**: €300/month (extended teams)
 - **Target:** Medium companies (50-249 employees, €1-50M annual revenue)
 - Silver company logo in README.md + documentation
 - Enhanced analytics and insights
 
 #### 🥇 Gold Enterprise - Large Companies & Consultants
-- **One-Time**: €4,999 (unlimited seats + client usage, 12 months updates)
-- **Monthly**: €1,000/month (enterprise-scale)
+- **One-Time**: €2,999 (unlimited seats + client usage, 12 months updates)
 - **Target:** Large companies (250+ employees or €50M+ annual revenue) & Consultants training LLMs for external clients
 - Large premium logo placement in our ReadME.md
 - Unlimited commercial usage including client projects
