@@ -45,7 +45,9 @@ Help us democratize AI development for education and research! Your support enab
 > **🎓 Academic Institutions**: Free for research and teaching activities
 >
 > **💼 Commercial Use?** → **(Enterprise Plan Required) see Github Sponsor** 
-> ✅ Test it 30 days for free before you pay 
+>
+> ✅ **Test it 30 days for free**, before you pay
+> 
 > 🎯 One-time payment with **1 year of updates included**  
 > 🔄 Optional update extensions available after first year  
 > 📞 Check out our Plans (down the page or in the Github Sponsor) for pricing & enterprise features
@@ -271,7 +273,8 @@ OpenTuneWeaver is committed to democratizing AI development while maintaining su
 
 ### 🏢 Enterprise Licensing (Required for Commercial Use)
 
-**Professional licensing for businesses and organizations using OpenTuneWeaver commercially:**
+- **Professional licensing for businesses and organizations using OpenTuneWeaver commercially:**
+- **Test OpenTuneWeaver 30 days for free, before you pay**
 
 #### 🥉 Bronze Enterprise - Small Companies
 - **One-Time**: €499 (1 seat, 12 months updates)
