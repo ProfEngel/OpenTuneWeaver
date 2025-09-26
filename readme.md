@@ -268,9 +268,6 @@ OpenTuneWeaver is committed to democratizing AI development while maintaining su
 - **📚 Education Champion - $25/month**: Enhanced educational resources access
 - **🔬 Research Supporter - $50/month**: Early access to experimental features
 
-### 🏢 Enterprise Licensing (Required for Commercial Use)
-
-**Professional licensing for businesses and organizations using OpenTuneWeaver commercially:**
 
 ### 🏢 Enterprise Licensing (Required for Commercial Use)
 
