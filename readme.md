@@ -99,6 +99,13 @@ docker run -d -p 3030:8080 \
 ```
 Access the application on your browser at `http://localhost:3030`.
 
+#### Troubleshooting Docker Build on Linux/Ubuntu/WSL2
+If the `docker build` fails during the `apt-get update` step with errors like `Temporary failure resolving 'deb.debian.org'`, it is usually a DNS issue inside the Docker build container. You can fix this by using your host's network during the build:
+```bash
+docker build --network host -t opentuneweaver .
+```
+*(Alternatively, configure your `/etc/docker/daemon.json` to use public DNS servers like `8.8.8.8`.)*
+
 ### Option 2: Local Installation (Linux/Windows/Mac)
 
 1. Clone the repository
