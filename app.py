@@ -86,60 +86,15 @@ AVAILABLE_MODELS = [
     "unsloth/gemma-3n-E4B-it"
 ]
 
-FINETUNING_PRESETS = {
-    "Test": {
-        "description": "Quick test run (minimal resources)",
-        "max_seq_length": 2048,
-        "num_train_epochs": 1,
-        "learning_rate": 5e-5,
-        "batch_size": 1,
-        "gradient_accumulation_steps": 4,
-        "warmup_steps": 50,
-        "lora_r": 4,
-        "lora_alpha": 4
-    },
-    "Development": {
-        "description": "Development testing (balanced)",
-        "max_seq_length": 4096,
-        "num_train_epochs": 2,
-        "learning_rate": 3e-5,
-        "batch_size": 1,
-        "gradient_accumulation_steps": 8,
-        "warmup_steps": 100,
-        "lora_r": 8,
-        "lora_alpha": 8
-    },
-    "Production": {
-        "description": "Production quality (best results)",
-        "max_seq_length": 8192,
-        "num_train_epochs": 3,
-        "learning_rate": 5e-5,
-        "batch_size": 1,
-        "gradient_accumulation_steps": 16,
-        "warmup_steps": 200,
-        "lora_r": 16,
-        "lora_alpha": 16
-    },
-    "Expert": {
-        "description": "Custom settings (use expert page)",
-        "max_seq_length": 8192,
-        "num_train_epochs": 3,
-        "learning_rate": 5e-5,
-        "batch_size": 1,
-        "gradient_accumulation_steps": 16,
-        "warmup_steps": 200,
-        "lora_r": 8,
-        "lora_alpha": 8
-    }
-}
+FINETUNING_PRESETS = {}
 
 # Global variables
-progress_messages = []
-processing_active = False
-current_process = None
-current_preset = "Production"
-pipeline_status = {}
-selected_steps = [1, 2, 3, 4, 5, 6, 7, 8]  # Default: all steps
+progress_messages: List[str] = []
+processing_active: bool = False
+current_process: Optional[subprocess.Popen] = None
+current_preset: Optional[str] = None
+pipeline_status: Dict[int, Dict] = {}
+selected_steps: List[int] = [1, 2, 3]  # Default: all steps
 
 # ==================== LOGGING ====================
 
@@ -163,6 +118,16 @@ def clear_terminal():
     progress_messages = []
     return ""
 
+def open_viewer():
+    """Opens the local otw_dataeditor.html viewer in the default browser."""
+    import webbrowser
+    import os
+    viewer_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "viewer", "otw_dataeditor.html"))
+    if os.path.exists(viewer_path):
+        webbrowser.open(f"file://{viewer_path}")
+        return "✅ Viewer opened in your browser"
+    return "❌ Viewer file not found at viewer/otw_dataeditor.html"
+
 # ==================== FILE UPLOAD ====================
 
 def save_uploaded_files(files: List) -> str:
@@ -181,7 +146,7 @@ def save_uploaded_files(files: List) -> str:
             old_file.unlink()
             log_message(f"🗑️ Deleted old file: {old_file.name}")
 
-    saved_count = 0
+    saved_count: int = 0
     for file in files:
         if file is not None:
             try:
@@ -189,7 +154,7 @@ def save_uploaded_files(files: List) -> str:
                 target_path = upload_dir / file_path.name
                 shutil.copy2(file_path, target_path)
                 log_message(f"✅ File saved: {file_path.name}")
-                saved_count += 1
+                saved_count = saved_count + 1
             except Exception as e:
                 log_message(f"❌ Error saving file: {e}", "ERROR")
 
@@ -207,12 +172,7 @@ def reset_pipeline_status():
     pipeline_status = {
         1: {"name": "Document Conversion", "status": "pending", "icon": "📄", "stats": {}, "duration": None},
         2: {"name": "Wiki Generation", "status": "pending", "icon": "📚", "stats": {}, "duration": None},
-        3: {"name": "QA Creation", "status": "pending", "icon": "❓", "stats": {}, "duration": None},
-        4: {"name": "Dataset Formatting", "status": "pending", "icon": "🔧", "stats": {}, "duration": None},
-        5: {"name": "Benchmark Creation", "status": "pending", "icon": "📊", "stats": {}, "duration": None},
-        6: {"name": "Fine-tuning", "status": "pending", "icon": "🤖", "stats": {}, "duration": None},
-        7: {"name": "Benchmarking", "status": "pending", "icon": "🏆", "stats": {}, "duration": None},
-        8: {"name": "Results Archive", "status": "pending", "icon": "📦", "stats": {}, "duration": None}
+        3: {"name": "Generate QA Dataset", "status": "pending", "icon": "❓", "stats": {}, "duration": None}
     }
     
     # Write initial status to file
@@ -238,7 +198,7 @@ def read_pipeline_status():
                 for step_id, step_data in file_status.items():
                     try:
                         int_id = int(step_id)
-                        if int_id in range(1, 9):
+                        if int_id in range(1, 4):
                             pipeline_status[int_id] = step_data
                     except ValueError:
                         pass
@@ -264,7 +224,7 @@ def create_pipeline_overview():
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;">
     """
     
-    for step_id in range(1, 9):
+    for step_id in range(1, 4):
         step_info = pipeline_status.get(step_id, {
             "name": f"Step {step_id}",
             "status": "pending",
@@ -301,18 +261,18 @@ def create_pipeline_overview():
         stats_text = ""
         if stats:
             if "files_processed" in stats:
-                stats_text += f"📁 {stats['files_processed']} files<br>"
+                stats_text += f"📁 {stats.get('files_processed', 0)} files<br>"
             if "entries" in stats:
-                stats_text += f"📝 {stats['entries']} entries<br>"
+                stats_text += f"📝 {stats.get('entries', 0)} entries<br>"
         
-        if duration:
-            if duration < 60:
-                duration_text = f"⏱️ {duration:.0f}s"
-            else:
-                duration_text = f"⏱️ {duration/60:.1f}m"
-            stats_text += duration_text
+            if isinstance(duration, (int, float)):
+                if duration < 60:
+                    duration_text = f"⏱️ {duration:.0f}s"
+                else:
+                    duration_text = f"⏱️ {duration/60:.1f}m"
+                stats_text += duration_text
         
-        # Create card for each step
+        status_icon_upper = status.upper() if isinstance(status, str) else "PENDING"
         card_html = f"""
         <div style="background: white; border-radius: 8px; padding: 10px; text-align: center; 
                     border: {border_style}; position: relative; min-height: 120px;">
@@ -321,7 +281,7 @@ def create_pipeline_overview():
             <div style="color: #4b5563; font-size: 0.75em; margin: 3px 0;">{name}</div>
             <div style="background: {bg_color}; color: white; padding: 2px 6px; border-radius: 4px; 
                         font-size: 0.7em; margin: 5px 0;">
-                {status_icon} {status.upper()}
+                {status_icon} {status_icon_upper}
             </div>
             <div style="color: #6b7280; font-size: 0.65em; margin-top: 3px;">
                 {stats_text}
@@ -339,7 +299,7 @@ def create_pipeline_overview():
     # Add summary
     completed = sum(1 for s in pipeline_status.values() if s.get("status") == "completed")
     running = sum(1 for s in pipeline_status.values() if s.get("status") == "running")
-    total = 8
+    total = 3
     progress_percent = (completed / total) * 100 if total > 0 else 0
     
     html += f"""
@@ -391,8 +351,8 @@ def update_step_selection(steps):
     
     selected_steps = sorted(selected_steps)
     
-    if len(selected_steps) == 8:
-        return "✅ All steps selected (1-8)"
+    if len(selected_steps) == 3:
+        return "✅ All steps selected (1-3)"
     else:
         selected_text = f"✅ Selected steps: {', '.join([str(s) for s in selected_steps])}"
         return selected_text
@@ -464,84 +424,13 @@ def load_existing_config():
                 "openai_model_name": "gemma3:12b-it-qat",
                 "temperature": 0.3
             },
-            "03_instructQA": {
+            "03_generate_qa": {
                 "use_openai_api": True,
                 "openai_base_url": "http://localhost:11434/v1",
                 "openai_api_key": "ollama",
                 "openai_model_name": "gemma3:12b-it-qat",
                 "temperature": 0.7
-            },
-            "05_bmcreator": {
-                "use_openai_api": True,
-                "openai_base_url": "http://localhost:11434/v1",
-                "openai_api_key": "ollama",
-                "openai_model_name": "gemma3:12b-it-qat",
-                "temperature": 0.5
             }
-        },
-        "finetuning": {
-            "model_name": "OpenTuneWeaver-Model",
-            "base_model": "unsloth/gemma-3n-E2B-it",
-            "hf_repo_id": "user/OpenTuneWeaver-Model",
-            "dataset_path": "INPUT/dataset.json",
-            "chat_template": "gemma-3",
-            "custom_model_dir": "CustomModel",
-            "max_seq_length": 8192,
-            "load_in_4bit": True,
-            "full_finetuning": False,
-            "lora_r": 8,
-            "lora_alpha": 8,
-            "lora_dropout": 0,
-            "bias": "none",
-            "random_state": 3407,
-            "per_device_train_batch_size": 1,
-            "gradient_accumulation_steps": 16,
-            "warmup_steps": 200,
-            "num_train_epochs": 3,
-            "max_steps": -1,
-            "learning_rate": 5e-5,
-            "logging_steps": 5,
-            "optim": "adamw_8bit",
-            "weight_decay": 0.03,
-            "lr_scheduler_type": "cosine",
-            "seed": 3407,
-            "save_lora": True,
-            "save_merged": True,
-            "save_gguf": False,
-            "upload_to_hf": False,
-            "gguf_quantizations": ["q8_0"],
-            "temperature": 1.0,
-            "top_p": 0.95,
-            "top_k": 64,
-            "max_new_tokens": 128
-        },
-        "benchmark": {
-            "mode": "comparison",
-            "pre_model": {
-                "name": "unsloth/gemma-3n-E2B-it",
-                "type": "transformers",
-                "load_in_4bit": False,
-                "max_seq_length": 2048
-            },
-            "post_model": {
-                "name": "CustomModel/OpenTuneWeaver-Model",
-                "type": "unknown",
-                "load_in_4bit": False,
-                "max_seq_length": 2048,
-                "base_model": None
-            },
-            "evaluator": {
-                "type": "api",
-                "api_base_url": "http://localhost:11434/v1",
-                "api_key": "ollama",
-                "model": "gemma3:12b-it-qat"
-            },
-            "questions_file": "BENCHMARKFRAGEN/benchmark_fragen_complete.json",
-            "max_new_tokens": 256,
-            "temperature": 0.3,
-            "top_p": 0.9,
-            "top_k": 50,
-            "repetition_penalty": 1.1
         },
         "pipeline": {
             "auto_cleanup": False,
@@ -551,128 +440,39 @@ def load_existing_config():
         }
     }
 
-def save_config_from_quick_settings(
-    model_name, hf_token, preset_name, save_lora, save_merged, save_gguf
-):
-    """Saves configuration from quick settings."""
-    global current_preset
-    current_preset = preset_name
-    
-    try:
-        # Load existing config as base
-        config = load_existing_config()
-        
-        # Update with quick settings
-        config["tokens"]["hf_token"] = hf_token
-        config["tokens"]["hf_write_token"] = hf_token
-        config["finetuning"]["model_name"] = model_name
-        config["finetuning"]["save_lora"] = save_lora
-        config["finetuning"]["save_merged"] = save_merged
-        config["finetuning"]["save_gguf"] = save_gguf
-        
-        # Apply preset settings if not Expert
-        if preset_name in FINETUNING_PRESETS and preset_name != "Expert":
-            preset = FINETUNING_PRESETS[preset_name]
-            config["finetuning"]["max_seq_length"] = preset["max_seq_length"]
-            config["finetuning"]["num_train_epochs"] = preset["num_train_epochs"]
-            config["finetuning"]["learning_rate"] = preset["learning_rate"]
-            config["finetuning"]["per_device_train_batch_size"] = preset["batch_size"]
-            config["finetuning"]["gradient_accumulation_steps"] = preset["gradient_accumulation_steps"]
-            config["finetuning"]["warmup_steps"] = preset["warmup_steps"]
-            config["finetuning"]["lora_r"] = preset["lora_r"]
-            config["finetuning"]["lora_alpha"] = preset["lora_alpha"]
-        
-        # Ensure benchmark section has all required fields
-        if "benchmark" not in config:
-            config["benchmark"] = {}
-        
-        # Update pre_model and post_model based on finetuning settings
-        base_model = config["finetuning"].get("base_model", "unsloth/gemma-3n-E2B-it")
-        custom_dir = config["finetuning"].get("custom_model_dir", "CustomModel")
-        
-        config["benchmark"]["pre_model"] = {
-            "name": base_model,
-            "type": "transformers",
-            "load_in_4bit": False,
-            "max_seq_length": 2048
-        }
-        
-        config["benchmark"]["post_model"] = {
-            "name": f"{custom_dir}/{model_name}",
-            "type": "unknown",
-            "load_in_4bit": False,
-            "max_seq_length": 2048,
-            "base_model": None
-        }
-        
-        # Ensure other benchmark fields exist
-        if "mode" not in config["benchmark"]:
-            config["benchmark"]["mode"] = "comparison"
-        if "evaluator" not in config["benchmark"]:
-            config["benchmark"]["evaluator"] = {
-                "type": "api",
-                "api_base_url": "http://localhost:11434/v1",
-                "api_key": "ollama",
-                "model": "gemma3:12b-it-qat"
-            }
-        if "questions_file" not in config["benchmark"]:
-            config["benchmark"]["questions_file"] = "BENCHMARKFRAGEN/benchmark_fragen_complete.json"
-        if "max_new_tokens" not in config["benchmark"]:
-            config["benchmark"]["max_new_tokens"] = 256
-        if "temperature" not in config["benchmark"]:
-            config["benchmark"]["temperature"] = 0.3
-        if "top_p" not in config["benchmark"]:
-            config["benchmark"]["top_p"] = 0.9
-        if "top_k" not in config["benchmark"]:
-            config["benchmark"]["top_k"] = 50
-        if "repetition_penalty" not in config["benchmark"]:
-            config["benchmark"]["repetition_penalty"] = 1.1
-        
-        # Save config
-        config_file = get_pipeline_file("pipeline_config.json")
-        config_file.parent.mkdir(parents=True, exist_ok=True)
-        
-        with open(config_file, 'w', encoding='utf-8') as f:
-            json.dump(config, f, indent=2, ensure_ascii=False)
-        
-        log_message(f"✅ Quick settings saved with preset: {preset_name}")
-        return f"✅ Settings saved! Using preset: {preset_name}"
-        
-    except Exception as e:
-        error_msg = f"❌ Error saving settings: {e}"
-        log_message(error_msg, "ERROR")
-        return error_msg
-
 def save_config_from_ui(
-    # Tokens
-    hf_token, hf_write_token,
     # API Configs
     api_base_url, api_key,
-    convert_model, wiki_model, qa_model, benchmark_model,
-    convert_temp, wiki_temp, qa_temp, benchmark_temp,
-    # Fine-tuning
-    model_name, base_model, hf_repo_id, custom_model_dir,
-    max_seq_length, load_in_4bit, full_finetuning,
-    lora_r, lora_alpha, lora_dropout,
-    batch_size, grad_accumulation, warmup_steps, num_epochs,
-    learning_rate, weight_decay,
-    save_lora, save_merged, save_gguf,
-    # Benchmark
-    benchmark_mode, evaluator_model, max_new_tokens,
-    eval_temp, top_p, top_k, repetition_penalty,
+    convert_model, wiki_model, qa_model,
+    convert_temp, wiki_temp, qa_temp,
     # Pipeline
     auto_cleanup, verbose_mode, continue_on_error
 ):
-    """Saves the configuration from the expert UI."""
+    """Saves the configuration from the UI.
+    
+    IMPORTANT: config_loader.py reads 'vision' and 'llm' top-level keys.
+    01_convert uses vision_config, 02_genwiki and 03_generate_qa use llm_config.
+    We write both the unified keys AND per-module api_configs for compatibility.
+    """
     try:
         config = {
-            "version": "11.0",
+            "version": "12.0",
             "created": datetime.now().isoformat(),
             "last_modified": datetime.now().isoformat(),
-            "tokens": {
-                "hf_token": hf_token,
-                "hf_write_token": hf_write_token or hf_token
+            # === Unified keys read by config_loader.py ===
+            "vision": {
+                "api_base_url": api_base_url,
+                "api_key": api_key,
+                "model_name": convert_model,
+                "temperature": convert_temp
             },
+            "llm": {
+                "api_base_url": api_base_url,
+                "api_key": api_key,
+                "model_name": wiki_model,
+                "temperature": wiki_temp
+            },
+            # === Per-module overrides (temperatures, model names) ===
             "api_configs": {
                 "01_convert": {
                     "use_openai_api": True,
@@ -688,84 +488,13 @@ def save_config_from_ui(
                     "openai_model_name": wiki_model,
                     "temperature": wiki_temp
                 },
-                "03_instructQA": {
+                "03_generate_qa": {
                     "use_openai_api": True,
                     "openai_base_url": api_base_url,
                     "openai_api_key": api_key,
                     "openai_model_name": qa_model,
                     "temperature": qa_temp
-                },
-                "05_bmcreator": {
-                    "use_openai_api": True,
-                    "openai_base_url": api_base_url,
-                    "openai_api_key": api_key,
-                    "openai_model_name": benchmark_model,
-                    "temperature": benchmark_temp
                 }
-            },
-            "finetuning": {
-                "model_name": model_name,
-                "base_model": base_model,
-                "hf_repo_id": hf_repo_id,
-                "dataset_path": "INPUT/dataset.json",
-                "chat_template": "gemma-3",
-                "custom_model_dir": custom_model_dir,
-                "max_seq_length": int(max_seq_length),
-                "load_in_4bit": load_in_4bit,
-                "full_finetuning": full_finetuning,
-                "lora_r": int(lora_r),
-                "lora_alpha": int(lora_alpha),
-                "lora_dropout": lora_dropout,
-                "bias": "none",
-                "random_state": 3407,
-                "per_device_train_batch_size": int(batch_size),
-                "gradient_accumulation_steps": int(grad_accumulation),
-                "warmup_steps": int(warmup_steps),
-                "num_train_epochs": int(num_epochs),
-                "max_steps": -1,
-                "learning_rate": learning_rate,
-                "logging_steps": 5,
-                "optim": "adamw_8bit",
-                "weight_decay": weight_decay,
-                "lr_scheduler_type": "cosine",
-                "seed": 3407,
-                "save_lora": save_lora,
-                "save_merged": save_merged,
-                "save_gguf": save_gguf,
-                "upload_to_hf": False,
-                "gguf_quantizations": ["q8_0"],
-                "temperature": 1.0,
-                "top_p": 0.95,
-                "top_k": 64,
-                "max_new_tokens": 128
-            },
-            "benchmark": {
-                "mode": benchmark_mode,
-                "pre_model": {
-                    "name": base_model,
-                    "type": "transformers",
-                    "load_in_4bit": False,
-                    "max_seq_length": 2048
-                },
-                "post_model": {
-                    "name": f"{custom_model_dir}/{model_name}",
-                    "type": "unknown",
-                    "load_in_4bit": False,
-                    "max_seq_length": 2048,
-                    "base_model": None
-                },
-                "evaluator": {
-                    "type": "api",
-                    "api_base_url": api_base_url,
-                    "api_key": api_key,
-                    "model": evaluator_model
-                },
-                "questions_file": "BENCHMARKFRAGEN/benchmark_fragen_complete.json",
-                "max_new_tokens": int(max_new_tokens),
-                "temperature": eval_temp,
-                "top_p": top_p,
-                "top_k": int(top_k),
-                "repetition_penalty": repetition_penalty
             },
             "pipeline": {
                 "auto_cleanup": auto_cleanup,
@@ -800,15 +529,8 @@ def get_pipeline_mode():
     
     steps = sorted(selected_steps)
     
-    # Check for standard modes
-    if steps == [1, 2, 3, 4, 5, 6, 7, 8]:
+    if steps == [1, 2, 3]:
         return "full"
-    elif steps == [1, 2, 3, 4, 5]:
-        return "data"
-    elif steps == [6, 7]:
-        return "training"
-    elif steps == [8]:
-        return "archive"
     elif len(steps) == 1:
         return "single"
     else:
@@ -882,9 +604,10 @@ def start_pipeline():
             )
 
             # Read output and display in terminal
-            for line in iter(current_process.stdout.readline, ''):
-                if not line:
-                    break
+            if current_process and current_process.stdout:
+                for line in iter(current_process.stdout.readline, ''):
+                    if not line:
+                        break
                 
                 # Log all outputs
                 clean_line = line.strip()
@@ -932,13 +655,14 @@ def stop_pipeline():
         return "⚠️ No active pipeline found", create_pipeline_overview()
 
     try:
-        # Try graceful termination
-        current_process.terminate()
-        time.sleep(2)
-        
-        # If still active, force kill
-        if current_process.poll() is None:
-            current_process.kill()
+        if current_process:
+            # Try graceful termination
+            current_process.terminate()
+            time.sleep(2)
+            
+            # Check current process is completely terminated
+            if current_process.poll() is None:
+                current_process.kill()
         
         log_message("⏹️ Pipeline stopped", "WARNING")
         processing_active = False
@@ -968,10 +692,7 @@ def create_documents_zip():
                 document_dirs = [
                     ("01_convert", ["OUTPUT", "INPUT", "UPLOAD"]),
                     ("02_wiki", ["OUTPUT", "INPUT"]), 
-                    ("03_instructQA", ["OUTPUT", "INPUT"]),
-                    ("04_format", ["OUTPUT", "INPUT"]),
-                    ("05_bmcreator", ["OUTPUT", "INPUT", "BENCHMARKFRAGEN"]),
-                    ("07_benchmark", ["OUTPUT", "INPUT", "BENCHMARKFRAGEN"])
+                    ("03_generate_qa", ["OUTPUT", "INPUT"])
                 ]
 
                 for module_name, folders in document_dirs:
@@ -1009,13 +730,9 @@ def create_model_zip():
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             total_files = 0
             
-            # CustomModel directory
-            custom_model_paths = [
-                get_pipeline_file("modules/06_finetuning/CustomModel"),
-                get_pipeline_file("CustomModel")
-            ]
+            # CustomModel directory logic disabled because model outputs are removed.
             
-            for custom_model_dir in custom_model_paths:
+            for custom_model_dir in []:
                 if custom_model_dir.exists():
                     for file_path in custom_model_dir.rglob("*"):
                         if file_path.is_file():
@@ -1050,39 +767,40 @@ def get_cleanup_info():
         total_files = 0
         total_size = 0
 
+        total_files: int = 0
+        total_size: int = 0
+        cleanup_info: List[str] = []
+        
+        # Module folders
         module_folders = [
             ("01_convert", ["INPUT", "OUTPUT", "UPLOAD"]),
             ("02_wiki", ["INPUT", "OUTPUT"]),
-            ("03_instructQA", ["INPUT", "OUTPUT"]),
-            ("04_format", ["INPUT", "OUTPUT"]),
-            ("05_bmcreator", ["INPUT", "OUTPUT", "BENCHMARKFRAGEN"]),
-            ("06_finetuning", ["INPUT", "OUTPUT"]),
-            ("07_benchmark", ["INPUT", "OUTPUT", "BENCHMARKFRAGEN"])
+            ("03_generate_qa", ["INPUT", "OUTPUT"])
         ]
-
+        
         for module_name, folders in module_folders:
             module_dir = modules_dir / module_name
             if module_dir.exists():
                 for folder in folders:
                     folder_path = module_dir / folder
                     if folder_path.exists():
-                        file_count = 0
-                        folder_size = 0
+                        file_count: int = 0
+                        folder_size: int = 0
                         for file_path in folder_path.rglob("*"):
                             if file_path.is_file():
-                                file_count += 1
-                                folder_size += file_path.stat().st_size
-
+                                file_count = file_count + 1
+                                folder_size = folder_size + file_path.stat().st_size
+                        
                         if file_count > 0:
                             size_mb = folder_size / (1024 * 1024)
                             cleanup_info.append(f"📁 {module_name}/{folder}: {file_count} files ({size_mb:.1f} MB)")
-                            total_files += file_count
-                            total_size += folder_size
+                            total_files = total_files + file_count
+                            total_size = total_size + folder_size
 
         if not cleanup_info:
             return "✅ No files found for cleanup"
 
-        total_size_mb = total_size / (1024 * 1024)
+        total_size_mb: float = float(total_size) / (1024 * 1024)
         info_text = f"🗑️ Cleanup Overview:\n\n"
         info_text += "\n".join(cleanup_info)
         info_text += f"\n\n📊 Total: {total_files} files ({total_size_mb:.1f} MB)"
@@ -1102,17 +820,13 @@ def cleanup_pipeline_folders():
         if not modules_dir.exists():
             return "❌ Pipeline directory not found"
 
-        deleted_files = 0
-        deleted_folders = 0
+        deleted_files: int = 0
+        deleted_folders: int = 0
 
         module_folders = [
             ("01_convert", ["INPUT", "OUTPUT", "UPLOAD"]),
             ("02_wiki", ["INPUT", "OUTPUT"]),
-            ("03_instructQA", ["INPUT", "OUTPUT"]),
-            ("04_format", ["INPUT", "OUTPUT"]),
-            ("05_bmcreator", ["INPUT", "OUTPUT", "BENCHMARKFRAGEN"]),
-            ("06_finetuning", ["INPUT", "OUTPUT"]),
-            ("07_benchmark", ["INPUT", "OUTPUT", "BENCHMARKFRAGEN"])
+            ("03_generate_qa", ["INPUT", "OUTPUT"])
         ]
 
         for module_name, folders in module_folders:
@@ -1124,19 +838,9 @@ def cleanup_pipeline_folders():
                         file_count = sum(1 for f in folder_path.rglob("*") if f.is_file())
                         if file_count > 0:
                             shutil.rmtree(folder_path)
-                            deleted_files += file_count
-                            deleted_folders += 1
+                            deleted_files = deleted_files + file_count
+                            deleted_folders = deleted_folders + 1
                             log_message(f"🗑️ Deleted: {module_name}/{folder} ({file_count} files)")
-
-        # Clean up CustomModel
-        custom_model_dir = get_pipeline_file("CustomModel")
-        if custom_model_dir.exists():
-            file_count = sum(1 for f in custom_model_dir.rglob("*") if f.is_file())
-            if file_count > 0:
-                shutil.rmtree(custom_model_dir)
-                deleted_files += file_count
-                deleted_folders += 1
-                log_message(f"🗑️ Deleted: CustomModel ({file_count} files)")
 
         if deleted_files == 0:
             return "✅ No files found for cleanup"
@@ -1158,26 +862,90 @@ def create_main_interface():
     reset_pipeline_status()
     initial_overview = create_pipeline_overview()
     
+    # Build logo path for serving
+    logo_path = str(PROJECT_ROOT / "assets" / "otw_logo.png")
+    
     with gr.Blocks(
         title="OpenTuneWeaver - Finetuning Pipeline UI",
-        theme=gr.themes.Soft(),
+        theme=gr.themes.Base(
+            primary_hue=gr.themes.colors.teal,
+            secondary_hue=gr.themes.colors.blue,
+            neutral_hue=gr.themes.colors.gray,
+            font=gr.themes.GoogleFont("Inter"),
+        ).set(
+            body_background_fill="#111827",
+            body_background_fill_dark="#111827",
+            body_text_color="#e5e7eb",
+            body_text_color_dark="#e5e7eb",
+            background_fill_primary="#1f2937",
+            background_fill_primary_dark="#1f2937",
+            background_fill_secondary="#374151",
+            background_fill_secondary_dark="#374151",
+            block_background_fill="#1f2937",
+            block_background_fill_dark="#1f2937",
+            block_border_color="#374151",
+            block_border_color_dark="#374151",
+            block_label_background_fill="#374151",
+            block_label_background_fill_dark="#374151",
+            block_label_text_color="#d1d5db",
+            block_label_text_color_dark="#d1d5db",
+            block_title_text_color="#f9fafb",
+            block_title_text_color_dark="#f9fafb",
+            border_color_primary="#4b5563",
+            border_color_primary_dark="#4b5563",
+            input_background_fill="#374151",
+            input_background_fill_dark="#374151",
+            input_border_color="#4b5563",
+            input_border_color_dark="#4b5563",
+            button_primary_background_fill="#0d9488",
+            button_primary_background_fill_dark="#0d9488",
+            button_primary_background_fill_hover="#0f766e",
+            button_primary_background_fill_hover_dark="#0f766e",
+            button_primary_text_color="#ffffff",
+            button_primary_text_color_dark="#ffffff",
+            button_secondary_background_fill="#374151",
+            button_secondary_background_fill_dark="#374151",
+            button_secondary_text_color="#d1d5db",
+            button_secondary_text_color_dark="#d1d5db",
+            panel_background_fill="#1f2937",
+            panel_background_fill_dark="#1f2937",
+        ),
         css="""
-        .header-gradient {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 15px;
-            text-align: center;
-            color: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        .gradio-container {
+            max-width: 100% !important;
+        }
+        .otw-header {
+            background: #1f2937;
+            padding: 16px 24px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 1px solid #374151;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .otw-header img {
+            height: 48px;
+            width: auto;
+        }
+        .otw-header .otw-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #f9fafb;
+            letter-spacing: -0.02em;
+        }
+        .otw-header .otw-subtitle {
+            font-size: 0.85em;
+            color: #9ca3af;
+            margin-top: 2px;
         }
         .terminal-output {
             font-family: 'Courier New', monospace !important;
-            background-color: #1a1a1a !important;
-            color: #00ff00 !important;
+            background-color: #0f172a !important;
+            color: #4ade80 !important;
             padding: 15px;
             border-radius: 8px;
-            border: 1px solid #333;
+            border: 1px solid #1e293b;
             height: 600px !important;
             max-height: 600px !important;
             overflow-y: scroll !important;
@@ -1186,38 +954,77 @@ def create_main_interface():
             word-wrap: break-word;
         }
         .status-info {
-            background-color: #f0f8ff;
+            background-color: #1e293b;
             padding: 10px;
             border-radius: 5px;
-            border: 1px solid #b8d4f2;
+            border: 1px solid #334155;
+            color: #94a3b8;
         }
         .quick-settings {
-            background-color: #f9fafb;
+            background-color: #1f2937;
             padding: 15px;
             border-radius: 8px;
-            border: 1px solid #e5e7eb;
+            border: 1px solid #374151;
             margin: 10px 0;
         }
         .help-section {
-            background-color: #fefce8;
+            background-color: #1c1917;
             padding: 15px;
             border-radius: 8px;
-            border: 1px solid #fde68a;
+            border: 1px solid #44403c;
             margin: 10px 0;
+            color: #d6d3d1;
+        }
+        /* Tab styling */
+        .tabs > .tab-nav > button {
+            color: #9ca3af !important;
+            border-color: #374151 !important;
+        }
+        .tabs > .tab-nav > button.selected {
+            color: #14b8a6 !important;
+            border-color: #14b8a6 !important;
+        }
+        /* Accordion */
+        .label-wrap {
+            color: #d1d5db !important;
+        }
+        /* Make textboxes readable */
+        textarea, input[type="text"], input[type="password"], input[type="number"] {
+            color: #e5e7eb !important;
+            background-color: #374151 !important;
+            border-color: #4b5563 !important;
         }
         """
     ) as interface:
 
-        # Header
-        gr.HTML("""
-        <div class="header-gradient">
-            <div style="font-size: 4em; margin-bottom: 10px;">🎯</div>
-            <h1 style="margin: 0; font-size: 3em; font-weight: bold;">OpenTuneWeaver</h1>
-            <p style="margin: 10px 0 0 0; font-size: 1.2em; opacity: 0.95;">
-                Your All-In-One Solution for Bringing Your Documents to Your LLM
-            </p>
-        </div>
-        """)
+        # Header with logo
+        import base64
+        logo_b64 = ""
+        try:
+            with open(logo_path, "rb") as f:
+                logo_b64 = base64.b64encode(f.read()).decode("utf-8")
+        except Exception:
+            pass
+        
+        if logo_b64:
+            gr.HTML(f"""
+            <div class="otw-header">
+                <img src="data:image/png;base64,{logo_b64}" alt="OTW Logo">
+                <div>
+                    <div class="otw-title">OpenTuneWeaver</div>
+                    <div class="otw-subtitle">Your All-In-One Solution for Bringing Your Documents to Your LLM</div>
+                </div>
+            </div>
+            """)
+        else:
+            gr.HTML("""
+            <div class="otw-header">
+                <div>
+                    <div class="otw-title">OpenTuneWeaver</div>
+                    <div class="otw-subtitle">Your All-In-One Solution for Bringing Your Documents to Your LLM</div>
+                </div>
+            </div>
+            """)
 
         with gr.Tabs():
 
@@ -1226,8 +1033,11 @@ def create_main_interface():
                 # Pipeline Status Overview
                 with gr.Row():
                     with gr.Column(scale=2):
-                        gr.Markdown("### 🎯 Pipeline Status")
+                        gr.Markdown("### 🎯 Output Hub & Status")
                         with gr.Row():
+                            viewer_launch_btn = gr.Button("🖥️ Launch Viewer Hub", variant="primary", size="lg")
+                        with gr.Row():
+                            viewer_status = gr.Textbox(visible=False)
                             refresh_btn = gr.Button("🔄 Refresh Status", variant="secondary", size="sm")
                         pipeline_overview_display = gr.HTML(value=initial_overview)
                         
@@ -1239,70 +1049,25 @@ def create_main_interface():
                             choices=[
                                 "1. Document Conversion",
                                 "2. Wiki Generation",
-                                "3. QA Creation",
-                                "4. Dataset Formatting",
-                                "5. Benchmark Creation",
-                                "6. Fine-tuning",
-                                "7. Benchmarking",
-                                "8. Results Archive"
+                                "3. Generate QA Dataset"
                             ],
                             value=[
                                 "1. Document Conversion",
                                 "2. Wiki Generation",
-                                "3. QA Creation",
-                                "4. Dataset Formatting",
-                                "5. Benchmark Creation",
-                                "6. Fine-tuning",
-                                "7. Benchmarking",
-                                "8. Results Archive"
+                                "3. Generate QA Dataset"
                             ],
                             label="Select steps to run:",
                             interactive=True
                         )
                         step_status = gr.Textbox(
                             label="Selected Steps",
-                            value="✅ All steps selected (1-8)",
+                            value="✅ All steps selected (1-3)",
                             interactive=False,
                             lines=1,
                             elem_classes=["status-info"]
                         )
                         
-                        # Quick Settings
-                        gr.Markdown("### ⚡ Quick Settings")
-                        with gr.Group(elem_classes=["quick-settings"]):
-                            model_name_quick = gr.Textbox(
-                                label="1. Model Name",
-                                value="OpenTuneWeaver-Model",
-                                placeholder="Name for your fine-tuned model"
-                            )
-                            
-                            hf_token_quick = gr.Textbox(
-                                label="2. HuggingFace Token (Read)",
-                                type="password",
-                                placeholder="hf_... (required for model downloads)"
-                            )
-                            
-                            preset_dropdown = gr.Dropdown(
-                                label="3. Fine-tuning Preset",
-                                choices=["Test", "Development", "Production", "Expert"],
-                                value="Production",
-                                interactive=True
-                            )
-                            
-                            preset_info = gr.Markdown(get_preset_info("Production"))
-                            
-                            gr.Markdown("**4. Save Options:**")
-                            with gr.Row():
-                                save_lora_quick = gr.Checkbox(label="LoRA Adapter", value=True)
-                                save_merged_quick = gr.Checkbox(label="Merged Model", value=True)
-                                save_gguf_quick = gr.Checkbox(label="GGUF Format", value=False)
-                            
-                            save_quick_btn = gr.Button("💾 Save Settings", variant="primary")
-                            quick_status = gr.Textbox(
-                                label="Status",
-                                interactive=False,
-                                elem_classes=["status-info"]
-                            )
+                        # Basic UI is ready now
                         
                         # File Upload
                         gr.Markdown("### 📁 Document Upload")
@@ -1335,8 +1100,7 @@ def create_main_interface():
                         # Downloads
                         gr.Markdown("### 📥 Downloads")
                         with gr.Row():
-                            download_docs_btn = gr.Button("📄 Documents", variant="secondary")
-                            download_model_btn = gr.Button("🤖 Model", variant="secondary")
+                            download_docs_btn = gr.Button("📄 Download Generated Datasets", variant="secondary")
                         
                         download_status = gr.Textbox(
                             label="Download Status",
@@ -1371,18 +1135,7 @@ def create_main_interface():
                 gr.Markdown("### 🔧 Expert Configuration")
                 gr.Markdown("Advanced settings for experienced users. For beginners, use the Quick Settings on the Home page.")
 
-                with gr.Accordion("🔑 HuggingFace Tokens", open=True):
-                    with gr.Row():
-                        hf_token = gr.Textbox(
-                            label="HF Token (for model downloads)",
-                            type="password",
-                            placeholder="hf_..."
-                        )
-                        hf_write_token = gr.Textbox(
-                            label="HF Write Token (optional)",
-                            type="password",
-                            placeholder="hf_..."
-                        )
+                # Removed HF Tokens Accordion
 
                 with gr.Accordion("🌐 API Configuration", open=False):
                     with gr.Row():
@@ -1396,6 +1149,13 @@ def create_main_interface():
                             value="ollama",
                             placeholder="ollama"
                         )
+                        test_api_btn = gr.Button("🔌 Test Connection", variant="secondary")
+                    
+                    api_test_result = gr.Textbox(
+                        label="Connection Status",
+                        interactive=False,
+                        visible=False
+                    )
 
                     gr.Markdown("**Model configuration for each step:**")
                     with gr.Row():
@@ -1409,74 +1169,6 @@ def create_main_interface():
                     with gr.Row():
                         qa_model = gr.Textbox(label="❓ QA Model", value="gemma3:12b-it-qat")
                         qa_temp = gr.Slider(label="Temperature", minimum=0.0, maximum=2.0, value=0.7, step=0.1)
-
-                    with gr.Row():
-                        benchmark_model = gr.Textbox(label="📊 Benchmark Model", value="gemma3:12b-it-qat")
-                        benchmark_temp = gr.Slider(label="Temperature", minimum=0.0, maximum=2.0, value=0.5, step=0.1)
-
-                with gr.Accordion("🤖 Fine-tuning Configuration", open=False):
-                    with gr.Row():
-                        model_name = gr.Textbox(label="Model Name", value="OpenTuneWeaver-Model")
-                        base_model = gr.Dropdown(
-                            label="Base Model",
-                            choices=AVAILABLE_MODELS,
-                            value="unsloth/gemma-3n-E2B-it",
-                            interactive=True
-                        )
-
-                    with gr.Row():
-                        hf_repo_id = gr.Textbox(label="HuggingFace Repo ID", value="user/OpenTuneWeaver-Model")
-                        custom_model_dir = gr.Textbox(label="CustomModel Directory", value="CustomModel")
-
-                    gr.Markdown("**Training Parameters:**")
-                    with gr.Row():
-                        max_seq_length = gr.Slider(label="Max Sequence Length", minimum=512, maximum=16384, value=8192, step=512)
-                        load_in_4bit = gr.Checkbox(label="Load in 4-bit", value=True)
-                        full_finetuning = gr.Checkbox(label="Full Fine-tuning", value=False)
-
-                    gr.Markdown("**LoRA Parameters:**")
-                    with gr.Row():
-                        lora_r = gr.Slider(label="LoRA r", minimum=1, maximum=64, value=8, step=1)
-                        lora_alpha = gr.Slider(label="LoRA Alpha", minimum=1, maximum=64, value=8, step=1)
-                        lora_dropout = gr.Slider(label="LoRA Dropout", minimum=0.0, maximum=0.5, value=0.0, step=0.05)
-
-                    gr.Markdown("**Training Settings:**")
-                    with gr.Row():
-                        batch_size = gr.Slider(label="Batch Size", minimum=1, maximum=16, value=1, step=1)
-                        grad_accumulation = gr.Slider(label="Gradient Accumulation Steps", minimum=1, maximum=64, value=16, step=1)
-
-                    with gr.Row():
-                        warmup_steps = gr.Slider(label="Warmup Steps", minimum=0, maximum=1000, value=200, step=10)
-                        num_epochs = gr.Slider(label="Number of Epochs", minimum=1, maximum=20, value=3, step=1)
-
-                    with gr.Row():
-                        learning_rate = gr.Slider(label="Learning Rate", minimum=1e-6, maximum=1e-3, value=5e-5, step=1e-6)
-                        weight_decay = gr.Slider(label="Weight Decay", minimum=0.0, maximum=0.3, value=0.03, step=0.01)
-
-                    gr.Markdown("**Output Options:**")
-                    with gr.Row():
-                        save_lora = gr.Checkbox(label="Save LoRA Adapter", value=True)
-                        save_merged = gr.Checkbox(label="Save Merged Model", value=True)
-                        save_gguf = gr.Checkbox(label="Save GGUF Model", value=False)
-
-                with gr.Accordion("🏆 Benchmark Configuration", open=False):
-                    with gr.Row():
-                        benchmark_mode = gr.Dropdown(
-                            label="Benchmark Mode",
-                            choices=["comparison", "post_only", "pre_only"],
-                            value="comparison"
-                        )
-                        evaluator_model = gr.Textbox(label="Evaluator Model", value="gemma3:12b-it-qat")
-
-                    with gr.Row():
-                        max_new_tokens = gr.Slider(label="Max New Tokens", minimum=50, maximum=1000, value=256, step=10)
-                        eval_temp = gr.Slider(label="Evaluation Temperature", minimum=0.0, maximum=2.0, value=0.3, step=0.1)
-
-                    with gr.Row():
-                        top_p = gr.Slider(label="Top P", minimum=0.1, maximum=1.0, value=0.9, step=0.05)
-                        top_k = gr.Slider(label="Top K", minimum=1, maximum=100, value=50, step=1)
-
-                    repetition_penalty = gr.Slider(label="Repetition Penalty", minimum=1.0, maximum=2.0, value=1.1, step=0.05)
 
                 with gr.Accordion("⚙️ Pipeline Settings", open=False):
                     with gr.Row():
@@ -1600,34 +1292,9 @@ def create_main_interface():
                     - Improves model understanding
                     
                     **3. QA Creation** ❓
-                    - Generates question-answer pairs
+                    - Generates question-answer pairs in Chat-Masterformat directly into JSONL
                     - Creates training examples
                     - Builds comprehension tests
-                    
-                    **4. Dataset Formatting** 🔧
-                    - Formats data for training
-                    - Creates JSON training file
-                    - Validates data structure
-                    
-                    **5. Benchmark Creation** 📊
-                    - Creates evaluation questions
-                    - Builds test dataset
-                    - Prepares comparison metrics
-                    
-                    **6. Fine-tuning** 🤖
-                    - Trains the model on your data
-                    - Applies LoRA adapters
-                    - Creates custom model
-                    
-                    **7. Benchmarking** 🏆
-                    - Tests model performance
-                    - Compares before/after
-                    - Generates metrics
-                    
-                    **8. Results Archive** 📦
-                    - Packages all results
-                    - Creates downloadable archive
-                    - Saves training history
                     """)
                 
                 with gr.Accordion("💡 Tips & Tricks", open=False):
@@ -1673,20 +1340,10 @@ def create_main_interface():
             outputs=[pipeline_overview_display]
         )
 
-        # Quick Settings handlers
-        preset_dropdown.change(
-            fn=lambda x: get_preset_info(x),
-            inputs=[preset_dropdown],
-            outputs=[preset_info]
-        )
-
-        save_quick_btn.click(
-            fn=save_config_from_quick_settings,
-            inputs=[
-                model_name_quick, hf_token_quick, preset_dropdown,
-                save_lora_quick, save_merged_quick, save_gguf_quick
-            ],
-            outputs=[quick_status]
+        # Viewer launch handler
+        viewer_launch_btn.click(
+            fn=open_viewer,
+            outputs=[viewer_status]
         )
 
         # Upload handler
@@ -1726,20 +1383,8 @@ def create_main_interface():
             else:
                 return status, None, gr.update(visible=False)
 
-        def handle_model_download():
-            zip_path, status = create_model_zip()
-            if zip_path:
-                return status, zip_path, gr.update(visible=True)
-            else:
-                return status, None, gr.update(visible=False)
-
         download_docs_btn.click(
             fn=handle_documents_download,
-            outputs=[download_status, download_file, download_file]
-        )
-
-        download_model_btn.click(
-            fn=handle_model_download,
             outputs=[download_status, download_file, download_file]
         )
 
@@ -1759,88 +1404,49 @@ def create_main_interface():
             config = load_existing_config()
             
             # Extract all values from config
-            tokens = config.get("tokens", {})
-            hf_token_val = tokens.get("hf_token", "")
-            hf_write_token_val = tokens.get("hf_write_token", "")
+            # API Config - read from unified keys first, fallback to api_configs
+            vision = config.get("vision", {})
+            llm = config.get("llm", {})
             
-            # API Config
-            api_config = config.get("api_configs", {}).get("01_convert", {})
-            api_base_url_val = api_config.get("openai_base_url", "http://localhost:11434/v1")
-            api_key_val = api_config.get("openai_api_key", "ollama")
+            # Fallback: try api_configs if unified keys are empty
+            convert_cfg = config.get("api_configs", {}).get("01_convert", {})
+            wiki_cfg = config.get("api_configs", {}).get("02_genwiki", {})
+            qa_cfg = config.get("api_configs", {}).get("03_generate_qa", {})
             
-            # Models
-            convert_config = config.get("api_configs", {}).get("01_convert", {})
-            wiki_config = config.get("api_configs", {}).get("02_genwiki", {})
-            qa_config = config.get("api_configs", {}).get("03_instructQA", {})
-            benchmark_config = config.get("api_configs", {}).get("05_bmcreator", {})
+            api_base_url_val = vision.get("api_base_url") or convert_cfg.get("openai_base_url", "")
+            api_key_val = vision.get("api_key") or convert_cfg.get("openai_api_key", "")
             
-            # Fine-tuning
-            ft_config = config.get("finetuning", {})
+            convert_model_val = vision.get("model_name") or convert_cfg.get("openai_model_name", "")
+            wiki_model_val = llm.get("model_name") or wiki_cfg.get("openai_model_name", "")
+            qa_model_val = qa_cfg.get("openai_model_name") or llm.get("model_name", "")
             
-            # Benchmark
-            bench_config = config.get("benchmark", {})
+            convert_temp_val = convert_cfg.get("temperature", vision.get("temperature", 0.1))
+            wiki_temp_val = wiki_cfg.get("temperature", llm.get("temperature", 0.3))
+            qa_temp_val = qa_cfg.get("temperature", 0.7)
             
             # Pipeline
             pipe_config = config.get("pipeline", {})
             
             return [
-                hf_token_val, hf_write_token_val,
                 api_base_url_val, api_key_val,
-                convert_config.get("openai_model_name", "gemma3:12b-it-qat"),
-                wiki_config.get("openai_model_name", "gemma3:12b-it-qat"),
-                qa_config.get("openai_model_name", "gemma3:12b-it-qat"),
-                benchmark_config.get("openai_model_name", "gemma3:12b-it-qat"),
-                convert_config.get("temperature", 0.1),
-                wiki_config.get("temperature", 0.3),
-                qa_config.get("temperature", 0.7),
-                benchmark_config.get("temperature", 0.5),
-                ft_config.get("model_name", "OpenTuneWeaver-Model"),
-                ft_config.get("base_model", "unsloth/gemma-3n-E2B-it"),
-                ft_config.get("hf_repo_id", "user/OpenTuneWeaver-Model"),
-                ft_config.get("custom_model_dir", "CustomModel"),
-                ft_config.get("max_seq_length", 8192),
-                ft_config.get("load_in_4bit", True),
-                ft_config.get("full_finetuning", False),
-                ft_config.get("lora_r", 8),
-                ft_config.get("lora_alpha", 8),
-                ft_config.get("lora_dropout", 0.0),
-                ft_config.get("per_device_train_batch_size", 1),
-                ft_config.get("gradient_accumulation_steps", 16),
-                ft_config.get("warmup_steps", 200),
-                ft_config.get("num_train_epochs", 3),
-                ft_config.get("learning_rate", 5e-5),
-                ft_config.get("weight_decay", 0.03),
-                ft_config.get("save_lora", True),
-                ft_config.get("save_merged", True),
-                ft_config.get("save_gguf", False),
-                bench_config.get("mode", "comparison"),
-                bench_config.get("evaluator", {}).get("model", "gemma3:12b-it-qat"),
-                bench_config.get("max_new_tokens", 256),
-                bench_config.get("temperature", 0.3),
-                bench_config.get("top_p", 0.9),
-                bench_config.get("top_k", 50),
-                bench_config.get("repetition_penalty", 1.1),
-                pipe_config.get("auto_cleanup", False),
-                pipe_config.get("verbose", True),
-                pipe_config.get("continue_on_error", True),
+                convert_model_val,
+                wiki_model_val,
+                qa_model_val,
+                convert_temp_val,
+                wiki_temp_val,
+                qa_temp_val,
+                pipe_config.get("auto_cleanup", False) if isinstance(pipe_config, dict) else False,
+                pipe_config.get("verbose", True) if isinstance(pipe_config, dict) else True,
+                pipe_config.get("continue_on_error", True) if isinstance(pipe_config, dict) else True,
                 "✅ Configuration loaded"
             ]
 
         load_config_btn.click(
             fn=load_config_to_ui,
             outputs=[
-                hf_token, hf_write_token,
                 api_base_url, api_key,
-                convert_model, wiki_model, qa_model, benchmark_model,
-                convert_temp, wiki_temp, qa_temp, benchmark_temp,
-                model_name, base_model, hf_repo_id, custom_model_dir,
-                max_seq_length, load_in_4bit, full_finetuning,
-                lora_r, lora_alpha, lora_dropout,
-                batch_size, grad_accumulation, warmup_steps, num_epochs,
-                learning_rate, weight_decay,
-                save_lora, save_merged, save_gguf,
-                benchmark_mode, evaluator_model, max_new_tokens,
-                eval_temp, top_p, top_k, repetition_penalty,
+                convert_model, wiki_model, qa_model,
+                convert_temp, wiki_temp, qa_temp,
                 auto_cleanup, verbose_mode, continue_on_error,
                 config_status
             ]
@@ -1849,39 +1455,61 @@ def create_main_interface():
         save_config_btn.click(
             fn=save_config_from_ui,
             inputs=[
-                hf_token, hf_write_token,
                 api_base_url, api_key,
-                convert_model, wiki_model, qa_model, benchmark_model,
-                convert_temp, wiki_temp, qa_temp, benchmark_temp,
-                model_name, base_model, hf_repo_id, custom_model_dir,
-                max_seq_length, load_in_4bit, full_finetuning,
-                lora_r, lora_alpha, lora_dropout,
-                batch_size, grad_accumulation, warmup_steps, num_epochs,
-                learning_rate, weight_decay,
-                save_lora, save_merged, save_gguf,
-                benchmark_mode, evaluator_model, max_new_tokens,
-                eval_temp, top_p, top_k, repetition_penalty,
+                convert_model, wiki_model, qa_model,
+                convert_temp, wiki_temp, qa_temp,
                 auto_cleanup, verbose_mode, continue_on_error
             ],
             outputs=[config_status]
         )
 
+        # API Test Handler
+        def test_api_connection(url: str, key: str, model_name: str) -> tuple[str, dict]:
+            import requests
+            try:
+                if not url.endswith('/'):
+                    url = f"{url}/"
+                models_endpoint = f"{url}models"
+                
+                headers = {
+                    "Authorization": f"Bearer {key}",
+                    "Content-Type": "application/json"
+                }
+                
+                response = requests.get(models_endpoint, headers=headers, timeout=5)
+                
+                if response.status_code == 200:
+                    models_data = response.json()
+                    available_models = [m.get('id', m.get('name', 'Unknown')) for m in models_data.get('data', [])]
+                    
+                    if model_name in available_models or not available_models:
+                        return f"✅ Connection successful! Model '{model_name}' is reachable.", gr.update(visible=True)
+                    else:
+                        return f"⚠️ Connected to API, but '{model_name}' is not in the list of available models. Available: {', '.join(available_models[:5])}...", gr.update(visible=True)
+                else:
+                    return f"❌ API Error {response.status_code}: {response.text}", gr.update(visible=True)
+            except Exception as e:
+                return f"❌ Connection failed: {e}", gr.update(visible=True)
+
+        test_api_btn.click(
+            fn=test_api_connection,
+            inputs=[api_base_url, api_key, convert_model],
+            outputs=[api_test_result, api_test_result]
+        )
+
         # Auto-refresh for pipeline overview and terminal
+        timer = gr.Timer(3)
+        
         def auto_refresh():
             overview = create_pipeline_overview()
             terminal = get_terminal_output()
             return overview, terminal
 
-        try:
-            interface.load(
-                fn=auto_refresh,
-                outputs=[pipeline_overview_display, terminal_output],
-                every=3  # Update every 3 seconds
-            )
-            log_message("✅ Auto-refresh activated (3 seconds)")
-        except:
-            log_message("⚠️ Auto-refresh not supported - use 'Refresh' button")
-
+        timer.tick(
+            fn=auto_refresh,
+            outputs=[pipeline_overview_display, terminal_output]
+        )
+        
         return interface
 
 def main():

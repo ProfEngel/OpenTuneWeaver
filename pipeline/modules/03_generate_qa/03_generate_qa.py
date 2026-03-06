@@ -3,41 +3,38 @@ import requests
 import random
 import os
 import sys
+import glob
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 
 # ========================================
 # LOAD CENTRAL CONFIGURATION
 # ========================================
-sys.path.append(str(Path(__file__).parent.parent.parent))  # To main directory
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))  # To main directory
 from config_loader import PipelineConfigLoader
 
 # Load configuration for this module
-config_loader = PipelineConfigLoader("03_instructQA")
-config = config_loader.get_api_config()
+config_loader = PipelineConfigLoader()
+module_config = config_loader.get_module_config("03_generate_qa")
+pipeline_config = config_loader.get_pipeline_config()
 
 # Extract configuration values
-USE_OPENAI_API = config.get("use_openai_api", True)
-OPENAI_BASE_URL = config.get("openai_base_url", "http://localhost:11434/v1")
-OPENAI_API_KEY = config.get("openai_api_key", "ollama")
-OPENAI_MODEL_NAME = config.get("openai_model_name", "gemma3:12b-it-qat")
-OLLAMA_SERVER_URL = config.get("ollama_server_url", "http://localhost:11434")
-OLLAMA_API_KEY = config.get("ollama_api_key", "ollama")
-OLLAMA_MODEL_NAME = config.get("ollama_model_name", "gemma3:12b-it-qat")
-OLLAMA_CHAT_ENDPOINT = f"{OLLAMA_SERVER_URL}/api/chat"
-OLLAMA_TAGS_ENDPOINT = f"{OLLAMA_SERVER_URL}/api/tags"
+API_BASE_URL = module_config.get("api_base_url", "")
+API_KEY = module_config.get("api_key", "")
+MODEL_NAME = module_config.get("model_name", "")
 
 # Directories
 INPUT_DIR = "INPUT"
 OUTPUT_DIR = "OUTPUT"
-OUTPUT_FILENAME = "qa_instruct_dataset.json"
+OUTPUT_FILENAME = "dataset.jsonl"
 
 # Show loaded configuration
 print("=" * 60)
-print("📋 CONFIGURATION LOADED (03_instructQA)")
+print("📋 CONFIGURATION LOADED (03_generate_qa)")
 print("=" * 60)
 config_loader.print_config_summary()
 print("=" * 60)
+
 
 # ========================================
 # EXTENDED QUESTION TYPES FOR BETTER COVERAGE
@@ -151,79 +148,41 @@ QUESTION_TYPES = [
 # ========================================
 
 def check_api_connection():
-    """Checks API connection (OpenAI or Ollama)."""
-    if USE_OPENAI_API:
-        return check_openai_connection()
-    else:
-        return check_ollama_connection()
-
-def check_openai_connection():
-    """Checks OpenAI API connection."""
+    """Checks LLM API connection."""
     try:
         headers = {
-            'Authorization': f'Bearer {OPENAI_API_KEY}',
+            'Authorization': f'Bearer {API_KEY}',
             'Content-Type': 'application/json'
         }
         
         payload = {
-            "model": OPENAI_MODEL_NAME,
+            "model": MODEL_NAME,
             "messages": [{"role": "user", "content": "Test"}],
             "max_tokens": 5
         }
         
         response = requests.post(
-            f"{OPENAI_BASE_URL}/chat/completions", 
+            f"{API_BASE_URL}/chat/completions", 
             json=payload, 
             headers=headers, 
             timeout=10
         )
         
         if response.status_code == 200:
-            print(f"✅ OpenAI API connection successful ({OPENAI_BASE_URL})")
-            print(f"✅ Model '{OPENAI_MODEL_NAME}' is available")
+            print(f"✅ LLM API connection successful ({API_BASE_URL})")
+            print(f"✅ Model '{MODEL_NAME}' is available")
             return True
         else:
-            print(f"❌ OpenAI API not reachable (Status: {response.status_code})")
+            print(f"❌ LLM API not reachable (Status: {response.status_code})")
             if response.status_code == 401:
-                print("🔒 Authentication failed - check OPENAI_API_KEY")
+                print("🔒 Authentication failed - check API Key")
             elif response.status_code == 404:
-                print("❌ Model not found - check OPENAI_MODEL_NAME")
+                print("❌ Model not found - check Model Name")
             return False
             
     except requests.RequestException as e:
-        print(f"❌ OpenAI API connection failed: {e}")
-        print(f"💡 Check: Server running on {OPENAI_BASE_URL}?")
-        return False
-
-def check_ollama_connection():
-    """Checks Ollama API connection."""
-    try:
-        headers = {
-            'Authorization': f'Bearer {OLLAMA_API_KEY}',
-            'Content-Type': 'application/json'
-        }
-        
-        response = requests.get(f"{OLLAMA_SERVER_URL}/api/tags", headers=headers, timeout=10)
-        
-        if response.status_code == 200:
-            models = response.json()
-            model_names = [model['name'] for model in models.get('models', [])]
-            
-            print(f"✅ Ollama connection successful ({OLLAMA_SERVER_URL})")
-            print(f"📋 Available models: {', '.join(model_names[:3])}..." if len(model_names) > 3 else f"📋 Available models: {', '.join(model_names)}")
-            
-            if OLLAMA_MODEL_NAME in model_names:
-                print(f"✅ Model '{OLLAMA_MODEL_NAME}' is available")
-                return True
-            else:
-                print(f"❌ Model '{OLLAMA_MODEL_NAME}' not found!")
-                return False
-        else:
-            print(f"❌ Ollama not reachable (Status: {response.status_code})")
-            return False
-            
-    except requests.RequestException as e:
-        print(f"❌ Ollama connection failed: {e}")
+        print(f"❌ LLM API connection failed: {e}")
+        print(f"💡 Check: Server running on {API_BASE_URL}?")
         return False
 
 # ========================================
@@ -418,21 +377,14 @@ IMPORTANT: Respond ONLY with the JSON object, no additional explanations!
 # ========================================
 
 def submit_to_api(prompt: str, retries: int = 3) -> Optional[str]:
-    """Sends a request to the chosen API and retrieves the response."""
-    if USE_OPENAI_API:
-        return submit_to_openai_api(prompt, retries)
-    else:
-        return submit_to_ollama_api(prompt, retries)
-
-def submit_to_openai_api(prompt: str, retries: int = 3) -> Optional[str]:
-    """Sends a request to the OpenAI API and retrieves the response."""
+    """Sends a request to the LLM API and retrieves the response."""
     headers = {
-        'Authorization': f'Bearer {OPENAI_API_KEY}',
+        'Authorization': f'Bearer {API_KEY}',
         'Content-Type': 'application/json'
     }
     
     payload = {
-        "model": OPENAI_MODEL_NAME,
+        "model": MODEL_NAME,
         "messages": [
             {
                 "role": "system", 
@@ -447,7 +399,7 @@ def submit_to_openai_api(prompt: str, retries: int = 3) -> Optional[str]:
     for attempt in range(retries):
         try:
             response = requests.post(
-                f"{OPENAI_BASE_URL}/chat/completions", 
+                f"{API_BASE_URL}/chat/completions", 
                 json=payload, 
                 headers=headers, 
                 timeout=60
@@ -458,45 +410,7 @@ def submit_to_openai_api(prompt: str, retries: int = 3) -> Optional[str]:
                 content = result.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
                 return content
             else:
-                print(f"❌ OpenAI API error {response.status_code}: {response.text}")
-                
-        except requests.RequestException as e:
-            print(f"❌ API error (attempt {attempt + 1}): {e}")
-    
-    return None
-
-def submit_to_ollama_api(prompt: str, retries: int = 3) -> Optional[str]:
-    """Sends a request to the Ollama API and retrieves the response."""
-    headers = {
-        'Authorization': f'Bearer {OLLAMA_API_KEY}',
-        'Content-Type': 'application/json'
-    }
-    
-    payload = {
-        "model": OLLAMA_MODEL_NAME,
-        "temperature": 0.3,  # Low for factual accuracy
-        "stream": False,
-        "messages": [
-            {
-                "role": "system", 
-                "content": "You are an expert at creating high-quality question-answer pairs for instruction datasets. Your answers are complete, fact-rich and preserve ALL details from the source. You use Markdown formatting for better structure. You respond in the same language as the source document."
-            },
-            {"role": "user", "content": prompt}
-        ],
-        "options": {
-            "num_predict": 2000  # Increased for longer answers
-        }
-    }
-
-    for attempt in range(retries):
-        try:
-            response = requests.post(OLLAMA_CHAT_ENDPOINT, json=payload, headers=headers, timeout=60)
-            
-            if response.status_code == 200:
-                content = response.json().get("message", {}).get("content", "").strip()
-                return content
-            else:
-                print(f"❌ Ollama API error {response.status_code}: {response.text}")
+                print(f"❌ LLM API error {response.status_code}: {response.text}")
                 
         except requests.RequestException as e:
             print(f"❌ API error (attempt {attempt + 1}): {e}")
@@ -656,49 +570,182 @@ def generate_qa_for_entry(entry: Dict[str, Any], num_questions: Optional[int] = 
     return qa_pairs
 
 # ========================================
+# BIDIRECTIONAL / INVERSE QA GENERATION
+# ========================================
+
+def generate_inverse_qa_prompt(original_question: str, original_answer: str) -> str:
+    """Creates a prompt to generate inverse/bidirectional QA pairs from an existing QA pair.
+    
+    This is the core innovation of OpenTuneWeaver: if the model learns that
+    'Tom Cruise's mother is Jay Dee', it should also learn that
+    'Jay Dee's son is Tom Cruise'. This ensures bidirectional knowledge.
+    """
+    prompt = f"""You are an expert at creating inverse question-answer pairs for training datasets.
+
+Given the following question-answer pair, your task is to CREATE NEW QUESTIONS that approach
+the same knowledge FROM THE OPPOSITE DIRECTION.
+
+The goal: If the original teaches "A relates to B", the inverse should teach "B relates to A".
+
+Examples of this principle:
+- Original: "What is the capital of France?" → "Paris"
+  Inverse: "Which country has Paris as its capital?" → "France"
+- Original: "Who invented the telephone?" → "Alexander Graham Bell"
+  Inverse: "What did Alexander Graham Bell invent?" → "The telephone"
+- Original: "What temperature does water boil at?" → "100°C at standard pressure"
+  Inverse: "What happens to water at 100°C?" → "It reaches its boiling point at standard pressure"
+
+Now apply this principle:
+
+ORIGINAL QUESTION:
+{original_question}
+
+ORIGINAL ANSWER:
+{original_answer}
+
+INSTRUCTIONS:
+1. Identify the KEY ENTITIES, FACTS, NUMBERS, or CONCEPTS mentioned in the answer
+2. For each significant entity/fact, create a NEW question where that entity becomes the SUBJECT
+3. The new answer should reference the original question's subject
+4. Respond in the SAME LANGUAGE as the original Q&A
+5. Generate 1 to 3 inverse pairs (depending on how many reversible facts the answer contains)
+6. Each answer should be complete and self-contained (3+ sentences)
+
+OUTPUT FORMAT (JSON array):
+[
+  {{
+    "question": "The reversed/inverse question",
+    "answer": "The complete answer from the reversed perspective"
+  }}
+]
+
+IMPORTANT: Respond ONLY with the JSON array, no additional explanations!
+If the Q&A pair does not contain reversible relationships (e.g., purely abstract concepts),
+return an empty array: []
+"""
+    return prompt
+
+
+def generate_inverse_qa(qa_pairs: List[Dict[str, Any]], max_inverse_per_pair: int = 2) -> List[Dict[str, Any]]:
+    """Generates inverse/bidirectional QA pairs from existing QA pairs.
+    
+    This is OpenTuneWeaver's core innovation: ensuring the fine-tuned model
+    learns knowledge bidirectionally. For every fact A→B, we also teach B→A.
+    """
+    if not qa_pairs:
+        return []
+    
+    inverse_pairs = []
+    
+    for idx, qa in enumerate(qa_pairs):
+        question = qa.get('question', '')
+        answer = qa.get('answer', '')
+        
+        if not question or not answer:
+            continue
+        
+        # Skip very short answers (not enough content to reverse)
+        if len(answer) < 50:
+            continue
+        
+        print(f"   🔄 Generating inverse QA for pair {idx + 1}...")
+        
+        prompt = generate_inverse_qa_prompt(question, answer)
+        response = submit_to_api(prompt)
+        
+        if not response:
+            continue
+        
+        try:
+            # Clean response
+            response = response.strip()
+            if response.startswith("```json") and response.endswith("```"):
+                response = response[7:-3].strip()
+            elif response.startswith("```") and response.endswith("```"):
+                response = response[3:-3].strip()
+            
+            inverse_data = json.loads(response)
+            
+            if not isinstance(inverse_data, list):
+                continue
+            
+            # Limit inverse pairs per original
+            for inv_idx, inv_pair in enumerate(inverse_data[:max_inverse_per_pair]):
+                if 'question' in inv_pair and 'answer' in inv_pair:
+                    inv_qa = {
+                        'question': inv_pair['question'].strip(),
+                        'answer': inv_pair['answer'].strip(),
+                        'source': qa.get('source', ''),
+                        'title': qa.get('title', ''),
+                        'question_type': 'inverse_bidirectional',
+                        'original_question': question[:100]  # Reference to original
+                    }
+                    inverse_pairs.append(inv_qa)
+                    print(f"      ✅ Inverse QA {inv_idx + 1}: {inv_qa['question'][:60]}...")
+        
+        except json.JSONDecodeError:
+            print(f"      ⚠️ Could not parse inverse QA response")
+            continue
+        except Exception as e:
+            print(f"      ⚠️ Error generating inverse QA: {e}")
+            continue
+    
+    return inverse_pairs
+
+
+# ========================================
 # DATASET CONVERSION
 # ========================================
 
-def convert_to_instruct_format(qa_pairs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Converts QA pairs to standard instruction format."""
-    instruct_dataset = []
+def convert_to_chat_masterformat(qa_pairs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Converts QA pairs to the generic Chat-Masterformat (JSONL)."""
+    dataset = []
     
     for qa in qa_pairs:
-        instruct_entry = {
-            "instruction": qa["question"],
-            "input": "",  # Empty for this use case
-            "output": qa["answer"],
+        # Create standard system prompt if no specific one exists
+        system_content = "You are a helpful and knowledgeable assistant."
+        
+        chat_entry = {
+            "messages": [
+                {
+                    "role": "system",
+                    "content": system_content
+                },
+                {
+                    "role": "user",
+                    "content": qa["question"]
+                },
+                {
+                    "role": "assistant",
+                    "content": qa["answer"]
+                }
+            ],
             "metadata": {
                 "source": qa.get("source", ""),
                 "title": qa.get("title", ""),
                 "question_type": qa.get("question_type", ""),
-                "answer_length": len(qa["answer"]),
-                "has_markdown": "**" in qa["answer"] or "*" in qa["answer"] or "#" in qa["answer"]
             }
         }
-        instruct_dataset.append(instruct_entry)
+        dataset.append(chat_entry)
     
-    return instruct_dataset
+    return dataset
 
 # ========================================
 # MAIN PROCESSING
 # ========================================
 
 def process_lexikon_to_qa_dataset(input_dir: str, output_dir: str, output_filename: str):
-    """Main function: Converts all lexicon files to a comprehensive QA dataset."""
-    api_name = "OpenAI-API" if USE_OPENAI_API else "Ollama-API"
-    server_url = OPENAI_BASE_URL if USE_OPENAI_API else OLLAMA_SERVER_URL
-    model_name = OPENAI_MODEL_NAME if USE_OPENAI_API else OLLAMA_MODEL_NAME
-    
-    print(f"🚀 Starting extended conversion Lexicon → QA-Instruct-Dataset")
+    """Main function: Converts all lexicon files to a comprehensive Chat-Masterformat dataset."""
+    print(f"🚀 Starting extended conversion Lexicon → Chat-Masterformat Dataset")
     print(f"📂 Input directory: {input_dir}")
     print(f"📂 Output directory: {output_dir}")
     print(f"📄 Output file: {output_filename}")
-    print(f"🔧 API type: {api_name}")
-    print(f"🔧 Server: {server_url}")
-    print(f"🔧 Model: {model_name}")
+    print(f"🔧 API type: LLM API")
+    print(f"🔧 Server: {API_BASE_URL}")
+    print(f"🔧 Model: {MODEL_NAME}")
     print(f"✨ Features:")
     print(f"   - Extended question types: {len(QUESTION_TYPES)} categories")
+    print(f"   - Bidirectional/Inverse QA: ✅ (Core Innovation)")
     print(f"   - Complete fact preservation: ✅")
     print(f"   - Markdown formatting: ✅")
     print(f"   - Dynamic question count: ✅")
@@ -725,13 +772,13 @@ def process_lexikon_to_qa_dataset(input_dir: str, output_dir: str, output_filena
     print(f"{'='*60}")
     
     all_qa_pairs = []
-    statistics = {
-        'total_entries': len(lexikon_entries),
-        'processed_entries': 0,
-        'failed_entries': 0,
-        'total_qa_pairs': 0,
-        'qa_by_type': {}
-    }
+    
+    total_entries: int = len(lexikon_entries)
+    processed_entries: int = 0
+    failed_entries: int = 0
+    total_qa_pairs_count: int = 0
+    total_inverse_count: int = 0
+    qa_by_type: Dict[str, int] = {}
     
     # Process each entry
     for idx, entry in enumerate(lexikon_entries, 1):
@@ -743,104 +790,92 @@ def process_lexikon_to_qa_dataset(input_dir: str, output_dir: str, output_filena
             
             if qa_pairs:
                 all_qa_pairs.extend(qa_pairs)
-                statistics['processed_entries'] += 1
-                statistics['total_qa_pairs'] += len(qa_pairs)
+                processed_entries += 1
+                total_qa_pairs_count += len(qa_pairs)
                 
                 # Statistics by type
                 for qa in qa_pairs:
                     q_type = qa.get('question_type', 'unknown')
-                    statistics['qa_by_type'][q_type] = statistics['qa_by_type'].get(q_type, 0) + 1
+                    qa_by_type[q_type] = qa_by_type.get(q_type, 0) + 1
                 
                 print(f"   📊 {len(qa_pairs)} QA pairs generated")
+                
+                # === BIDIRECTIONAL QA (Core Innovation) ===
+                print(f"   🔄 Generating bidirectional/inverse QA pairs...")
+                inverse_pairs = generate_inverse_qa(qa_pairs)
+                if inverse_pairs:
+                    all_qa_pairs.extend(inverse_pairs)
+                    total_inverse_count += len(inverse_pairs)
+                    total_qa_pairs_count += len(inverse_pairs)
+                    for inv in inverse_pairs:
+                        q_type = inv.get('question_type', 'inverse_bidirectional')
+                        qa_by_type[q_type] = qa_by_type.get(q_type, 0) + 1
+                    print(f"   🔁 {len(inverse_pairs)} inverse QA pairs added (bidirectional knowledge)")
+                else:
+                    print(f"   ℹ️ No inverse QA pairs generated for this entry")
             else:
-                statistics['failed_entries'] += 1
+                failed_entries += 1
                 print(f"   ⚠️ No QA pairs generated")
                 
         except Exception as e:
-            statistics['failed_entries'] += 1
+            failed_entries += 1
             print(f"   ❌ Error during processing: {e}")
     
-    # Convert to instruction format
-    instruct_dataset = convert_to_instruct_format(all_qa_pairs)
+    # Convert to Chat-Masterformat
+    chat_dataset = convert_to_chat_masterformat(all_qa_pairs)
     
     # Calculate additional statistics
-    avg_answer_length = sum(entry['metadata']['answer_length'] for entry in instruct_dataset) / len(instruct_dataset) if instruct_dataset else 0
-    markdown_count = sum(1 for entry in instruct_dataset if entry['metadata']['has_markdown'])
+    avg_answer_length = 0
+    markdown_count = 0
+    if chat_dataset:
+        total_len = sum(len(entry['messages'][2]['content']) for entry in chat_dataset if len(entry.get('messages', [])) > 2)
+        avg_answer_length = total_len / len(chat_dataset)
+        markdown_count = sum(1 for entry in chat_dataset if len(entry.get('messages', [])) > 2 and ("**" in entry['messages'][2]['content'] or "*" in entry['messages'][2]['content'] or "#" in entry['messages'][2]['content']))
     
-    # Create final dataset
+    # Create final dataset file
     output_path = Path(output_dir) / output_filename
     
-    final_dataset = {
-        "metadata": {
-            "total_entries": statistics['total_entries'],
-            "processed_entries": statistics['processed_entries'],
-            "failed_entries": statistics['failed_entries'],
-            "total_qa_pairs": statistics['total_qa_pairs'],
-            "qa_by_type": statistics['qa_by_type'],
-            "avg_qa_per_entry": statistics['total_qa_pairs'] / statistics['processed_entries'] if statistics['processed_entries'] > 0 else 0,
-            "avg_answer_length": avg_answer_length,
-            "markdown_formatted_answers": markdown_count,
-            "api_used": api_name,
-            "model_used": model_name,
-            "server_used": server_url,
-            "format": "instruct",
-            "features": {
-                "markdown_formatting": True,
-                "complete_overview_guaranteed": True,
-                "fact_preservation": True,
-                "table_support": True,
-                "language_agnostic": True,
-                "extended_question_types": len(QUESTION_TYPES)
-            }
-        },
-        "data": instruct_dataset
-    }
-    
-    # Save dataset
+    # Save dataset as JSONL
     with open(output_path, 'w', encoding='utf-8') as f:
-        json.dump(final_dataset, f, ensure_ascii=False, indent=2)
+        for entry in chat_dataset:
+            f.write(json.dumps(entry, ensure_ascii=False) + '\n')
     
     # Output statistics
     print(f"\n{'='*60}")
-    print(f"🎉 QA-Instruct-Dataset successfully created!")
+    print(f"🎉 Chat-Masterformat Dataset successfully created!")
     print(f"{'='*60}")
     print(f"📊 Detailed Statistics:")
     print(f"   📁 Processing:")
-    print(f"      - Total lexicon entries: {statistics['total_entries']}")
-    print(f"      - Successfully processed: {statistics['processed_entries']}")
-    print(f"      - Failed: {statistics['failed_entries']}")
+    print(f"      - Total lexicon entries: {total_entries}")
+    print(f"      - Successfully processed: {processed_entries}")
+    print(f"      - Failed: {failed_entries}")
     print(f"   📝 QA pairs:")
-    print(f"      - Total generated: {statistics['total_qa_pairs']}")
-    print(f"      - Average per entry: {statistics['total_qa_pairs']/statistics['processed_entries']:.1f}" if statistics['processed_entries'] > 0 else "")
+    print(f"      - Total generated: {total_qa_pairs_count}")
+    print(f"      - Thereof inverse/bidirectional: {total_inverse_count}")
+    print(f"      - Average per entry: {total_qa_pairs_count/processed_entries:.1f}" if processed_entries > 0 else "")
     print(f"      - Average answer length: {avg_answer_length:.0f} characters")
-    print(f"      - With Markdown formatting: {markdown_count}/{len(instruct_dataset)}")
+    print(f"      - With Markdown formatting: {markdown_count}/{len(chat_dataset)}")
     print(f"   🎯 Question types:")
-    for q_type, count in sorted(statistics['qa_by_type'].items(), key=lambda x: x[1], reverse=True):
+    for q_type, count in sorted(qa_by_type.items(), key=lambda x: x[1], reverse=True):
         print(f"      - {q_type}: {count}")
     print(f"   🔧 Technical details:")
-    print(f"      - API: {api_name}")
-    print(f"      - Server: {server_url}")
-    print(f"      - Model: {model_name}")
+    print(f"      - API: {API_BASE_URL}")
+    print(f"      - Model: {MODEL_NAME}")
     print(f"   💾 Output:")
     print(f"      - File: {output_path}")
     print(f"      - Size: {output_path.stat().st_size / 1024:.1f} KB" if output_path.exists() else "")
     
     # Show examples
-    if instruct_dataset:
-        print(f"\n📋 Example QA pairs:")
+    if chat_dataset:
+        print(f"\n📋 Example generic chats:")
         
-        # Show different question types
-        shown_types = set()
         examples_shown = 0
         
-        for entry in instruct_dataset:
-            q_type = entry['metadata']['question_type']
-            if q_type not in shown_types and examples_shown < 3:
-                print(f"\n   Type: {q_type}")
-                print(f"   Question: {entry['instruction']}")
-                answer_preview = entry['output'][:200] + "..." if len(entry['output']) > 200 else entry['output']
-                print(f"   Answer: {answer_preview}")
-                shown_types.add(q_type)
+        for entry in chat_dataset:
+            if examples_shown < 1:
+                print(f"\n   User: {entry['messages'][1]['content']}")
+                answer_preview = entry['messages'][2]['content'][:200] + "..." if len(entry['messages'][2]['content']) > 200 else entry['messages'][2]['content']
+                print(f"   Assistant: {answer_preview}")
                 examples_shown += 1
 
 # ========================================
@@ -851,14 +886,10 @@ if __name__ == "__main__":
     # Import regex for extended pattern matching
     import re
     
-    api_name = "OpenAI-API" if USE_OPENAI_API else "Ollama-API"
-    server_url = OPENAI_BASE_URL if USE_OPENAI_API else OLLAMA_SERVER_URL
-    model_name = OPENAI_MODEL_NAME if USE_OPENAI_API else OLLAMA_MODEL_NAME
-    
     print(f"🔧 CONFIGURATION (from central config):")
-    print(f"   - API type: {api_name}")
-    print(f"   - Server: {server_url}")
-    print(f"   - Model: {model_name}")
+    print(f"   - API type: LLM API")
+    print(f"   - Server: {API_BASE_URL}")
+    print(f"   - Model: {MODEL_NAME}")
     print(f"   - Extended features: ✅")
     print(f"   - Fact preservation: ✅")
     print(f"   - Markdown formatting: ✅")

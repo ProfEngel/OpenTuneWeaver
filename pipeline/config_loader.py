@@ -3,7 +3,7 @@
 
 """
 Zentrale Config-Loader für OpenTuneWeaver Pipeline
-Lädt die zentrale pipeline_config.json für alle Module
+Lädt die zentrale pipeline_config.json
 """
 
 import os
@@ -14,19 +14,36 @@ from pathlib import Path
 class PipelineConfigLoader:
     """Lädt und verwaltet die zentrale Pipeline-Konfiguration"""
     
-    def __init__(self, module_id=None):
-        """
-        Initialisiert den Config-Loader
+    @staticmethod
+    def _normalize_api_url(url: str) -> str:
+        """Ensures the API base URL ends with /v1 for OpenAI-compatible endpoints.
         
-        Args:
-            module_id: ID des Moduls (z.B. "01_convert", "02_genwiki", etc.)
+        Users often enter bare Ollama URLs like http://host:11434 without /v1,
+        but all modules build endpoints as {API_BASE_URL}/chat/completions.
+        This auto-appends /v1 if missing.
         """
-        self.module_id = module_id
+        if not url:
+            return url
+        url = url.rstrip('/')
+        if not url.endswith('/v1'):
+            url = f"{url}/v1"
+        return url
+    
+    def __init__(self):
+        """Initialisiert den Config-Loader"""
         self.config = self._load_config()
-        self.api_config = None
+        self.vision_config = self.config.get("vision", {})
+        self.llm_config = self.config.get("llm", {})
         
-        if module_id and module_id in self.config.get("api_configs", {}):
-            self.api_config = self.config["api_configs"][module_id]
+        # Normalize API URLs
+        if "api_base_url" in self.vision_config:
+            self.vision_config["api_base_url"] = self._normalize_api_url(
+                self.vision_config["api_base_url"]
+            )
+        if "api_base_url" in self.llm_config:
+            self.llm_config["api_base_url"] = self._normalize_api_url(
+                self.llm_config["api_base_url"]
+            )
     
     def _find_config_file(self):
         """Sucht die zentrale Config-Datei"""
@@ -38,11 +55,11 @@ class PipelineConfigLoader:
         
         # Priorität 2: Suche relativ zum aktuellen Verzeichnis
         search_paths = [
-            Path.cwd() / "pipeline_config.json",  # Im aktuellen Verzeichnis
-            Path.cwd().parent / "pipeline_config.json",  # Eine Ebene höher
-            Path.cwd().parent.parent / "pipeline_config.json",  # Zwei Ebenen höher
-            Path.cwd().parent.parent.parent / "pipeline_config.json",  # Drei Ebenen höher (für Module)
-            Path(__file__).parent / "pipeline_config.json",  # Neben diesem Skript
+            Path.cwd() / "pipeline_config.json",
+            Path.cwd().parent / "pipeline_config.json",
+            Path.cwd().parent.parent / "pipeline_config.json",
+            Path.cwd().parent.parent.parent / "pipeline_config.json",
+            Path(__file__).parent / "pipeline_config.json",
             Path(__file__).parent.parent / "pipeline_config.json",
             Path(__file__).parent.parent.parent / "pipeline_config.json",
         ]
@@ -51,10 +68,9 @@ class PipelineConfigLoader:
             if path.exists():
                 return path
         
-        # Nicht gefunden
         raise FileNotFoundError(
             "pipeline_config.json nicht gefunden!\n"
-            "Bitte führen Sie zuerst run_pipeline.py aus oder setzen Sie PIPELINE_CONFIG_PATH"
+            "Bitte speichern Sie zuerst die Einstellungen im UI."
         )
     
     def _load_config(self):
@@ -65,15 +81,6 @@ class PipelineConfigLoader:
         try:
             with open(config_path, 'r', encoding='utf-8') as f:
                 config = json.load(f)
-            
-            # Setze Umgebungsvariablen für Tokens
-            if "tokens" in config:
-                if config["tokens"].get("hf_token"):
-                    os.environ["HF_TOKEN"] = config["tokens"]["hf_token"]
-                    os.environ["HUGGINGFACE_TOKEN"] = config["tokens"]["hf_token"]
-                if config["tokens"].get("hf_write_token"):
-                    os.environ["HF_WRITE_TOKEN"] = config["tokens"]["hf_write_token"]
-            
             return config
             
         except json.JSONDecodeError as e:
@@ -83,35 +90,52 @@ class PipelineConfigLoader:
             print(f"❌ Fehler beim Laden der Config: {e}")
             sys.exit(1)
     
-    def get_api_config(self, module_id=None):
-        """
-        Gibt die API-Konfiguration für ein Modul zurück
-        
-        Args:
-            module_id: Optionale Module-ID, falls nicht im Konstruktor gesetzt
-        
-        Returns:
-            Dict mit API-Konfiguration
-        """
-        if module_id:
-            return self.config.get("api_configs", {}).get(module_id, {})
-        return self.api_config or {}
-    
-    def get_finetuning_config(self):
-        """Gibt die Finetuning-Konfiguration zurück"""
-        return self.config.get("finetuning", {})
-    
-    def get_benchmark_config(self):
-        """Gibt die Benchmark-Konfiguration zurück"""
-        return self.config.get("benchmark", {})
+    def get_vision_config(self):
+        """Gibt die Vision-Konfiguration zurück"""
+        return self.vision_config
+
+    def get_llm_config(self):
+        """Gibt die LLM-Konfiguration zurück"""
+        return self.llm_config
     
     def get_pipeline_config(self):
         """Gibt die Pipeline-Konfiguration zurück"""
         return self.config.get("pipeline", {})
     
-    def get_tokens(self):
-        """Gibt die Token-Konfiguration zurück"""
-        return self.config.get("tokens", {})
+    def get_module_config(self, module_name: str):
+        """Returns a merged config for a specific module.
+        
+        Starts from the global vision/llm config and overlays any
+        per-module overrides from api_configs. This allows e.g. 
+        03_generate_qa to use a different model_name than 02_genwiki
+        while sharing the same API base URL and key.
+        """
+        # Pick base: 01_convert uses vision, everything else uses llm
+        if module_name == "01_convert":
+            base = dict(self.vision_config)
+        else:
+            base = dict(self.llm_config)
+        
+        # Overlay per-module overrides
+        module_overrides = self.config.get("api_configs", {}).get(module_name, {})
+        if isinstance(module_overrides, dict):
+            # Map the openai_* keys to the canonical names
+            key_map = {
+                "openai_base_url": "api_base_url",
+                "openai_api_key": "api_key",
+                "openai_model_name": "model_name",
+            }
+            for old_key, new_key in key_map.items():
+                if old_key in module_overrides and module_overrides[old_key]:
+                    value = module_overrides[old_key]
+                    # Normalize API URLs
+                    if new_key == "api_base_url":
+                        value = self._normalize_api_url(value)
+                    base[new_key] = value
+            if "temperature" in module_overrides:
+                base["temperature"] = module_overrides["temperature"]
+        
+        return base
     
     def get_full_config(self):
         """Gibt die komplette Konfiguration zurück"""
@@ -121,70 +145,37 @@ class PipelineConfigLoader:
         """Gibt eine Zusammenfassung der Konfiguration aus"""
         print("\n📊 Konfigurations-Übersicht:")
         print(f"  📋 Version: {self.config.get('version', 'unbekannt')}")
-        print(f"  📅 Erstellt: {self.config.get('created', 'unbekannt')}")
-        print(f"  🔄 Geändert: {self.config.get('last_modified', 'unbekannt')}")
         
-        if self.api_config:
-            print(f"\n  📡 API-Config für {self.module_id}:")
-            api_type = "OpenAI" if self.api_config.get("use_openai_api") else "Ollama"
-            if api_type == "OpenAI":
-                print(f"    - Typ: {api_type}")
-                print(f"    - URL: {self.api_config.get('openai_base_url', 'nicht gesetzt')}")
-                print(f"    - Model: {self.api_config.get('openai_model_name', 'nicht gesetzt')}")
-            else:
-                print(f"    - Typ: {api_type}")
-                print(f"    - URL: {self.api_config.get('ollama_server_url', 'nicht gesetzt')}")
-                print(f"    - Model: {self.api_config.get('ollama_model_name', 'nicht gesetzt')}")
+        print(f"\n  👁️ Vision Config:")
+        print(f"    - URL: {self.vision_config.get('api_base_url', 'nicht gesetzt')}")
+        print(f"    - Model: {self.vision_config.get('model_name', 'nicht gesetzt')}")
+
+        print(f"\n  🤖 LLM Config:")
+        print(f"    - URL: {self.llm_config.get('api_base_url', 'nicht gesetzt')}")
+        print(f"    - Model: {self.llm_config.get('model_name', 'nicht gesetzt')}")
 
 
 # Convenience-Funktionen für direkten Import
-def load_config(module_id=None):
+def load_config():
     """
     Lädt die zentrale Pipeline-Konfiguration
-    
-    Args:
-        module_id: Optionale Module-ID (z.B. "01_convert")
-    
-    Returns:
-        PipelineConfigLoader Instanz
     """
-    return PipelineConfigLoader(module_id)
+    return PipelineConfigLoader()
 
+def get_vision_config():
+    loader = PipelineConfigLoader()
+    return loader.get_vision_config()
 
-def get_api_config(module_id):
-    """
-    Holt direkt die API-Konfiguration für ein Modul
-    
-    Args:
-        module_id: Module-ID (z.B. "01_convert")
-    
-    Returns:
-        Dict mit API-Konfiguration
-    """
-    loader = PipelineConfigLoader(module_id)
-    return loader.get_api_config()
-
+def get_llm_config():
+    loader = PipelineConfigLoader()
+    return loader.get_llm_config()
 
 # Beispiel-Verwendung
 if __name__ == "__main__":
-    # Test: Lade Config
     print("🧪 Teste Config-Loader...")
-    
     try:
-        # Lade für ein spezifisches Modul
-        loader = PipelineConfigLoader("02_genwiki")
+        loader = PipelineConfigLoader()
         loader.print_config_summary()
-        
-        # Hole API-Config
-        api_config = loader.get_api_config()
-        print(f"\n📡 API-Konfiguration:")
-        print(json.dumps(api_config, indent=2))
-        
-        # Hole Tokens
-        tokens = loader.get_tokens()
-        if tokens.get("hf_token"):
-            print(f"\n🔑 HF-Token gefunden: {tokens['hf_token'][:8]}...")
-        
     except FileNotFoundError as e:
         print(f"❌ {e}")
     except Exception as e:

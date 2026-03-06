@@ -2,10 +2,7 @@
   "version": "5.3",
   "created": "2025-08-14T21:30:21.121269",
   "last_modified": "2025-08-14T21:30:21.121290",
-  "tokens": {
-    "hf_token": "hf_",
-    "hf_write_token": "hf_"
-  },
+  "tokens": {},
   "api_configs": {
     "01_convert": {
       "use_openai_api": true,

@@ -12,8 +12,9 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #2c5282 0%, #2d6748 50%, #319795 100%);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #111827; /* Dark background */
+            color: #e5e7eb; /* Light text */
             min-height: 100vh;
         }
 
@@ -27,10 +28,11 @@
         .hub-header {
             text-align: center;
             margin-bottom: 50px;
-            background: white;
+            background: #1f2937; /* Dark card background */
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid #374151;
         }
 
         .logo-container {
@@ -60,14 +62,13 @@
 
         .hub-header h1 {
             font-size: 3em;
-            background: linear-gradient(45deg, #2c5282, #319795);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #f3f4f6;
             margin-bottom: 15px;
+            font-weight: 700;
         }
 
         .hub-subtitle {
-            color: #4a5568;
+            color: #9ca3af;
             font-size: 1.2em;
             margin-bottom: 30px;
         }
@@ -113,10 +114,11 @@
         }
 
         .hub-card {
-            background: white;
+            background: #1f2937;
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border: 1px solid #374151;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
@@ -129,8 +131,8 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 6px;
-            background: linear-gradient(45deg, #2c5282, #319795);
+            height: 4px;
+            background: #0d9488; /* Teal accent */
             transform: translateX(-100%);
             transition: transform 0.3s ease;
         }
@@ -140,8 +142,9 @@
         }
 
         .hub-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            transform: translateY(-5px);
+            border-color: #4b5563;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
         .hub-card-icon {
@@ -152,14 +155,14 @@
 
         .hub-card-title {
             font-size: 1.5em;
-            font-weight: bold;
-            color: #2d3748;
+            font-weight: 600;
+            color: #f3f4f6;
             text-align: center;
             margin-bottom: 15px;
         }
 
         .hub-card-description {
-            color: #4a5568;
+            color: #9ca3af;
             text-align: center;
             line-height: 1.6;
             margin-bottom: 20px;
@@ -167,13 +170,13 @@
 
         .hub-card-features {
             list-style: none;
-            color: #2d3748;
+            color: #d1d5db;
             font-size: 0.9em;
         }
 
         .hub-card-features li {
             margin-bottom: 6px;
-            padding-left: 15px;
+            padding-left: 20px;
             position: relative;
         }
 
@@ -181,16 +184,17 @@
             content: '✓';
             position: absolute;
             left: 0;
-            color: #319795;
+            color: #0d9488;
             font-weight: bold;
         }
 
         /* Viewer Styles */
         .viewer-page {
             display: none;
-            background: white;
+            background: #1f2937;
             border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border: 1px solid #374151;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             padding: 40px;
             min-height: 600px;
         }
@@ -209,15 +213,14 @@
             text-align: center;
             margin-bottom: 30px;
             padding-bottom: 20px;
-            border-bottom: 2px solid #e2e8f0;
+            border-bottom: 1px solid #374151;
         }
 
         .viewer-title {
             font-size: 2.5em;
-            background: linear-gradient(45deg, #2c5282, #319795);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #f3f4f6;
             margin-bottom: 15px;
+            font-weight: 700;
         }
 
         .viewer-controls {
@@ -238,34 +241,34 @@
         }
 
         .back-btn {
-            background: linear-gradient(45deg, #718096, #4a5568);
-            color: white;
+            background: #374151;
+            color: #f3f4f6;
         }
 
         .control-btn {
-            background: linear-gradient(45deg, #2c5282, #319795);
+            background: #0d9488;
             color: white;
         }
 
         .control-btn:hover, .back-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            filter: brightness(1.1);
         }
 
         .file-drop-zone {
-            border: 3px dashed #2c5282;
+            border: 2px dashed #4b5563;
             border-radius: 15px;
             padding: 40px;
             text-align: center;
             margin: 20px 0;
-            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            background: #111827;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .file-drop-zone:hover {
-            background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%);
-            border-color: #319795;
+            background: #1f2937;
+            border-color: #0d9488;
         }
 
         .file-input {
@@ -275,8 +278,9 @@
         .content-area {
             margin-top: 30px;
             padding: 20px;
-            background: #f7fafc;
+            background: #111827;
             border-radius: 10px;
+            border: 1px solid #374151;
         }
 
         /* Content Formatting */
@@ -286,38 +290,38 @@
         }
 
         .entry-content h3 {
-            color: #2c5282;
+            color: #f3f4f6;
             font-size: 1.1em;
-            font-weight: bold;
+            font-weight: 600;
             margin: 15px 0 8px 0;
             padding-bottom: 5px;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #374151;
         }
 
         .entry-content h4 {
-            color: #2d3748;
+            color: #d1d5db;
             font-size: 1.05em;
-            font-weight: bold;
+            font-weight: 600;
             margin: 12px 0 6px 0;
         }
 
         .entry-content strong {
-            color: #2c5282;
+            color: #f3f4f6;
             font-weight: 600;
         }
 
         .entry-content em {
             font-style: italic;
-            color: #4a5568;
+            color: #9ca3af;
         }
 
         .entry-content code {
-            background: #f7fafc;
+            background: #374151;
             padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
+            border-radius: 4px;
+            font-family: ui-monospace, 'Courier New', monospace;
             font-size: 0.9em;
-            color: #e53e3e;
+            color: #fbbf24;
         }
 
         .entry-content ul {
@@ -335,23 +339,24 @@
         }
 
         .entry-card {
-            border: 2px solid #e2e8f0;
+            border: 1px solid #374151;
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 25px;
-            background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%);
+            background: #1f2937;
             transition: all 0.3s ease;
         }
 
         .entry-card:hover {
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             transform: translateY(-2px);
+            border-color: #4b5563;
         }
 
         .entry-title {
             font-size: 1.3em;
-            font-weight: bold;
-            color: #2c5282;
+            font-weight: 600;
+            color: #f3f4f6;
             margin-bottom: 10px;
         }
 
@@ -372,15 +377,15 @@
             left: 0;
             right: 0;
             height: 50px;
-            background: linear-gradient(transparent, white);
+            background: linear-gradient(transparent, #1f2937);
         }
 
         .expand-btn {
             margin-top: 10px;
             padding: 8px 16px;
-            background: linear-gradient(45deg, #319795, #38b2ac);
-            color: white;
-            border: none;
+            background: #374151;
+            color: #f3f4f6;
+            border: 1px solid #4b5563;
             border-radius: 20px;
             cursor: pointer;
             font-weight: 600;
@@ -388,8 +393,7 @@
         }
 
         .expand-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(49, 151, 149, 0.3);
+            background: #4b5563;
         }
 
         .message-bubble {
@@ -400,56 +404,62 @@
         }
 
         .message-user {
-            background: #e6fffa;
-            border-left-color: #319795;
+            background: #0f766e;
+            border-left-color: #14b8a6;
+            color: #f3f4f6;
         }
 
         .message-assistant {
-            background: #ebf4ff;
-            border-left-color: #2c5282;
+            background: #374151;
+            border-left-color: #6b7280;
+            color: #f3f4f6;
         }
 
         .message-role {
             font-weight: bold;
             margin-bottom: 8px;
-            color: #2d3748;
+            color: #d1d5db;
         }
 
         .edit-mode {
-            background: #fffbeb;
-            border: 2px dashed #f6ad55;
+            background: #1e293b;
+            border: 1px dashed #f59e0b;
         }
 
         .edit-textarea {
             width: 100%;
             min-height: 200px;
             padding: 15px;
-            border: 1px solid #e2e8f0;
+            background: #111827;
+            color: #f3f4f6;
+            border: 1px solid #4b5563;
             border-radius: 8px;
             font-family: inherit;
             resize: vertical;
         }
 
         .debug-info {
-            background: #2d3748;
-            color: #f7fafc;
+            background: #111827;
+            color: #10b981;
+            border: 1px solid #374151;
             padding: 15px;
             border-radius: 10px;
             margin: 20px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
+            font-family: ui-monospace, 'Courier New', monospace;
+            font-size: 13px;
             line-height: 1.4;
             max-height: 200px;
             overflow-y: auto;
         }
 
         .debug-info h4 {
-            color: #319795;
+            color: #f59e0b;
             margin-bottom: 10px;
         }
 
         .highlight {
-            background: linear-gradient(45deg, #fefcbf, #faf089);
+            background: rgba(245, 158, 11, 0.2);
+            color: #fcd34d;
             padding: 2px 6px;
             border-radius: 4px;
             font-weight: bold;
@@ -488,9 +498,9 @@
                         <h1>Universal Document Hub</h1>
                         <p class="hub-subtitle">Viewer and Editor for OpenTuneWeaver Pipeline Documents</p>
                         <div style="margin-top: 15px; color: #4a5568; font-size: 0.95em; line-height: 1.5;">
-                            <strong>📄 Pipeline Integration:</strong> Process documents from all 7 steps of the OpenTuneWeaver pipeline<br>
-                            <strong>🔍 Supported Formats:</strong> Markdown, Lexicon JSON, QA-Instruct, Benchmark Questions, Pipeline Reports<br>
-                            <strong>🎯 Workflow:</strong> From document conversion to LLM fine-tuning
+                            <strong>📄 Pipeline Integration:</strong> View and edit documents from the 3-step OpenTuneWeaver pipeline<br>
+                            <strong>🔍 Supported Formats:</strong> Markdown, Lexicon JSON, QA Dataset JSONL<br>
+                            <strong>🎯 Workflow:</strong> Document Conversion → Wiki Generation → QA Dataset
                         </div>
                     </div>
                 </div>
@@ -532,58 +542,16 @@
                 </div>
 
                 <div class="hub-card" data-viewer="qa-instruct">
-                    <div class="hub-card-icon">🔍</div>
-                    <div class="hub-card-title">QA Instruct Viewer</div>
+                    <div class="hub-card-icon">📊</div>
+                    <div class="hub-card-title">QA Dataset Viewer</div>
                     <div class="hub-card-description">
-                        Manage Q&A instruction datasets for training and analysis
+                        View and edit QA training datasets in JSONL Chat format
                     </div>
                     <ul class="hub-card-features">
-                        <li>Instruction-Input-Output display</li>
-                        <li>Metadata tags and filters</li>
+                        <li>JSONL and JSON format support</li>
+                        <li>Chat message display (system/user/assistant)</li>
                         <li>Statistics and analysis</li>
                         <li>Editing and export</li>
-                    </ul>
-                </div>
-
-                <div class="hub-card" data-viewer="benchmark">
-                    <div class="hub-card-icon">🎯</div>
-                    <div class="hub-card-title">Benchmark Questions Viewer</div>
-                    <div class="hub-card-description">
-                        Manage benchmark questions with categories and detailed answers
-                    </div>
-                    <ul class="hub-card-features">
-                        <li>Category-based organization</li>
-                        <li>Question-answer pairs</li>
-                        <li>Expandable long answers</li>
-                        <li>Editing and export</li>
-                    </ul>
-                </div>
-
-                <div class="hub-card" data-viewer="bmReport">
-                    <div class="hub-card-icon">📊</div>
-                    <div class="hub-card-title">BM-Report Viewer</div>
-                    <div class="hub-card-description">
-                        Display and analysis of benchmark reports from the pipeline
-                    </div>
-                    <ul class="hub-card-features">
-                        <li>Benchmark results visualization</li>
-                        <li>Model comparisons</li>
-                        <li>Performance metrics</li>
-                        <li>Markdown-formatted reports</li>
-                    </ul>
-                </div>
-
-                <div class="hub-card" data-viewer="pipelineReport">
-                    <div class="hub-card-icon">📋</div>
-                    <div class="hub-card-title">Pipeline Report Viewer</div>
-                    <div class="hub-card-description">
-                        Detailed pipeline reports with step-by-step analyses
-                    </div>
-                    <ul class="hub-card-features">
-                        <li>Complete pipeline overview</li>
-                        <li>Step statistics</li>
-                        <li>Error and success logs</li>
-                        <li>Timestamps and metrics</li>
                     </ul>
                 </div>
             </div>
@@ -631,69 +599,18 @@
 
         <div id="qaInstructViewer" class="viewer-page">
             <div class="viewer-header">
-                <h1 class="viewer-title">🔍 QA Instruct Viewer</h1>
+                <h1 class="viewer-title">📊 QA Dataset Viewer</h1>
                 <div class="viewer-controls">
                     <button class="back-btn" onclick="showHub()">← Back to Hub</button>
                     <button class="control-btn" id="toggleAllQaInstruct">📖 Expand All</button>
                 </div>
             </div>
             <div class="file-drop-zone" onclick="document.getElementById('qaFile').click()">
-                <h3>🔍 Load QA Instruct File</h3>
-                <p>Drag your qa_instruct_*.json file here</p>
-                <input type="file" class="file-input" id="qaFile" accept=".json">
+                <h3>📊 Load QA Dataset File</h3>
+                <p>Drag your dataset.jsonl or .json file here</p>
+                <input type="file" class="file-input" id="qaFile" accept=".json,.jsonl">
             </div>
             <div class="content-area" id="qaContent" style="display: none;"></div>
-        </div>
-
-        <div id="benchmarkViewer" class="viewer-page">
-            <div class="viewer-header">
-                <h1 class="viewer-title">🎯 Benchmark Questions Viewer</h1>
-                <div class="viewer-controls">
-                    <button class="back-btn" onclick="showHub()">← Back to Hub</button>
-                    <button class="control-btn" id="toggleAllBenchmark">📖 Expand All</button>
-                    <button class="control-btn" id="editModeBenchmark">✏️ Edit</button>
-                </div>
-            </div>
-            <div class="file-drop-zone" onclick="document.getElementById('benchmarkFile').click()">
-                <h3>🎯 Load Benchmark File</h3>
-                <p>Drag your benchmark_*.json file here</p>
-                <input type="file" class="file-input" id="benchmarkFile" accept=".json">
-            </div>
-            <div class="content-area" id="benchmarkContent" style="display: none;"></div>
-        </div>
-
-        <div id="bmReportViewer" class="viewer-page">
-            <div class="viewer-header">
-                <h1 class="viewer-title">📊 BM-Report Viewer</h1>
-                <div class="viewer-controls">
-                    <button class="back-btn" onclick="showHub()">← Back to Hub</button>
-                    <button class="control-btn" id="toggleAllBmReport">📖 Expand All</button>
-                    <button class="control-btn" id="editModeBmReport">✏️ Edit</button>
-                </div>
-            </div>
-            <div class="file-drop-zone" onclick="document.getElementById('bmReportFile').click()">
-                <h3>📊 Load BM-Report File</h3>
-                <p>Drag your benchmark_report.md file here</p>
-                <input type="file" class="file-input" id="bmReportFile" accept=".md,.markdown,.txt">
-            </div>
-            <div class="content-area" id="bmReportContent" style="display: none;"></div>
-        </div>
-
-        <div id="pipelineReportViewer" class="viewer-page">
-            <div class="viewer-header">
-                <h1 class="viewer-title">📋 Pipeline Report Viewer</h1>
-                <div class="viewer-controls">
-                    <button class="back-btn" onclick="showHub()">← Back to Hub</button>
-                    <button class="control-btn" id="toggleAllPipelineReport">📖 Expand All</button>
-                    <button class="control-btn" id="editModePipelineReport">✏️ Edit</button>
-                </div>
-            </div>
-            <div class="file-drop-zone" onclick="document.getElementById('pipelineReportFile').click()">
-                <h3>📋 Load Pipeline Report File</h3>
-                <p>Drag your pipeline_report.md file here</p>
-                <input type="file" class="file-input" id="pipelineReportFile" accept=".md,.markdown,.txt">
-            </div>
-            <div class="content-area" id="pipelineReportContent" style="display: none;"></div>
         </div>
     </div>
 
@@ -790,10 +707,7 @@
                 'markdown': 'markdownViewer',
                 'lexikon': 'lexikonViewer', 
                 'qaInstruct': 'qaInstructViewer',
-                'qa-instruct': 'qaInstructViewer',
-                'benchmark': 'benchmarkViewer',
-                'bmReport': 'bmReportViewer',
-                'pipelineReport': 'pipelineReportViewer'
+                'qa-instruct': 'qaInstructViewer'
             };
             
             const viewerId = viewerIdMap[viewerType] || viewerType + 'Viewer';
@@ -978,15 +892,15 @@
                     
                     // Create editable form with better styling
                     expandableContent.innerHTML = `
-                        <div style="background: #fff8e1; padding: 20px; border-radius: 10px; border: 2px dashed #f39c12; position: relative;">
-                            <div style="position: absolute; top: 10px; right: 15px; background: #e67e22; color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold;">
+                        <div style="background: #1e293b; padding: 20px; border-radius: 10px; border: 1px dashed #f59e0b; position: relative;">
+                            <div style="position: absolute; top: 10px; right: 15px; background: #ea580c; color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold;">
                                 ✏️ EDIT MODE
                             </div>
                             
-                            <h4 style="color: #e67e22; margin-bottom: 20px; font-size: 16px;">✏️ Edit Q&A Entry #${index + 1}</h4>
+                            <h4 style="color: #f59e0b; margin-bottom: 20px; font-size: 16px;">✏️ Edit Q&A Entry #${index + 1}</h4>
                             
                             <div style="margin-bottom: 20px;">
-                                <label style="display: block; font-weight: bold; color: #2c5282; margin-bottom: 8px; font-size: 14px;">🔍 Instruction/Question: *</label>
+                                <label style="display: block; font-weight: bold; color: #9ca3af; margin-bottom: 8px; font-size: 14px;">🔍 Instruction/Question: *</label>
                                 <textarea 
                                     id="edit-instruction-${index}" 
                                     placeholder="Enter the instruction or question here..."
@@ -994,24 +908,24 @@
                                         width: 100%; 
                                         min-height: 100px; 
                                         padding: 15px; 
-                                        border: 2px solid #2c5282; 
+                                        border: 1px solid #4b5563; 
                                         border-radius: 8px; 
                                         font-family: inherit; 
                                         font-size: 14px; 
                                         line-height: 1.4;
                                         resize: vertical;
-                                        background: white;
-                                        color: #2d3748;
+                                        background: #111827;
+                                        color: #f3f4f6;
                                         outline: none;
                                         transition: border-color 0.3s ease;
                                     "
-                                    onfocus="this.style.borderColor='#319795';"
-                                    onblur="this.style.borderColor='#2c5282';"
+                                    onfocus="this.style.borderColor='#0d9488';"
+                                    onblur="this.style.borderColor='#4b5563';"
                                 >${currentInstruction}</textarea>
                             </div>
                             
                             <div style="margin-bottom: 20px;">
-                                <label style="display: block; font-weight: bold; color: #2c5282; margin-bottom: 8px; font-size: 14px;">📋 Input (optional):</label>
+                                <label style="display: block; font-weight: bold; color: #9ca3af; margin-bottom: 8px; font-size: 14px;">📋 Input (optional):</label>
                                 <textarea 
                                     id="edit-input-${index}" 
                                     placeholder="Additional input (if available)..."
@@ -1019,24 +933,24 @@
                                         width: 100%; 
                                         min-height: 80px; 
                                         padding: 15px; 
-                                        border: 2px solid #2c5282; 
+                                        border: 1px solid #4b5563; 
                                         border-radius: 8px; 
                                         font-family: inherit; 
                                         font-size: 14px; 
                                         line-height: 1.4;
                                         resize: vertical;
-                                        background: white;
-                                        color: #2d3748;
+                                        background: #111827;
+                                        color: #f3f4f6;
                                         outline: none;
                                         transition: border-color 0.3s ease;
                                     "
-                                    onfocus="this.style.borderColor='#319795';"
-                                    onblur="this.style.borderColor='#2c5282';"
+                                    onfocus="this.style.borderColor='#0d9488';"
+                                    onblur="this.style.borderColor='#4b5563';"
                                 >${currentInput}</textarea>
                             </div>
                             
                             <div style="margin-bottom: 20px;">
-                                <label style="display: block; font-weight: bold; color: #2c5282; margin-bottom: 8px; font-size: 14px;">💬 Answer/Output: *</label>
+                                <label style="display: block; font-weight: bold; color: #9ca3af; margin-bottom: 8px; font-size: 14px;">💬 Answer/Output: *</label>
                                 <textarea 
                                     id="edit-output-${index}" 
                                     placeholder="Enter the answer here..."
@@ -1044,19 +958,19 @@
                                         width: 100%; 
                                         min-height: 150px; 
                                         padding: 15px; 
-                                        border: 2px solid #2c5282; 
+                                        border: 1px solid #4b5563; 
                                         border-radius: 8px; 
                                         font-family: inherit; 
                                         font-size: 14px; 
                                         line-height: 1.4;
                                         resize: vertical;
-                                        background: white;
-                                        color: #2d3748;
+                                        background: #111827;
+                                        color: #f3f4f6;
                                         outline: none;
                                         transition: border-color 0.3s ease;
                                     "
-                                    onfocus="this.style.borderColor='#319795';"
-                                    onblur="this.style.borderColor='#2c5282';"
+                                    onfocus="this.style.borderColor='#0d9488';"
+                                    onblur="this.style.borderColor='#4b5563';"
                                 >${currentOutput}</textarea>
                             </div>
                             
@@ -1126,7 +1040,7 @@
                         const originalHtml = content.innerHTML;
                         entry.setAttribute('data-original-content', originalHtml);
                         const plainText = originalHtml.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
-                        content.innerHTML = `<textarea class="edit-textarea" style="width: 100%; min-height: 200px; padding: 15px; border: 2px solid #2c5282; border-radius: 8px; font-family: inherit; resize: vertical;">${plainText}</textarea>`;
+                        content.innerHTML = `<textarea class="edit-textarea" style="width: 100%; min-height: 200px; padding: 15px; border: 1px solid #4b5563; background: #111827; color: #f3f4f6; border-radius: 8px; font-family: inherit; resize: vertical;">${plainText}</textarea>`;
                     }
                 });
             }
@@ -1196,70 +1110,7 @@
             reader.readAsText(file);
         }
 
-        // Report file handlers (same as markdown but for specific viewers)
-        function handleBmReportFile(file) {
-            if (!file) return;
-            
-            log(`📊 Loading BM report file: ${file.name}`);
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const content = e.target.result;
-                    originalData.bmReport = content;
-                    const html = convertMarkdownToHTML(content);
-                    
-                    document.getElementById('bmReportContent').innerHTML = `
-                        <div class="entry-card">
-                            <div class="entry-title">📊 ${file.name}</div>
-                            <div class="entry-content expandable-content collapsed">
-                                ${html}
-                            </div>
-                            <button class="expand-btn" onclick="toggleContent(this, true)">🔽 Read More</button>
-                        </div>
-                    `;
-                    
-                    document.getElementById('bmReportContent').style.display = 'block';
-                    log('✅ BM Report file loaded successfully');
-                } catch (error) {
-                    log(`❌ Error loading BM report: ${error.message}`);
-                }
-            };
-            
-            reader.readAsText(file);
-        }
-
-        function handlePipelineReportFile(file) {
-            if (!file) return;
-            
-            log(`📋 Loading Pipeline report file: ${file.name}`);
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const content = e.target.result;
-                    originalData.pipelineReport = content;
-                    const html = convertMarkdownToHTML(content);
-                    
-                    document.getElementById('pipelineReportContent').innerHTML = `
-                        <div class="entry-card">
-                            <div class="entry-title">📋 ${file.name}</div>
-                            <div class="entry-content expandable-content collapsed">
-                                ${html}
-                            </div>
-                            <button class="expand-btn" onclick="toggleContent(this, true)">🔽 Read More</button>
-                        </div>
-                    `;
-                    
-                    document.getElementById('pipelineReportContent').style.display = 'block';
-                    log('✅ Pipeline Report file loaded successfully');
-                } catch (error) {
-                    log(`❌ Error loading Pipeline report: ${error.message}`);
-                }
-            };
-            
-            reader.readAsText(file);
-        }
+        // (Benchmark and Report handlers removed - legacy features)
 
         function handleLexikonFile(file) {
             if (!file) return;
@@ -1310,41 +1161,87 @@
         function handleQAFile(file) {
             if (!file) return;
             
-            log(`🔍 Loading QA file: ${file.name}`);
+            log(`📊 Loading QA dataset file: ${file.name}`);
             
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const rawData = e.target.result;
-                    const data = JSON.parse(rawData);
-                    originalData.qa = data;
-                    
-                    log(`🔍 QA Data structure: ${JSON.stringify(Object.keys(data))}`);
-                    
-                    // Process data exactly like the original QA viewer
                     let entries = [];
                     
-                    if (data.data && Array.isArray(data.data)) {
-                        entries = data.data.map((entry, index) => ({
-                            ...entry,
-                            id: `${file.name}_${index}`,
-                            originalIndex: index
-                        }));
-                        log(`✅ Found data.data array with ${entries.length} entries`);
-                    } else if (Array.isArray(data)) {
-                        entries = data.map((entry, index) => ({
-                            ...entry,
-                            id: `${file.name}_${index}`,
-                            originalIndex: index
-                        }));
-                        log(`✅ Found direct array with ${entries.length} entries`);
+                    // Detect JSONL format (one JSON object per line)
+                    const isJsonl = file.name.endsWith('.jsonl') || rawData.trim().startsWith('{"messages');
+                    
+                    if (isJsonl) {
+                        // Parse JSONL: each line is a separate JSON object
+                        const lines = rawData.trim().split('\n').filter(line => line.trim());
+                        log(`📊 Parsing JSONL format: ${lines.length} lines`);
+                        
+                        lines.forEach((line, index) => {
+                            try {
+                                const obj = JSON.parse(line.trim());
+                                
+                                // Chat-Masterformat: {"messages": [{"role": "...", "content": "..."}]}
+                                if (obj.messages && Array.isArray(obj.messages)) {
+                                    // Extract instruction/input/output from chat messages
+                                    let instruction = '';
+                                    let input = '';
+                                    let output = '';
+                                    
+                                    obj.messages.forEach(msg => {
+                                        if (msg.role === 'system') instruction = msg.content || '';
+                                        else if (msg.role === 'user') input = msg.content || '';
+                                        else if (msg.role === 'assistant') output = msg.content || '';
+                                    });
+                                    
+                                    entries.push({
+                                        instruction: instruction,
+                                        input: input,
+                                        output: output,
+                                        messages: obj.messages,
+                                        id: `${file.name}_${index}`,
+                                        originalIndex: index
+                                    });
+                                } else {
+                                    // Fallback: instruction/input/output format
+                                    entries.push({
+                                        ...obj,
+                                        id: `${file.name}_${index}`,
+                                        originalIndex: index
+                                    });
+                                }
+                            } catch (lineErr) {
+                                log(`⚠️ Skipping invalid line ${index + 1}: ${lineErr.message}`);
+                            }
+                        });
+                        
+                        log(`✅ Parsed ${entries.length} entries from JSONL`);
                     } else {
-                        log(`❌ Unrecognized data format`);
-                        throw new Error('Unexpected data format. Expected {data: [...]} or [...] array.');
+                        // Standard JSON format
+                        const data = JSON.parse(rawData);
+                        originalData.qa = data;
+                        
+                        log(`📊 QA Data structure: ${JSON.stringify(Object.keys(data))}`);
+                        
+                        if (data.data && Array.isArray(data.data)) {
+                            entries = data.data.map((entry, index) => ({
+                                ...entry,
+                                id: `${file.name}_${index}`,
+                                originalIndex: index
+                            }));
+                        } else if (Array.isArray(data)) {
+                            entries = data.map((entry, index) => ({
+                                ...entry,
+                                id: `${file.name}_${index}`,
+                                originalIndex: index
+                            }));
+                        } else {
+                            throw new Error('Unexpected JSON format. Expected {data: [...]} or [...] array.');
+                        }
                     }
                     
                     if (entries.length === 0) {
-                        throw new Error('No QA entries found.');
+                        throw new Error('No QA entries found in file.');
                     }
                     
                     // Store entries globally for edit functions
@@ -1358,7 +1255,7 @@
                     
                     document.getElementById('qaContent').innerHTML = entriesHtml;
                     document.getElementById('qaContent').style.display = 'block';
-                    log(`✅ QA file loaded successfully: ${entries.length} entries`);
+                    log(`✅ QA dataset loaded successfully: ${entries.length} entries`);
                     
                 } catch (error) {
                     log(`❌ Error loading QA file: ${error.message}`);
@@ -1371,12 +1268,10 @@
                                 <p><strong>Filename:</strong> ${file.name}</p>
                                 <p><strong>File size:</strong> ${(file.size / 1024).toFixed(2)} KB</p>
                                 
-                                <h4>💡 Expected format (like in original QA viewer):</h4>
+                                <h4>💡 Supported formats:</h4>
                                 <ul>
-                                    <li><strong>Main format:</strong> <code>{"data": [...]}</code></li>
-                                    <li><strong>Alternative:</strong> Direct array <code>[...]</code></li>
-                                    <li><strong>Required fields:</strong> <code>instruction</code>, <code>output</code></li>
-                                    <li><strong>Optional fields:</strong> <code>input</code>, <code>metadata</code></li>
+                                    <li><strong>JSONL (preferred):</strong> One JSON per line: <code>{"messages": [{"role": "...", "content": "..."}]}</code></li>
+                                    <li><strong>JSON array:</strong> <code>{"data": [...]}</code> or <code>[...]</code></li>
                                 </ul>
                             </div>
                         </div>
@@ -1561,91 +1456,7 @@
             document.getElementById('qaContent').innerHTML = entriesHtml;
         }
 
-        function handleBenchmarkFile(file) {
-            if (!file) return;
-            
-            log(`🎯 Loading benchmark file: ${file.name}`);
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    originalData.benchmark = data;
-                    const questions = [];
-                    
-                    // Handle different data structures
-                    if (data.kategorien) {
-                        data.kategorien.forEach(kat => {
-                            if (kat.fragen) {
-                                kat.fragen.forEach(frage => {
-                                    questions.push({...frage, kategorie: kat.kategorie});
-                                });
-                            }
-                        });
-                    } else if (data.questions || data.data) {
-                        const entries = data.questions || data.data;
-                        entries.forEach(entry => questions.push(entry));
-                    } else if (Array.isArray(data)) {
-                        data.forEach(entry => questions.push(entry));
-                    }
-                    
-                    if (questions.length === 0) {
-                        throw new Error('No benchmark questions found');
-                    }
-                    
-                    const questionsHtml = questions.map((question, index) => {
-                        const frage = question.frage || question.question || question.text || '';
-                        const antwort = question.antwort || question.answer || question.response || '';
-                        
-                        const convertedQuestion = convertMarkdownToHTML(frage);
-                        const convertedAnswer = convertMarkdownToHTML(antwort);
-                        
-                        return `
-                            <div class="entry-card">
-                                <div class="entry-title">${question.id || `Q${index + 1}`} ${question.kategorie ? `(${question.kategorie})` : ''}</div>
-                                <div style="margin-bottom: 15px;">
-                                    <strong>🎯 Question:</strong>
-                                    <div class="entry-content" style="margin-top: 8px; background: #f0f9ff; padding: 10px; border-radius: 8px;">
-                                        ${convertedQuestion || '<em>No question available</em>'}
-                                    </div>
-                                </div>
-                                <div class="expandable-content collapsed">
-                                    <strong>💬 Answer:</strong>
-                                    <div class="entry-content" style="margin-top: 8px; background: #f0fff4; padding: 10px; border-radius: 8px;">
-                                        ${convertedAnswer || '<em>No answer available</em>'}
-                                    </div>
-                                </div>
-                                <button class="expand-btn" onclick="toggleContent(this, true)">🔽 Full Answer</button>
-                            </div>
-                        `;
-                    }).join('');
-                    
-                    document.getElementById('benchmarkContent').innerHTML = questionsHtml;
-                    document.getElementById('benchmarkContent').style.display = 'block';
-                    log(`✅ Benchmark file loaded: ${questions.length} questions`);
-                } catch (error) {
-                    log(`❌ Error loading benchmark file: ${error.message}`);
-                    document.getElementById('benchmarkContent').innerHTML = `
-                        <div class="entry-card">
-                            <div class="entry-title">❌ Loading Error</div>
-                            <div class="entry-content">
-                                <p><strong>Error:</strong> ${error.message}</p>
-                                <p><strong>Filename:</strong> ${file.name}</p>
-                                <h4>💡 Supported formats:</h4>
-                                <ul>
-                                    <li>{"kategorien": [{"kategorie": "...", "fragen": [...]}]}</li>
-                                    <li>{"questions": [...]} or {"data": [...]}</li>
-                                    <li>Array of questions directly</li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                    document.getElementById('benchmarkContent').style.display = 'block';
-                }
-            };
-            
-            reader.readAsText(file);
-        }
+        // (handleBenchmarkFile removed - legacy feature)
 
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
@@ -1702,7 +1513,7 @@
             });
             
             // Setup toggle all buttons
-            ['markdown', 'lexikon', 'benchmark', 'bmReport', 'pipelineReport'].forEach(viewerType => {
+            ['markdown', 'lexikon'].forEach(viewerType => {
                 const toggleBtn = document.getElementById('toggleAll' + viewerType.charAt(0).toUpperCase() + viewerType.slice(1));
                 const editBtn = document.getElementById('editMode' + viewerType.charAt(0).toUpperCase() + viewerType.slice(1));
                 
@@ -1717,20 +1528,17 @@
                 }
             });
 
-            // Special setup for QA Instruct toggle (no edit button)
+            // Special setup for QA Dataset toggle
             const qaToggleBtn = document.getElementById('toggleAllQaInstruct');
             if (qaToggleBtn) {
                 qaToggleBtn.addEventListener('click', () => toggleAllContent('qaInstruct'));
-                log(`🔧 QA Instruct toggle button set up`);
+                log(`🔧 QA Dataset toggle button set up`);
             }
             
             // File input handlers
             document.getElementById('markdownFile').addEventListener('change', e => handleMarkdownFile(e.target.files[0]));
             document.getElementById('lexikonFile').addEventListener('change', e => handleLexikonFile(e.target.files[0]));
             document.getElementById('qaFile').addEventListener('change', e => handleQAFile(e.target.files[0]));
-            document.getElementById('benchmarkFile').addEventListener('change', e => handleBenchmarkFile(e.target.files[0]));
-            document.getElementById('bmReportFile').addEventListener('change', e => handleBmReportFile(e.target.files[0]));
-            document.getElementById('pipelineReportFile').addEventListener('change', e => handlePipelineReportFile(e.target.files[0]));
             
             log('✅ OTW Hub initialization complete');
             

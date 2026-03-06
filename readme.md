@@ -18,7 +18,7 @@
 ![OTW pipeline overview](assets/8.png)
 *Pipeline status and progress.*
 
-**OpenTuneWeaver is a semantically-structured, curatable all-in-one LLM fine-tuning pipeline that automatically creates structured wiki entries, InstructQA datasets, and benchmarkable, deployment-ready models from any raw data (PDF, DOCX, etc.).** The system revolutionizes LLM fine-tuning through **semantic chunking**, **curatable dataset creation**, and **end-to-end automation** without requiring technical expertise.
+**OpenTuneWeaver is a semantically-structured, curatable all-in-one API-based document pipeline that automatically creates structured wiki entries and diverse InstructQA datasets from any raw data (PDF, DOCX, etc.).** The system revolutionizes how knowledge is extracted by providing **semantic chunking**, **bidirectional AI Q&A generation**, and a **clean UI** without requiring expensive local GPUs or technical expertise.
 
 <div align="right">
   <img src="assets/mwk_logo_w2.png" alt="Ministry of Science, Research and Arts Logo" height="60">
@@ -31,7 +31,7 @@ This project is part-funded by the **Ministry of Science, Research and Arts Bade
 
 ## 💖 Support OpenTuneWeaver
 
-Help us democratize AI development for education and research! Your support enables us to continue building accessible, enterprise-grade AI tools that cost a fraction of traditional fine-tuning services (€5,000-€10,000+).
+Help us democratize AI development for education and research! OpenTuneWeaver is completely free to use, and we want to keep it that way. Your support enables us to continue building accessible AI tools without any paywalls.
 
 [![Sponsor](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=ff69b4)](https://github.com/sponsors/ProfEngel)
 
@@ -39,152 +39,76 @@ Help us democratize AI development for education and research! Your support enab
 
 > **🚀 Get Started with OpenTuneWeaver**
 > 
-> **✅ Free for Personal & Educational Use**  
-> Perfect for researchers, students, and personal projects
+> **✅ 100% Free**  
+> We have eliminated all commercial licensing. You no longer need to pay for an enterprise tier! Support us voluntarily with donations.
 >  
-> **🎓 Academic Institutions**: Free for research and teaching activities
->
-> **💼 Commercial Use?** → **(Enterprise Plan Required) see Github Sponsor** 
->
-> ✅ **Test it 30 days for free**, before you pay
-> 
-> 🎯 One-time payment with **1 year of updates included**  
-> 🔄 Optional update extensions available after first year  
-> 📞 Check out our Plans (down the page or in the Github Sponsor) for pricing & enterprise features
+> **💻 Work with Any API**  
+> No more 24GB GPUs needed locally. Connect to Ollama, OpenAI, or any endpoint, and build datasets easily.
 ***
-
-![OpenTuneWeaver Viewer Demo](assets/OTW_viewer_demo.gif)
-With the OTW-Viewer, all generated documents (converted Markdown files, lexicon wiki entries, QA instruct datasets, benchmark question datasets) can be read and curated as well as edited and saved back. Additionally, reports about the benchmark run and the pipeline run can be displayed.
+***
 
 ## Key Features 🚀
 
-- 🔄 **End-to-End Automation**: Only platform from PDF to deployment-ready, benchmarkable model in one workflow
-- 🧠 **Semantic Wiki Chunking**: Revolutionary meaning-preserving segmentation instead of destructive fixed chunking  
-- 📚 **Automatic Dataset Creation**: Wiki entries, InstructQA with 5 question types, benchmarks with ground truth
-- 🎨 **Curatable Viewer Environment**: Interactive quality assurance with split/merge/annotation for all pipeline steps
-- 📊 **Integrated Telemetry**: Real-time monitoring, metrics and audit trails for complete transparency
-- 🤖 **GPU-Adaptive Training**: Automatic hardware optimization with LoRA/QLoRA for 100+ models
-- 📱 **No-Code Gradio Interface**: Drag-&-drop upload with live terminal and complete pipeline control
-- 🌐 **Multi-Format Export**: LoRA, Merged (both for transformers, vLLM, etc.), GGUF in Q_8 with quantizations for local deployment (OpenWebUI/LM-Studio)
-- 🔍 **VLM Integration**: Vision-Language-Models for automatic image descriptions in documents
-- ⚡ **Runpod Integration**: Scalable cloud GPU support for cost-effective training
+- 🔄 **End-to-End Automation**: From complex PDFs with tables straight to QA Dataset ready for AI consumption
+- 🧠 **Bidirectional Knowledge Generation**: Core innovation creating *Inverse QA pairs (A -> Q)* ensuring models deeply map concepts and relationships symmetrically.
+- 📚 **Automatic Dataset Creation**: Automatically builds Wiki entries and versatile InstructQA formats.
+- 🎨 **Curatable Viewer Environment**: Clean, completely dark-mode aligned responsive interface allowing manual QA and fixes safely.
+- 🌐 **Hardware Agnostic via API Config**: Works anywhere! Fully operational with `docling` extracting data, while external APIs (like Docker-bound Ollama endpoints or OpenAI) do the LLM reasoning processing.
+- 🔍 **VLM Integration**: Seamless integration of Vision-Language-Models to recognize and describe embedded images.
+
+### The OpenTuneWeaver Innovation 🎯
+
+**Why is OpenTuneWeaver different?** Traditional LLM dataset preparation is often a messy, fragmented, and highly technical process. OpenTuneWeaver revolutionizes this by offering a **seamless, end-to-end pipeline** that brings order to chaos. 
+
+It takes any unstructured raw document—complete with complex tables, multi-column layouts, and embedded images—and intelligently transforms it into highly structured, interconnected knowledge. Utilizing advanced vision models to "see" your documents, the pipeline performs **Semantic Wiki Chunking** to synthesize context-rich lexicon entries rather than blindly chopping text into pieces. 
+
+From these synthesized wikis, it autonomously generates diverse InstructQA datasets. This includes our core innovation of **Bidirectional Knowledge Generation**, ensuring that your model learns relational concepts symmetrically.
+
+**Full Control with the Built-in Viewer:**
+You are never isolated from your data. Instead of digging through raw `.jsonl` files in a code editor, OpenTuneWeaver features an **integrated, dark-mode Viewer Environment**. You can directly read, review, edit, and safely save every generated markdown file, lexicon wiki, and QA pair right inside the application, ensuring maximum dataset quality before any training begins.
+
+![OpenTuneWeaver Viewer Demo](assets/OTW_viewer_demo.gif)
 
 ***
 
 ## How to Install 🚀
 
-Full Installation Guide here [Installation and Use-Guide](howto.md) or here...
+### Option 1: Docker (Highly Recommended)
+We provide a highly optimized Docker image that handles all PyTorch and `docling` dependencies for you cleanly.
 
-### System Requirements
+```bash
+# Build the container locally
+docker build -t opentuneweaver .
 
-**Hardware:**
-- **Linux system recommended** (Ubuntu 22.04 LTS or similar)
-- **At least 100 GB free storage space**
-- **NVIDIA GPU with at least 20 GB VRAM** (depending on the model being trained)
-  - RTX 4090/A6000/A100 recommended
-  - For smaller models: RTX 3090/4080 (16GB) possible
-- **CUDA 12.8+ and cuDNN installed**
-
-**Accounts:**
-- **HuggingFace Account** with Access Token (Read + optional Write)
-
-### HuggingFace Token Setup
-
-1. Create an account on [huggingface.co](https://huggingface.co)
-2. Go to [Settings > Access Tokens](https://huggingface.co/settings/tokens)
-3. Create a new token with **Read** permission (and **Write** for model upload)
-4. Note down the token for installation
-
-### Quick Start with Runpod (Recommended)
-This is how to work with Runpod. But you can also use this for your Local Server, as long as the requirements are done.
-
-**Runpod Template:**
+# Run the container (Requires port 3030)
+# Uses host-gateway to correctly bridge API requests to your local Ollama/LM Studio or APIs like OpenRouter/OpenAI
+docker run -d -p 3030:8080 \
+  --add-host=host.docker.internal:host-gateway \
+  -v opentuneweaver_data:/app/pipeline/OUTPUT \
+  --name opentuneweaver \
+  --restart always \
+  opentuneweaver:latest
 ```
+Access the application on your browser at `http://localhost:3030`.
 
-runpod/pytorch:2.8.0-py3.11-cuda12.8.1-cudnn-devel-ubuntu22.04
-Disk Volume: 100 GB
-Pod Volume:  100 GB
-Open Ports: 8080,11434
+### Option 2: Local Installation (Linux/Windows/Mac)
 
-```
-
-**Installation:**
- Go to your pod and fire up the Jupyter Hub of the pod. Open a terminal window in the hub and put the following in.
-
-native installation (not recommended)
-
-```
-
-cd /workspace
+1. Clone the repository
+```bash
 git clone https://github.com/ProfEngel/OpenTuneWeaver.git
-cp OpenTuneWeaver/setup_with_ollama.sh .
-chmod +x setup_with_ollama.sh
-./setup_with_ollama.sh
-
+cd OpenTuneWeaver
 ```
 
- or better with venv...
-
-venv installation (recommended)
-
+2. Create a Virtual Environment & Install Requirements
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-cd /workspace
-git clone https://github.com/ProfEngel/OpenTuneWeaver.git
-cp OpenTuneWeaver/setup_with_ollama_venv.sh .
-chmod +x setup_with_ollama_venv.sh
-./setup_with_ollama_venv.sh
-
-```
-
-**After installation:**
-wait until the installation is done (approx. 5-10 min.), then press y for starting the ui. The ui starts on port http://your(runpod)IP:8080
-
-In Runpod access via Runpod web interface on port 8080.
-
-### Alternative Installation Methods
-
-**Docker Installation:** *(Coming Soon)*
-```
-
-docker run -d -p 7860:7860 --gpus all -v opentuneweaver:/app/data --name opentuneweaver opentuneweaver/opentuneweaver:latest
-
-```
-
-**Conda Installation:**
-```
-
-conda create -n opentuneweaver python=3.11
-conda activate opentuneweaver
-apt-get update && apt-get upgrade -y
-git clone https://github.com/ProfEngel/OpenTuneWeaver.git
-cp OpenTuneWeaver/setup_with_ollama.sh .
-chmod +x setup_with_ollama.sh
-
-# Installation of unsloth_zoo from GitHub
-pip install --upgrade --no-cache-dir --no-deps git+https://github.com/unslothai/unsloth-zoo.git
-
-# now fire up the setup script
-./setup_with_ollama.sh
-
-```
-
-**Virtual Environment:**
-```
-
-python3.11 -m venv opentuneweaver-env
-source opentuneweaver-env/bin/activate
-apt-get update && apt-get upgrade -y
-git clone https://github.com/ProfEngel/OpenTuneWeaver.git
-cp OpenTuneWeaver/setup_with_ollama.sh .
-chmod +x setup_with_ollama.sh
-
-# Installation of unsloth_zoo from GitHub
-pip install --upgrade --no-cache-dir --no-deps git+https://github.com/unslothai/unsloth-zoo.git
-
-# now fire up the setup script
-./setup_with_ollama.sh
-
+3. Start OpenTuneWeaver
+```bash
+python app.py
 ```
 
 ***
@@ -193,23 +117,13 @@ pip install --upgrade --no-cache-dir --no-deps git+https://github.com/unslothai/
 
 **Short to medium-term roadmap:**
 - 🌍 **Multilingual Support**: German, Spanish, French, additional languages
-- 🌍 **Reasoning Model/ GPRO Support**: generating reasoning datasets and training in GPRO
-- 🤖 **Extended Model Support**: 
-  - GPT-OSS family (Reasoning with harmony-parsing and tokenization library)
-  - Qwen 3.0 series
-  - furthcoming SOTA OpenWeight or OpenSource LLM look here [ArtificalAnalysis AI](https://artificialanalysis.ai/)
-- 🎨 **UI-Refresh**: Modern, robust, and cleaner user interface design
-- 🐳 **Docker Support**: Simplified production deployment with containerization
-- ⚙️ **User-friendly VLM/LLM Pipeline Switching**: Easy model selection and configuration within the pipeline
-- 🌐 **OpenAI-API Compatible Platforms**: Support for alternative API providers beyond Ollama
-- 🔗 **MCP-Server Integration**: OpenTuneWeaver as MCP-Server for direct chat integration and automation pipelines like n8n
-- ⏱️ **Real-time Progress Tracking**: Live progress updates with remaining time estimates without page refresh
-- 🎥 **YouTube Tutorials**: Comprehensive video tutorials on [MatMaxEngel YouTube Channel](https://www.youtube.com/user/MatMaxEngel) covering ongoing OTW updates and usage guides
-- 📚 **Research Paper on OTW**: Detailed academic publication documenting OpenTuneWeaver's methodology, benchmarks, and educational applications
-- 📊 **Advanced Analytics Dashboard**: Detailed training metrics and comparisons
-- 🔧 **API Interface**: RESTful API for external integration
-- 📱 **Mobile-optimized UI**: Responsive design for tablets and smartphones
-- and many more. Stay tuned.
+- 🔬 **ArXiv Publication**: Publishing the foundational research paper for OpenTuneWeaver's methodology on ArXiv
+- 📟 **Real LiveView**: Building a genuine, Container-aware Live Terminal directly into the UI for full transparency on background processes
+- 🗄️ **Direct VectorDB Export**: One-click integrations to export generated datasets straight to ChromaDB, Pinecone, or Qdrant for immediate RAG deployments
+- 🕸️ **Web Ingestion**: Direct support for URLs and Web-Scraping to convert entire websites into curatable Wiki/QA knowledge
+- 🤖 **Agentic QA Evaluation**: Implementing an "LLM-as-a-Judge" pipeline to automatically score and filter generated QA pairs for maximum quality
+- 🔗 **MCP-Server Integration**: OpenTuneWeaver as MCP-Server for direct chat integration and automation pipelines
+- 🎥 **YouTube Tutorials**: Comprehensive video tutorials on [MatMaxEngel YouTube Channel](https://www.youtube.com/user/MatMaxEngel) covering usage guides
 
 ***
 
@@ -220,125 +134,45 @@ OpenTuneWeaver and our research on AI in education have gained significant media
 ### Recent Press Coverage
 
 **⚡ [Lehr/Lernkonferenz 2025 - "Erprobung eines MoE und MultiAgenten – Chatbot als KI-Tutor für die Lehre"](https://www.lehrlernkonferenz-2025.de/programm)**  
-*Lightning Talk: 09.10.2025*  
-Lightning talk exploring the implementation of Mixture of Experts (MoE) and multi-agent chatbot systems as AI tutors in educational settings, presenting experimental results and practical applications.
+Lightning talk exploring the implementation of Mixture of Experts (MoE) and multi-agent chatbot systems as AI tutors in educational settings.
 
 **🎤 [HAWAII der GHD - "Level up! KI-Tutor „Käpsele" und trainiertes Sprachmodell „Hölderlin" im Multiplayer-Modus"](https://www.hochschuldidaktik.net/hawaii-25)**  
-*Presentation: 26.09.2025*  
-Conference presentation demonstrating advanced AI tutoring systems in multiplayer mode, featuring the "Käpsele" AI tutor and custom-trained "Hölderlin" language model for enhanced educational experiences.
+Conference presentation demonstrating advanced AI tutoring systems in multiplayer mode.
 
 **📰 [VDI Nachrichten - "Professor Chatbot hilft den Studierenden"](https://www.vdi-nachrichten.com/karriere/studium/professor-chatbot/)**  
-*Published: 17.01.2025*  
-Technical magazine article exploring how universities increasingly deploy artificial intelligence to enhance teaching quality, discussing both the potential and limitations of AI-powered learning assistance systems.
+Technical magazine article exploring how universities increasingly deploy artificial intelligence to enhance teaching quality.
 
 **📄 [Controlling & Management Review - "Generative KI im Controlling praktisch umsetzen"](https://www.springerprofessional.de/generative-ki-im-controlling-praktisch-umsetzen/51394852)**  
-*Published: 01.08.2025*  
-Reviewed paper discussing practical implementation of generative AI in controlling, showcasing real-world applications and methodologies for integrating AI solutions into business controlling processes.
+Reviewed paper discussing practical implementation of generative AI in controlling.
 
 **📰 [Nürtinger Zeitung - "Wie künstliche Intelligenz beim Studieren hilft"](https://www.ntz.de/nuertingen/artikel_hfwu-in-nuertingen-wie-kuenstliche-intelligenz-beim-studieren-hilft.html)**  
-*Published: 03.12.2024*  
-Feature article on how AI supports university studies, highlighting the collaborative research between Tobias Leiblein and Prof. Dr. Mathias Engel on developing AI tutoring systems and their impact on future education methods.
+Feature article on how AI supports university studies, highlighting the collaborative research between Tobias Leiblein and Prof. Dr. Mathias Engel.
 
 **📰 [Stuttgarter Zeitung - "Wie künstliche Intelligenz beim Lernen hilft"](https://www.stuttgarter-zeitung.de/inhalt.wissenschaftler-aus-nuertingen-wie-kuenstliche-intelligenz-beim-lernen-hilft.016cc0c8-debb-46b5-9fb4-8e99815dfcdb.html)**  
-*Published: 23.09.2024*  
-Article discussing how artificial intelligence assists in learning processes, featuring research from HfWU Nürtingen-Geislingen and addressing both opportunities and challenges that language models like ChatGPT present to academic teaching.
+Article discussing how artificial intelligence assists in learning processes.
 
 ---
 
 **Academic Impact:**  
-These media appearances reflect the growing recognition of OpenTuneWeaver's innovative approach to democratizing AI fine-tuning for educational institutions and the broader implications of semantic chunking technology in knowledge management.
+These media appearances reflect the growing recognition of OpenTuneWeaver's innovative approach to democratizing AI dataset generation for educational institutions and the broader implications of semantic chunking technology.
 
 **Press Contact:**  
 For additional interviews or press inquiries: [mathias@opentuneweaver.com](mailto:mathias@opentuneweaver.com)
 
 ## 💖 Sponsorship & Support
 
-OpenTuneWeaver is committed to democratizing AI development while maintaining sustainability. Your support helps us continue building accessible, enterprise-grade tools at a fraction of traditional costs.
+If OpenTuneWeaver provides immense value in building out datasets over traditional €5,000-€10,000 consulting options, help us keep it thriving! We rely on voluntary contributions.
 
-### 🎯 Community Support (Voluntary)
+### 🎯 Community Support
 
-**Perfect for individuals, students, and researchers who want to support our mission:**
+**Perfect for individuals, students, and organizations who want to support our mission:**
 
-#### One-Time Donations
-- **☕ Coffee for ProfEngel - $5**: Fuel late-night coding session for ProfEngel, the founder
-- **☕ Coffee for the Team - $30**: Fuel late-night coding sessions
-- **💻 Workstation Day - $110**: Power a full day of concentrated development  
-- **🚀 GPU Hour Sponsor - $550**: Supercharge development with serious computational power
-
-#### Monthly Support
-- **☕ Coffee Supporter - $10/month**: Basic community support
-- **📚 Education Champion - $25/month**: Enhanced educational resources access
-- **🔬 Research Supporter - $50/month**: Early access to experimental features
-
-
-### 🏢 Enterprise Licensing (Required for Commercial Use)
-
-- **Professional licensing for businesses and organizations using OpenTuneWeaver commercially:**
-- **Test OpenTuneWeaver 30 days for free, before you pay**
-
-#### 🥉 Bronze Enterprise - Small Companies
-- **One-Time**: €499 (1 seat, 12 months updates)
-- **Target:** Small companies (≤49 employees, ≤€1M annual revenue)
-- Bronze company logo in README.md
-- Commercial usage rights for qualifying small companies
-
-#### 🥈 Silver Enterprise - Medium Companies  
-- **One-Time**: €1,499 (3 seats, 12 months updates)
-- **Target:** Medium companies (50-249 employees, €1-50M annual revenue)
-- Silver company logo in README.md + documentation
-- Enhanced analytics and insights
-
-#### 🥇 Gold Enterprise - Large Companies & Consultants
-- **One-Time**: €2,999 (unlimited seats + client usage, 12 months updates)
-- **Target:** Large companies (250+ employees or €50M+ annual revenue) & Consultants training LLMs for external clients
-- Large premium logo placement in our ReadME.md
-- Unlimited commercial usage including client projects
-- Direct development roadmap influence
-
-### Why These Prices Matter
-
-Traditional LLM fine-tuning services cost **€5,000-€10,000+ per project**. OpenTuneWeaver provides enterprise-grade capabilities at a fraction of these costs, making advanced AI accessible to organizations of all sizes while supporting continued open-source development. OpenTuneWeaver is the first and only AllInOne-Solution for EndUsers to finetune your local LLM with all of your data.
+- **☕ Coffee for ProfEngel - $5**: Fuel late-night coding sessions for ProfEngel! 
+- **☕ Coffee for the Team - $30**: Fuel late-night coding sessions for contributors
+- **💻 GPU Hour Sponsor - $110+**: Help us test models faster on rigorous instances
 
 **Ready to support democratized AI development?**  
 [![Sponsor](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=ff69b4)](https://github.com/sponsors/ProfEngel)
-
-**Enterprise licensing questions?** Contact: mathias@opentuneweaver.com
-
-## Project Overview(the hard facts about the project) 📊
-
-### Technical Specifications
-**📁 Repository Scale:**
-- **71+ Files** across multiple languages and frameworks
-- **Python:** 45 files (63.4%) - Core ML/AI pipeline
-- **HTML:** 15 files (21.1%) - User interface components  
-- **Shell:** 8 files (11.3%) - Deployment and setup scripts
-- **Docker:** 3 files (4.2%) - Containerization support
-- **8,265+ Lines of Code** - Enterprise-grade implementation
-
-### Development Investment
-**⏰ Timeline:**
-- **80+ Development Days** already invested
-- **91% Project Completion** achieved
-- **3.2 Month Equivalent** full-time development effort
-
-**🎯 Required Expertise:**
-- Machine Learning/AI (LLM Fine-tuning, GPU-Optimization)
-- Backend Development (Python, Pipeline Architecture)
-- Frontend/UI (Gradio Interface, HTML/CSS)
-- DevOps (Docker, Cloud Integration, Runpod)
-- Document Processing (PDF-to-Markdown, VLM)
-- Quality Assurance (Testing, Benchmarking)
-
-### Project Value & Recognition
-**🏆 Achievements:**
-- **Funding:** MWK Baden-Württemberg + Stifterverband Deutschland
-- **Dual Licensing:** Free for education, commercial licensing available
-- **Unique Selling Point:** End-to-end PDF-to-Model pipeline automation
-- **Media Recognition:** Featured in academic and technical publications
-- **Market Position:** Leading solution in German educational sector
-
-**💡 Why OpenTuneWeaver Matters:**
-Traditional LLM fine-tuning services cost **€5,000-€10,000+ per project**. OpenTuneWeaver democratizes this technology, making enterprise-grade AI accessible to educational institutions and researchers at a fraction of traditional costs.
 
 ## License 📜
 
@@ -347,10 +181,9 @@ This project is licensed under the **Apache License 2.0**.
 **Usage Rights:**
 - ✅ **Private Use**: Completely free
 - ✅ **Educational Institutions**: Free for research and teaching
-- ✅ **Open Source Projects**: Free use with attribution
-- ⚠️ **Commercial Use**: Enterprise license required
+- ✅ **Commercial Use**: Free
 
-For commercial licensing, see our [sponsorship tiers above](#-sponsorship--support) or contact [mathias@opentuneweaver.com](mailto:mathias@opentuneweaver.com).
+If deploying commercially, we politely ask you to consider the [Github Sponsor](https://github.com/sponsors/ProfEngel) link to acknowledge the value provided!
 
 Full license terms can be found in the LICENSE file.
 
@@ -359,24 +192,10 @@ Full license terms can be found in the LICENSE file.
 OpenTuneWeaver would not be possible without these excellent open-source frameworks:
 
 **Core Frameworks:**
-- Unsloth - Efficient LLM fine-tuning
-- Gradio - No-code web interface
-- Transformers - HuggingFace Model Hub
-- Ollama - Local LLM inference
-
-**Document Processing:**
-- Docling (IBM) - Intelligent PDF processing
-- Marker - PDF-to-Markdown conversion
-
-**Training & Optimization:**
-- LoRA/QLoRA - Parameter-efficient fine-tuning
-- BitsAndBytes - GPU quantization
-- PEFT - Parameter-efficient fine-tuning
-
-**Vision & Multimodal:**
-- Google Gemma - Vision-Language models
-- OpenAI GPT-OSS - Open Source LLM
-- OpenAI CLIP - Image-text understanding
+- Gradio - Elegant, no-code web interface
+- Ollama - Agile local LLM interfacing 
+- Docling (IBM) - Best-in-class PDF processing
+- Marker - Robust PDF-to-Markdown conversion
 
 **Thanks to the entire open-source community!** 🎉
 
@@ -386,8 +205,7 @@ OpenTuneWeaver would not be possible without these excellent open-source framewo
 
 If you use OpenTuneWeaver in your research, please cite our paper:
 
-```
-
+```bibtex
 @article{opentuneweaver2025,
 title={OpenTuneWeaver: Semantically-structured, Curatable LLM Fine-tuning Pipeline for Research and Education},
 author={Engel, Prof. Dr. Mathias},
@@ -396,12 +214,7 @@ year={2024},
 institution={Hochschule für Wirtschaft und Umwelt Nürtingen-Geislingen},
 note={Funded by MWK Baden-Württemberg and Stifterverband Deutschland}
 }
-
 ```
-
-**Paper available:**
-- 📄 [Local Version](docs/opentuneweaver-paper.pdf)
-- 🌐 [ArXiv](https://arxiv.org/) *(Link follows after publication)*
 
 ***
 
@@ -411,7 +224,6 @@ Do you have questions, suggestions, or need support?
 
 - 🐛 **Issues**: [GitHub Issues](https://github.com/ProfEngel/OpenTuneWeaver/issues)
 - 💬 **Discussions**: [GitHub Discussions](https://github.com/ProfEngel/OpenTuneWeaver/discussions)  
-- 📧 **Enterprise Support**: [sales@opentuneweaver.com](mailto:sales@opentuneweaver.com)
 - 🎓 **Academic Collaboration**: [research@opentuneweaver.com](mailto:research@opentuneweaver.com)
 
 ***
@@ -424,7 +236,7 @@ _Made with ❤️ in Stuttgart / Nürtingen, Germany_
 
 ## About
 
-Semantically-structured, curatable all-in-one LLM fine-tuning pipeline
+Semantically-structured, curatable all-in-one LLM text pipeline
 
 <div align="left">
   <img src="assets/otw_logo.png" alt="OpenTuneWeaver Logo" width="100">
@@ -443,7 +255,6 @@ Semantically-structured, curatable all-in-one LLM fine-tuning pipeline
 Contributions are welcome!  
 If you have ideas, improvements, or bug reports, feel free to open an **Issue** or submit a **Pull Request**.
 
-
 ## Star History
 <a href="https://star-history.com/#ProfEngel/OpenTuneWeaver&Date">
   <picture>
@@ -453,7 +264,6 @@ If you have ideas, improvements, or bug reports, feel free to open an **Issue** 
   </picture>
 </a>
 
-
 ### Topics
 
-`llm` `finetuning` `ai` `machine-learning` `nlp` `semantic-chunking` `lora` `qlora` `pdf-processing` `qa-generation` `benchmarking` `gradio` `huggingface` `educational-ai` `research-tools`
+`llm` `dataset-generation` `ai` `machine-learning` `nlp` `semantic-chunking` `pdf-processing` `qa-generation` `benchmarking` `gradio` `educational-ai` `research-tools`

@@ -44,48 +44,11 @@ STEPS = [
     },
     {
         'id': 3,
-        'name': 'Instruct QA Creation',
-        'script': 'modules/03_instructQA/03_instructQA.py',
-        'working_dir': 'modules/03_instructQA',
+        'name': 'Generate QA Dataset',
+        'script': 'modules/03_generate_qa/03_generate_qa.py',
+        'working_dir': 'modules/03_generate_qa',
         'directories': ['INPUT', 'OUTPUT'],
         'needs_api': True
-    },
-    {
-        'id': 4,
-        'name': 'Dataset Formatting',
-        'script': 'modules/04_format/04_format.py',
-        'working_dir': 'modules/04_format',
-        'directories': ['INPUT', 'OUTPUT']
-    },
-    {
-        'id': 5,
-        'name': 'Benchmark Creation',
-        'script': 'modules/05_bmcreator/05_bmcreator.py',
-        'working_dir': 'modules/05_bmcreator',
-        'directories': ['INPUT', 'BENCHMARKFRAGEN'],
-        'needs_api': True
-    },
-    {
-        'id': 6,
-        'name': 'Fine-tuning',
-        'script': 'modules/06_finetuning/06_finetuning.py',
-        'working_dir': 'modules/06_finetuning',
-        'directories': ['INPUT', 'CustomModel'],
-        'needs_hf_token': True
-    },
-    {
-        'id': 7,
-        'name': 'Benchmarking',
-        'script': 'modules/07_benchmark/07_benchmark.py',
-        'working_dir': 'modules/07_benchmark',
-        'directories': ['BENCHMARKFRAGEN', 'OUTPUT']
-    },
-    {
-        'id': 8,
-        'name': 'Results Archive & Transfer',
-        'script': None,  # Executed directly
-        'working_dir': '.',
-        'directories': ['data/OUTPUT']
     }
 ]
 
@@ -514,15 +477,15 @@ class SimplifiedPipelineRunner:
                 "01_convert": {
                     "use_openai_api": True,
                     "openai_base_url": "http://localhost:11434/v1",
-                    "openai_api_key": "ollama",
-                    "openai_model_name": "gemma3:12b-it-qat",
+                    "openai_api_key": "",
+                    "openai_model_name": "llama3.2-vision:latest",
                     "temperature": 0.1
                 },
                 "02_genwiki": {
                     "use_openai_api": True,
                     "openai_base_url": "http://localhost:11434/v1",
-                    "openai_api_key": "ollama",
-                    "openai_model_name": "gemma3:12b-it-qat",
+                    "openai_api_key": "",
+                    "openai_model_name": "gemma2:27b",
                     "temperature": 0.3
                 },
                 "03_instructQA": {
@@ -643,10 +606,9 @@ class SimplifiedPipelineRunner:
             print("\n1. READ Token (for model downloads):")
             hf_token = getpass.getpass("Enter HF_TOKEN (hidden): ").strip()
             if not hf_token:
-                hf_token = input("Use dummy token? (y/n) [n]: ").lower() == 'y'
-                if hf_token:
-                    hf_token = "hf_DUMMY_TOKEN_REPLACE_ME"
-                    print("⚠️ Dummy token set - replace later!")
+                use_dummy = input("Use dummy token? (y/n) [n]: ").lower() == 'y'
+                if use_dummy:
+                    hf_token = input("HuggingFace Write Token (für automatischen Upload): ").strip()
             
             print("\n2. WRITE Token (for uploads, optional):")
             hf_write = input("Set write token? (y/n) [n]: ").lower() == 'y'
@@ -1136,28 +1098,8 @@ def get_api_config(module_id):
             },
             3: {
                 'source': 'modules/02_wiki/OUTPUT',
-                'target': 'modules/03_instructQA/INPUT',
+                'target': 'modules/03_generate_qa/INPUT',
                 'files': 'lexikon_*.json'
-            },
-            4: {
-                'source': 'modules/03_instructQA/OUTPUT',
-                'target': 'modules/04_format/INPUT',
-                'files': 'qa_instruct_dataset.json'
-            },
-            5: {
-                'source': 'modules/02_wiki/OUTPUT',
-                'target': 'modules/05_bmcreator/INPUT',
-                'files': 'lexikon_*.json'
-            },
-            6: {
-                'source': 'modules/04_format/OUTPUT',
-                'target': 'modules/06_finetuning/INPUT',
-                'files': 'dataset.json'
-            },
-            7: {
-                'source': 'modules/05_bmcreator/BENCHMARKFRAGEN',
-                'target': 'modules/07_benchmark/BENCHMARKFRAGEN',
-                'files': 'benchmark_fragen_complete.json'
             }
         }
         
@@ -1239,10 +1181,10 @@ def get_api_config(module_id):
         self.metrics['data_statistics']['lexikon'] = self.analyze_lexikon_files('modules/02_wiki/OUTPUT')
         
         # QA dataset statistics
-        self.metrics['data_statistics']['qa_dataset'] = self.analyze_qa_dataset('modules/03_instructQA/OUTPUT')
+        self.metrics['data_statistics']['qa_dataset'] = self.analyze_qa_dataset('modules/03_generate_qa/OUTPUT')
         
         # Formatted dataset statistics
-        self.metrics['data_statistics']['formatted_dataset'] = self.analyze_qa_dataset('modules/04_format/OUTPUT')
+        # Removed as formatting is now integrated into step 3
         
         # Benchmark questions statistics
         self.metrics['data_statistics']['benchmark_questions'] = self.analyze_benchmark_questions('modules/05_bmcreator/BENCHMARKFRAGEN')
@@ -1272,15 +1214,10 @@ def get_api_config(module_id):
                 'patterns': ['lexikon_*.json'],
                 'description': 'Wiki lexicon JSON files'
             },
-            'Step3_InstructQA': {
-                'source': base_dir / 'modules' / '03_instructQA' / 'OUTPUT',
-                'patterns': ['*.json'],
-                'description': 'InstructQA datasets'
-            },
-            'Step4_Conversation': {
-                'source': base_dir / 'modules' / '04_format' / 'OUTPUT',
-                'patterns': ['*.json'],
-                'description': 'Conversation-formatted datasets'
+            'Step3_GenerateQA': {
+                'source': base_dir / 'modules' / '03_generate_qa' / 'OUTPUT',
+                'patterns': ['*.jsonl'],
+                'description': 'Chat-Masterformat QA Datasets'
             },
             'Step5_Benchmark': {
                 'sources': [
@@ -1455,8 +1392,7 @@ def get_api_config(module_id):
             cleanup_dirs = [
                 'modules/01_convert/OUTPUT',
                 'modules/02_wiki/OUTPUT', 
-                'modules/03_instructQA/OUTPUT',
-                'modules/04_format/OUTPUT',
+                'modules/03_generate_qa/OUTPUT',
                 'modules/05_bmcreator/BENCHMARKFRAGEN',
                 'modules/07_benchmark/OUTPUT',
                 'modules/06_finetuning/CustomModel'  # Corrected path
@@ -1631,7 +1567,7 @@ def get_api_config(module_id):
                     step_metrics['lexikon_entries'] = lexikon_stats['total_entries']
                     step_metrics['lexikon_categories'] = len(lexikon_stats['categories'])
                 
-                elif step['id'] == 3:  # InstructQA
+                elif step['id'] == 3:  # QA Generation
                     output_dir = os.path.join(working_dir, 'OUTPUT')
                     qa_stats = self.analyze_qa_dataset(output_dir)
                     step_metrics['qa_pairs'] = qa_stats['total_qa_pairs']
@@ -1861,32 +1797,14 @@ def main():
         print("="*60)
         
         print("\n📋 Pipeline Options:")
-        print("1. 🔄 Complete pipeline with archiving (1-8)")
-        print("2. 📝 Data processing only (1-5)")
-        print("3. 🤖 Training & benchmark only (6-7)")
-        print("4. ⚙️ Single step")
-        print("5. 🎯 Custom")
-        print("6. 📦 Archiving only (8)")
-        print("7. 🧹 Cleanup")
+        print("1. 🔄 Complete pipeline with archiving (1-3)")
+        print("2. 🧹 Cleanup")
         
-        choice = input("\nOption (1-7) [1]: ").strip() or "1"
+        choice = input("\nOption (1-2) [1]: ").strip() or "1"
         
         if choice == "1":
-            runner.run(1, 8)
+            runner.run(1, 3)
         elif choice == "2":
-            runner.run(1, 5)
-        elif choice == "3":
-            runner.run(6, 7)
-        elif choice == "4":
-            step_num = int(input("Which step (1-8)? "))
-            runner.run(step_num, step_num)
-        elif choice == "5":
-            start = int(input("Start step [1]: ").strip() or "1")
-            end = int(input("End step [8]: ").strip() or "8")
-            runner.run(start, end)
-        elif choice == "6":
-            runner.run(8, 8)
-        elif choice == "7":
             runner.cleanup()
         else:
             print("❌ Invalid option")

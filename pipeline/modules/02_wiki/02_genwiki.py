@@ -14,18 +14,13 @@ sys.path.append(str(Path(__file__).parent.parent.parent))  # To main directory
 from config_loader import PipelineConfigLoader
 
 # Load configuration for this module
-config_loader = PipelineConfigLoader("02_genwiki")
-config = config_loader.get_api_config()
+config_loader = PipelineConfigLoader()
+module_config = config_loader.get_module_config("02_genwiki")
 
 # Extract configuration values
-USE_OPENAI_API = config.get("use_openai_api", True)
-OPENAI_BASE_URL = config.get("openai_base_url", "http://localhost:11434/v1")
-OPENAI_API_KEY = config.get("openai_api_key", "ollama")
-OPENAI_MODEL_NAME = config.get("openai_model_name", "gemma3:12b-it-qat")
-OLLAMA_SERVER_URL = config.get("ollama_server_url", "http://localhost:11434")
-OLLAMA_API_KEY = config.get("ollama_api_key", "ollama")
-OLLAMA_MODEL_NAME = config.get("ollama_model_name", "gemma3:12b-it-qat")
-OLLAMA_CHAT_ENDPOINT = f"{OLLAMA_SERVER_URL}/api/chat"
+API_BASE_URL = module_config.get("api_base_url", "")
+API_KEY = module_config.get("api_key", "")
+MODEL_NAME = module_config.get("model_name", "")
 
 # Show loaded configuration
 print("=" * 60)
@@ -77,79 +72,41 @@ STRUCTURED_INDICATORS = [
 # ========================================
 
 def check_api_connection():
-    """Checks API connection (OpenAI or Ollama)."""
-    if USE_OPENAI_API:
-        return check_openai_connection()
-    else:
-        return check_ollama_connection()
-
-def check_openai_connection():
-    """Checks OpenAI API connection."""
+    """Checks LLM API connection."""
     try:
         headers = {
-            'Authorization': f'Bearer {OPENAI_API_KEY}',
+            'Authorization': f'Bearer {API_KEY}',
             'Content-Type': 'application/json'
         }
         
         payload = {
-            "model": OPENAI_MODEL_NAME,
+            "model": MODEL_NAME,
             "messages": [{"role": "user", "content": "Test"}],
             "max_tokens": 5
         }
         
         response = requests.post(
-            f"{OPENAI_BASE_URL}/chat/completions", 
+            f"{API_BASE_URL}/chat/completions", 
             json=payload, 
             headers=headers, 
             timeout=10
         )
         
         if response.status_code == 200:
-            print(f"✅ OpenAI API connection successful ({OPENAI_BASE_URL})")
-            print(f"✅ Model '{OPENAI_MODEL_NAME}' is available")
+            print(f"✅ LLM API connection successful ({API_BASE_URL})")
+            print(f"✅ Model '{MODEL_NAME}' is available")
             return True
         else:
-            print(f"❌ OpenAI API not reachable (Status: {response.status_code})")
+            print(f"❌ LLM API not reachable (Status: {response.status_code})")
             if response.status_code == 401:
-                print("🔒 Authentication failed - check OPENAI_API_KEY")
+                print("🔒 Authentication failed - check API Key")
             elif response.status_code == 404:
-                print("❌ Model not found - check OPENAI_MODEL_NAME")
+                print("❌ Model not found - check Model Name")
             return False
             
     except requests.RequestException as e:
-        print(f"❌ OpenAI API connection failed: {e}")
-        print(f"💡 Check: Is server running at {OPENAI_BASE_URL}?")
-        return False
-
-def check_ollama_connection():
-    """Checks Ollama API connection."""
-    try:
-        headers = {
-            'Authorization': f'Bearer {OLLAMA_API_KEY}',
-            'Content-Type': 'application/json'
-        }
-        
-        response = requests.get(f"{OLLAMA_SERVER_URL}/api/tags", headers=headers, timeout=10)
-        
-        if response.status_code == 200:
-            models = response.json()
-            model_names = [model['name'] for model in models.get('models', [])]
-            
-            print(f"✅ Ollama connection successful ({OLLAMA_SERVER_URL})")
-            print(f"📋 Available models: {', '.join(model_names[:3])}..." if len(model_names) > 3 else f"📋 Available models: {', '.join(model_names)}")
-            
-            if OLLAMA_MODEL_NAME in model_names:
-                print(f"✅ Model '{OLLAMA_MODEL_NAME}' is available")
-                return True
-            else:
-                print(f"❌ Model '{OLLAMA_MODEL_NAME}' not found!")
-                return False
-        else:
-            print(f"❌ Ollama not reachable (Status: {response.status_code})")
-            return False
-            
-    except requests.RequestException as e:
-        print(f"❌ Ollama connection failed: {e}")
+        print(f"❌ LLM API connection failed: {e}")
+        print(f"💡 Check: Is server running at {API_BASE_URL}?")
         return False
 
 # ========================================
@@ -283,21 +240,14 @@ def extract_sections_from_md(file_path: str) -> List[Dict[str, Any]]:
 # ========================================
 
 def submit_to_api(prompt: str, retries: int = 3) -> Optional[str]:
-    """Sends a request to the selected API and retrieves the response."""
-    if USE_OPENAI_API:
-        return submit_to_openai_api(prompt, retries)
-    else:
-        return submit_to_ollama_api(prompt, retries)
-
-def submit_to_openai_api(prompt: str, retries: int = 3) -> Optional[str]:
-    """Sends a request to OpenAI API - LANGUAGE AGNOSTIC."""
+    """Sends a request to the LLM API - LANGUAGE AGNOSTIC."""
     headers = {
-        'Authorization': f'Bearer {OPENAI_API_KEY}',
+        'Authorization': f'Bearer {API_KEY}',
         'Content-Type': 'application/json'
     }
     
     payload = {
-        "model": OPENAI_MODEL_NAME,
+        "model": MODEL_NAME,
         "messages": [
             {"role": "system", "content": "You are an expert at creating precise lexicon and product entries. Always respond in the same language as the source document. If the source is in German, respond in German. If the source is in English, respond in English. Always respond only with the requested entry, without additional explanations."},
             {"role": "user", "content": prompt}
@@ -309,7 +259,7 @@ def submit_to_openai_api(prompt: str, retries: int = 3) -> Optional[str]:
     for attempt in range(retries):
         try:
             response = requests.post(
-                f"{OPENAI_BASE_URL}/chat/completions", 
+                f"{API_BASE_URL}/chat/completions", 
                 json=payload, 
                 headers=headers, 
                 timeout=60
@@ -320,42 +270,10 @@ def submit_to_openai_api(prompt: str, retries: int = 3) -> Optional[str]:
                 content = result.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
                 return content
             else:
-                print(f"❌ OpenAI API error {response.status_code}: {response.text}")
+                print(f"❌ LLM API error {response.status_code}: {response.text}")
                 
         except requests.RequestException as e:
-            print(f"Error in OpenAI API request (attempt {attempt + 1}): {e}")
-    
-    return None
-
-def submit_to_ollama_api(prompt: str, retries: int = 3) -> Optional[str]:
-    """Sends a request to Ollama API - LANGUAGE AGNOSTIC."""
-    headers = {
-        'Authorization': f'Bearer {OLLAMA_API_KEY}',
-        'Content-Type': 'application/json'
-    }
-    
-    payload = {
-        "model": OLLAMA_MODEL_NAME,
-        "temperature": 0.3,
-        "stream": False,
-        "messages": [
-            {"role": "system", "content": "You are an expert at creating precise lexicon and product entries. Always respond in the same language as the source document. If the source is in German, respond in German. If the source is in English, respond in English. Always respond only with the requested entry, without additional explanations."},
-            {"role": "user", "content": prompt}
-        ]
-    }
-
-    for attempt in range(retries):
-        try:
-            response = requests.post(OLLAMA_CHAT_ENDPOINT, json=payload, headers=headers, timeout=60)
-            
-            if response.status_code == 200:
-                content = response.json().get("message", {}).get("content", "").strip()
-                return content
-            else:
-                print(f"❌ Ollama API error {response.status_code}: {response.text}")
-                
-        except requests.RequestException as e:
-            print(f"Error in Ollama API request (attempt {attempt + 1}): {e}")
+            print(f"Error in LLM API request (attempt {attempt + 1}): {e}")
     
     return None
 
@@ -848,9 +766,6 @@ def process_markdown_to_lexikon(md_file_path: str, output_json: str):
             print(f"⚠️ Section skipped")
     
     # Create metadata
-    api_name = "OpenAI API" if USE_OPENAI_API else "Ollama API"
-    model_name = OPENAI_MODEL_NAME if USE_OPENAI_API else OLLAMA_MODEL_NAME
-    
     result = {
         'metadata': {
             'source_file': str(Path(md_file_path).name),
@@ -858,8 +773,8 @@ def process_markdown_to_lexikon(md_file_path: str, output_json: str):
             'total_sections': len(sections),
             'processed_sections': len(entries),
             'skipped_sections': len(skipped_sections),
-            'api_used': api_name,
-            'model_used': model_name,
+            'api_used': "LLM API",
+            'model_used': MODEL_NAME,
             'entry_statistics': type_stats,
             'skipped_section_titles': skipped_sections,
             'language_handling': 'agnostic'
@@ -873,8 +788,8 @@ def process_markdown_to_lexikon(md_file_path: str, output_json: str):
     
     print(f"\n✅ Processing completed!")
     print(f"📊 Statistics:")
-    print(f"   - API used: {api_name}")
-    print(f"   - Model used: {model_name}")
+    print(f"   - API used: LLM API")
+    print(f"   - Model used: {MODEL_NAME}")
     print(f"   - Found sections: {len(sections)}")
     print(f"   - Successfully processed: {len(entries)}")
     print(f"   - Entry types:")
@@ -919,14 +834,11 @@ def find_md_files(input_dir: str) -> List[Path]:
 
 def process_all_md_files(input_dir: str = "INPUT", output_dir: str = "OUTPUT"):
     """Processes all Markdown files in the input directory."""
-    api_name = "OpenAI API" if USE_OPENAI_API else "Ollama API"
-    server_url = OPENAI_BASE_URL if USE_OPENAI_API else OLLAMA_SERVER_URL
-    
     print(f"🚀 Starting processing of all Markdown files...")
     print(f"📂 Input directory: {input_dir}")
     print(f"📂 Output directory: {output_dir}")
-    print(f"🔧 API type: {api_name}")
-    print(f"🔧 Server: {server_url}")
+    print(f"🔧 API type: LLM API")
+    print(f"🔧 Server: {API_BASE_URL}")
     print(f"🌐 Language handling: Agnostic (preserves document language)")
     
     if not check_api_connection():
@@ -985,7 +897,7 @@ def process_all_md_files(input_dir: str = "INPUT", output_dir: str = "OUTPUT"):
         if count > 0:
             print(f"   • {entry_type}: {count}")
     print(f"📂 Output files in directory: {output_dir}")
-    print(f"🔧 Used: {api_name}")
+    print(f"🔧 Used: LLM API")
     print(f"🌐 Language preservation: ✅ Document language preserved")
 
 # ========================================
@@ -996,14 +908,10 @@ if __name__ == "__main__":
     INPUT_DIR = "INPUT"
     OUTPUT_DIR = "OUTPUT"
     
-    api_name = "OpenAI API" if USE_OPENAI_API else "Ollama API"
-    server_url = OPENAI_BASE_URL if USE_OPENAI_API else OLLAMA_SERVER_URL
-    model_name = OPENAI_MODEL_NAME if USE_OPENAI_API else OLLAMA_MODEL_NAME
-    
     print(f"🔧 CONFIGURATION (from central config):")
-    print(f"   - API type: {api_name}")
-    print(f"   - Server: {server_url}")
-    print(f"   - Model: {model_name}")
+    print(f"   - API type: LLM API")
+    print(f"   - Server: {API_BASE_URL}")
+    print(f"   - Model: {MODEL_NAME}")
     print(f"   - Language handling: Agnostic (preserves document language)")
     
     # Optional: Preview for a specific file

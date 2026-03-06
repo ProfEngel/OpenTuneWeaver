@@ -17,31 +17,25 @@ sys.path.append(str(Path(__file__).parent.parent.parent))  # To main directory
 from config_loader import PipelineConfigLoader
 
 # Load configuration for this module
-config_loader = PipelineConfigLoader("01_convert")
-config = config_loader.get_api_config()
+config_loader = PipelineConfigLoader()
+module_config = config_loader.get_module_config("01_convert")
 pipeline_config = config_loader.get_pipeline_config()
 
 # Extract configuration values
-CREATE_COMBINED_MD = config.get("create_combined_md", False)
-USE_OPENAI_API = config.get("use_openai_api", True)
-OPENAI_BASE_URL = config.get("openai_base_url", "http://localhost:11434/v1")
-OPENAI_API_KEY = config.get("openai_api_key", "ollama")
-OPENAI_MODEL_NAME = config.get("openai_model_name", "gemma3:12b-it-qat")
-OLLAMA_SERVER_URL = config.get("ollama_server_url", "http://localhost:11434")
-OLLAMA_API_KEY = config.get("ollama_api_key", "ollama")
-OLLAMA_MODEL_NAME = config.get("ollama_model_name", "gemma3:12b-it-qat")
-OLLAMA_CHAT_ENDPOINT = f"{OLLAMA_SERVER_URL}/api/chat"
-OLLAMA_TAGS_ENDPOINT = f"{OLLAMA_SERVER_URL}/api/tags"
-CONTRAST_FACTOR = config.get("contrast_factor", 2.0)
-IMAGE_DESCRIPTION_TIMEOUT = config.get("image_description_timeout", 60)
-MAX_RETRIES = config.get("max_retries", 3)
+API_BASE_URL = module_config.get("api_base_url", "")
+API_KEY = module_config.get("api_key", "")
+MODEL_NAME = module_config.get("model_name", "")
+
+CONTRAST_FACTOR = pipeline_config.get("contrast_factor", 2.0)
+IMAGE_DESCRIPTION_TIMEOUT = pipeline_config.get("image_description_timeout", 60)
+MAX_RETRIES = pipeline_config.get("max_retries", 3)
+CREATE_COMBINED_MD = pipeline_config.get("create_combined_md", False)
 
 # Show loaded configuration
 print("=" * 60)
 print("📋 CONFIGURATION LOADED (01_convert)")
 print("=" * 60)
 config_loader.print_config_summary()
-print(f"  📄 Combined MD: {'✅' if CREATE_COMBINED_MD else '❌'}")
 print(f"  🖼️ Contrast Factor: {CONTRAST_FACTOR}")
 print("=" * 60)
 
@@ -426,88 +420,44 @@ def enhance_images_contrast(directory="OUTPUT", contrast_factor=None):
 
 def check_api_connection():
     """Checks API connection for image descriptions."""
-    if USE_OPENAI_API:
-        return check_openai_connection()
-    else:
-        return check_ollama_connection()
-
-def check_openai_connection():
-    """Checks OpenAI API connection."""
     try:
         headers = {
-            'Authorization': f'Bearer {OPENAI_API_KEY}',
+            'Authorization': f'Bearer {API_KEY}',
             'Content-Type': 'application/json'
         }
         
         payload = {
-            "model": OPENAI_MODEL_NAME,
+            "model": MODEL_NAME,
             "messages": [{"role": "user", "content": "Test"}],
             "max_tokens": 5
         }
         
         response = requests.post(
-            f"{OPENAI_BASE_URL}/chat/completions", 
+            f"{API_BASE_URL}/chat/completions", 
             json=payload, 
             headers=headers, 
             timeout=10
         )
         
         if response.status_code == 200:
-            print(f"✅ OpenAI API connection successful ({OPENAI_BASE_URL})")
-            print(f"✅ Model '{OPENAI_MODEL_NAME}' is available")
+            print(f"✅ Vision API connection successful ({API_BASE_URL})")
+            print(f"✅ Model '{MODEL_NAME}' is available")
             return True
         else:
-            print(f"❌ OpenAI API not reachable (Status: {response.status_code})")
+            print(f"❌ Vision API not reachable (Status: {response.status_code})")
             return False
             
     except requests.RequestException as e:
-        print(f"❌ OpenAI API connection failed: {e}")
-        return False
-
-def check_ollama_connection():
-    """Checks Ollama API connection."""
-    try:
-        headers = {
-            'Authorization': f'Bearer {OLLAMA_API_KEY}',
-            'Content-Type': 'application/json'
-        }
-        
-        response = requests.get(OLLAMA_TAGS_ENDPOINT, headers=headers, timeout=10)
-        
-        if response.status_code == 200:
-            models = response.json()
-            model_names = [model['name'] for model in models.get('models', [])]
-            
-            print(f"✅ Ollama connection successful ({OLLAMA_SERVER_URL})")
-            
-            if OLLAMA_MODEL_NAME in model_names:
-                print(f"✅ Model '{OLLAMA_MODEL_NAME}' is available")
-                return True
-            else:
-                print(f"❌ Model '{OLLAMA_MODEL_NAME}' not found!")
-                return False
-        else:
-            print(f"❌ Ollama not reachable (Status: {response.status_code})")
-            return False
-            
-    except requests.RequestException as e:
-        print(f"❌ Ollama connection failed: {e}")
+        print(f"❌ Vision API connection failed: {e}")
         return False
 
 def query_image_with_api(image_path, retries=None):
-    """Sends an API request with image for description."""
-    if retries is None:
-        retries = MAX_RETRIES
-        
-    if USE_OPENAI_API:
-        return query_openai_with_image(image_path, retries)
-    else:
-        return query_ollama_with_image(image_path, retries)
-
-def query_openai_with_image(image_path, retries):
-    """Sends an OpenAI API request with image - LANGUAGE AGNOSTIC."""
+    """Sends an Vision API request with image."""
     import base64
     
+    if retries is None:
+        retries: int = int(MAX_RETRIES)
+        
     if not os.path.exists(image_path):
         print(f"❌ Image not found: {image_path}")
         return None
@@ -520,13 +470,13 @@ def query_openai_with_image(image_path, retries):
         return None
     
     headers = {
-        'Authorization': f'Bearer {OPENAI_API_KEY}',
+        'Authorization': f'Bearer {API_KEY}',
         'Content-Type': 'application/json'
     }
     
     # LANGUAGE AGNOSTIC: Let the model respond in the same language as the document
     payload = {
-        "model": OPENAI_MODEL_NAME,
+        "model": MODEL_NAME,
         "messages": [
             {
                 "role": "user",
@@ -550,7 +500,7 @@ def query_openai_with_image(image_path, retries):
     for attempt in range(retries):
         try:
             response = requests.post(
-                f"{OPENAI_BASE_URL}/chat/completions", 
+                f"{API_BASE_URL}/chat/completions", 
                 json=payload, 
                 headers=headers, 
                 timeout=IMAGE_DESCRIPTION_TIMEOUT
@@ -576,70 +526,15 @@ def query_openai_with_image(image_path, retries):
     
     return None
 
-def query_ollama_with_image(image_path, retries):
-    """Sends an Ollama API request with image - LANGUAGE AGNOSTIC."""
-    import base64
-    
-    if not os.path.exists(image_path):
-        print(f"❌ Image not found: {image_path}")
-        return None
-    
-    try:
-        with open(image_path, "rb") as image_file:
-            image_base64 = base64.b64encode(image_file.read()).decode('utf-8')
-    except Exception as e:
-        print(f"❌ Error reading image: {e}")
-        return None
-    
-    headers = {
-        'Authorization': f'Bearer {OLLAMA_API_KEY}',
-        'Content-Type': 'application/json'
-    }
-    
-    # LANGUAGE AGNOSTIC: Let the model respond in the same language as the document
-    payload = {
-        "model": OLLAMA_MODEL_NAME,
-        "messages": [
-            {
-                "role": "user",
-                "content": "Please describe the content of this image in great detail in the same language as the document being processed. If you detect German text or context, respond in German. If you detect English text or context, respond in English. If the language is unclear, use the language that best matches the content. Explain what can be seen, what texts or data are displayed, and what the meaning might be.",
-                "images": [image_base64]
-            }
-        ],
-        "stream": False
-    }
-    
-    for attempt in range(retries):
-        try:
-            response = requests.post(
-                OLLAMA_CHAT_ENDPOINT, 
-                json=payload, 
-                headers=headers, 
-                timeout=IMAGE_DESCRIPTION_TIMEOUT
-            )
-            
-            if response.status_code == 200:
-                result = response.json()
-                content = result.get("message", {}).get("content", "").strip()
-                
-                if content:
-                    return content
-                    
-        except requests.RequestException as e:
-            print(f"   ❌ Network error (attempt {attempt + 1}): {e}")
-            if attempt < retries - 1:
-                time.sleep(2)
-    
-    return None
+
 
 def describe_images_with_api():
     """Describes all images in _artifacts directories with VLM."""
-    api_name = "OpenAI API" if USE_OPENAI_API else "Ollama API"
-    print_section(f"5. IMAGE DESCRIPTION WITH {api_name.upper()}")
+    print_section("5. IMAGE DESCRIPTION WITH VISION API")
     
-    print(f"🔧 Testing {api_name} connection...")
+    print("🔧 Testing Vision API connection...")
     if not check_api_connection():
-        print(f"❌ {api_name} server not available")
+        print("❌ Vision API server not available")
         print("💡 Image descriptions will be skipped")
         return False
     
@@ -906,15 +801,11 @@ def main():
     """Main program with optimized processing."""
     print_section("🚀 DOCUMENT PROCESSOR STARTED (WITH CENTRAL CONFIG)")
     
-    api_name = "OpenAI API" if USE_OPENAI_API else "Ollama API"
-    server_url = OPENAI_BASE_URL if USE_OPENAI_API else OLLAMA_SERVER_URL
-    model_name = OPENAI_MODEL_NAME if USE_OPENAI_API else OLLAMA_MODEL_NAME
-    
     print(f"🔧 CONFIGURATION:")
     print(f"   - Text extraction: Docling Standard (fast)")
-    print(f"   - Image description: {api_name}")
-    print(f"   - Server: {server_url}")
-    print(f"   - Model: {model_name}")
+    print(f"   - Image description: Vision API")
+    print(f"   - Server: {API_BASE_URL}")
+    print(f"   - Model: {MODEL_NAME}")
     print(f"   - Combined.md: {'YES' if CREATE_COMBINED_MD else 'NO'}")
     print(f"   - Language handling: Agnostic (preserves document language)")
     
