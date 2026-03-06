@@ -76,11 +76,19 @@ You are never isolated from your data. Instead of digging through raw `.jsonl` f
 ### Option 1: Docker (Highly Recommended)
 We provide a highly optimized Docker image that handles all PyTorch and `docling` dependencies for you cleanly.
 
+1. **Clone the repository:**
 ```bash
-# Build the container locally
-docker build -t opentuneweaver .
+git clone https://github.com/profengel/opentuneweaver.git
+cd opentuneweaver
+```
 
-# Run the container (Requires port 3030)
+2. **Build the container locally:**
+```bash
+docker build -t opentuneweaver .
+```
+
+3. **Run the container (Requires port 3030):**
+```bash
 # Uses host-gateway to correctly bridge API requests to your local Ollama/LM Studio or APIs like OpenRouter/OpenAI
 docker run -d -p 3030:8080 \
   --add-host=host.docker.internal:host-gateway \
