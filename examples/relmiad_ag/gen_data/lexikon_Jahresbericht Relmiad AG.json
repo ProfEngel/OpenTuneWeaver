@@ -6,7 +6,7 @@
     "processed_sections": 4,
     "skipped_sections": 1,
     "api_used": "OpenAI-API",
-    "model_used": "qwen3.5:35b",
+    "model_used": "qwen3.5:9b",
     "entry_statistics": {
       "product": 1,
       "structured_data": 1,

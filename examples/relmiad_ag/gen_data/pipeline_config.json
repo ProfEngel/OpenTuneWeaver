@@ -8,28 +8,28 @@
       "use_openai_api": true,
       "openai_base_url": "http://host.docker.internal:11434/v1",
       "openai_api_key": "ollama",
-      "openai_model_name": "qwen3.5:35b",
+      "openai_model_name": "qwen3.5:9b",
       "temperature": 0.1
     },
     "02_genwiki": {
       "use_openai_api": true,
       "openai_base_url": "http://host.docker.internal:11434/v1",
       "openai_api_key": "ollama",
-      "openai_model_name": "qwen3.5:35b",
+      "openai_model_name": "qwen3.5:9b",
       "temperature": 0.3
     },
     "03_instructQA": {
       "use_openai_api": true,
       "openai_base_url": "http://host.docker.internal:11434/v1",
       "openai_api_key": "ollama",
-      "openai_model_name": "qwen3.5:35b",
+      "openai_model_name": "qwen3.5:9b",
       "temperature": 0.7
     },
     "05_bmcreator": {
       "use_openai_api": true,
       "openai_base_url": "http://host.docker.internal:11434/v1",
       "openai_api_key": "ollama",
-      "openai_model_name": "qwen3.5:35b",
+      "openai_model_name": "qwen3.5:9b",
       "temperature": 0.5
     }
   },
@@ -90,7 +90,7 @@
       "type": "api",
       "api_base_url": "http://host.docker.internal:11434/v1",
       "api_key": "ollama",
-      "model": "qwen3.5:35b"
+      "model": "qwen3.5:9b"
     },
     "questions_file": "BENCHMARKFRAGEN/benchmark_fragen_complete.json",
     "max_new_tokens": 256,

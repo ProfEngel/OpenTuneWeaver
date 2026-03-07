@@ -414,21 +414,21 @@ def load_existing_config():
                 "use_openai_api": True,
                 "openai_base_url": "http://host.docker.internal:11434/v1",
                 "openai_api_key": "ollama",
-                "openai_model_name": "qwen3.5:35b",
+                "openai_model_name": "qwen3.5:9b",
                 "temperature": 0.1
             },
             "02_genwiki": {
                 "use_openai_api": True,
                 "openai_base_url": "http://host.docker.internal:11434/v1",
                 "openai_api_key": "ollama",
-                "openai_model_name": "qwen3.5:35b",
+                "openai_model_name": "qwen3.5:9b",
                 "temperature": 0.3
             },
             "03_generate_qa": {
                 "use_openai_api": True,
                 "openai_base_url": "http://host.docker.internal:11434/v1",
                 "openai_api_key": "ollama",
-                "openai_model_name": "qwen3.5:35b",
+                "openai_model_name": "qwen3.5:9b",
                 "temperature": 0.7
             }
         },
@@ -655,16 +655,44 @@ def stop_pipeline():
         return "⚠️ No active pipeline found", create_pipeline_overview()
 
     try:
-        if current_process:
-            # Try graceful termination
-            current_process.terminate()
-            time.sleep(2)
-            
-            # Check current process is completely terminated
-            if current_process.poll() is None:
-                current_process.kill()
+        import psutil
         
-        log_message("⏹️ Pipeline stopped", "WARNING")
+        if current_process:
+            try:
+                parent = psutil.Process(current_process.pid)
+                children = parent.children(recursive=True)
+                
+                # Terminate children
+                for child in children:
+                    try:
+                        child.terminate()
+                    except psutil.NoSuchProcess:
+                        pass
+                
+                # Terminate parent
+                parent.terminate()
+                
+                # Wait up to 3 seconds for graceful termination
+                gone, still_alive = psutil.wait_procs(children + [parent], timeout=3.0)
+                
+                # Kill anything still alive
+                for p in still_alive:
+                    try:
+                        p.kill()
+                    except psutil.NoSuchProcess:
+                        pass
+                        
+            except psutil.NoSuchProcess:
+                pass
+            except Exception as e:
+                log_message(f"⚠️ Error during process tree traversal: {e}")
+                # Fallback to standard termination if psutil fails
+                current_process.terminate()
+                time.sleep(1)
+                if current_process.poll() is None:
+                    current_process.kill()
+        
+        log_message("⏹️ Pipeline stopped. All child processes terminated.", "WARNING")
         processing_active = False
         current_process = None
         
@@ -1035,9 +1063,6 @@ def create_main_interface():
                     with gr.Column(scale=2):
                         gr.Markdown("### 🎯 Output Hub & Status")
                         with gr.Row():
-                            viewer_launch_btn = gr.Button("🖥️ Launch Viewer Hub", variant="primary", size="lg")
-                        with gr.Row():
-                            viewer_status = gr.Textbox(visible=False)
                             refresh_btn = gr.Button("🔄 Refresh Status", variant="secondary", size="sm")
                         pipeline_overview_display = gr.HTML(value=initial_overview)
                         
@@ -1097,10 +1122,12 @@ def create_main_interface():
                             elem_classes=["status-info"]
                         )
 
-                        # Downloads
-                        gr.Markdown("### 📥 Downloads")
+                        # Downloads and Viewer
+                        gr.Markdown("### 📥 Downloads & Viewer")
                         with gr.Row():
                             download_docs_btn = gr.Button("📄 Download Generated Datasets", variant="secondary")
+                            viewer_launch_btn = gr.Button("🖥️ Launch Viewer Hub", variant="primary")
+                            viewer_status = gr.Textbox(visible=False)
                         
                         download_status = gr.Textbox(
                             label="Download Status",
@@ -1159,15 +1186,15 @@ def create_main_interface():
 
                     gr.Markdown("**Model configuration for each step:**")
                     with gr.Row():
-                        convert_model = gr.Textbox(label="📄 Convert Model", value="qwen3.5:35b")
+                        convert_model = gr.Textbox(label="📄 Convert Model", value="qwen3.5:9b")
                         convert_temp = gr.Slider(label="Temperature", minimum=0.0, maximum=2.0, value=0.1, step=0.1)
 
                     with gr.Row():
-                        wiki_model = gr.Textbox(label="📚 Wiki Model", value="qwen3.5:35b")
+                        wiki_model = gr.Textbox(label="📚 Wiki Model", value="qwen3.5:9b")
                         wiki_temp = gr.Slider(label="Temperature", minimum=0.0, maximum=2.0, value=0.3, step=0.1)
 
                     with gr.Row():
-                        qa_model = gr.Textbox(label="❓ QA Model", value="qwen3.5:35b")
+                        qa_model = gr.Textbox(label="❓ QA Model", value="qwen3.5:9b")
                         qa_temp = gr.Slider(label="Temperature", minimum=0.0, maximum=2.0, value=0.7, step=0.1)
 
                 with gr.Accordion("⚙️ Pipeline Settings", open=False):

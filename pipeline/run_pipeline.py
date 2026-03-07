@@ -485,21 +485,21 @@ class SimplifiedPipelineRunner:
                     "use_openai_api": True,
                     "openai_base_url": "http://host.docker.internal:11434/v1",
                     "openai_api_key": "",
-                    "openai_model_name": "qwen3.5:35b",
+                    "openai_model_name": "qwen3.5:9b",
                     "temperature": 0.3
                 },
                 "03_instructQA": {
                     "use_openai_api": True,
                     "openai_base_url": "http://host.docker.internal:11434/v1",
                     "openai_api_key": "ollama",
-                    "openai_model_name": "qwen3.5:35b",
+                    "openai_model_name": "qwen3.5:9b",
                     "temperature": 0.7
                 },
                 "05_bmcreator": {
                     "use_openai_api": True,
                     "openai_base_url": "http://host.docker.internal:11434/v1",
                     "openai_api_key": "ollama",
-                    "openai_model_name": "qwen3.5:35b",
+                    "openai_model_name": "qwen3.5:9b",
                     "temperature": 0.5
                 }
             },
@@ -558,7 +558,7 @@ class SimplifiedPipelineRunner:
                     "type": "api",
                     "api_base_url": "http://host.docker.internal:11434/v1",
                     "api_key": "ollama",
-                    "model": "qwen3.5:35b"
+                    "model": "qwen3.5:9b"
                 },
                 "questions_file": "BENCHMARKFRAGEN/benchmark_fragen_complete.json",
                 "max_new_tokens": 256,
@@ -647,7 +647,7 @@ class SimplifiedPipelineRunner:
             
             # 01_convert
             print("\n📄 Module 01 - Document Conversion:")
-            model_01 = input("Model [qwen3.5:35b]: ").strip() or "qwen3.5:35b"
+            model_01 = input("Model [qwen3.5:9b]: ").strip() or "qwen3.5:9b"
             api_configs["01_convert"] = {
                 "use_openai_api": True,
                 "openai_base_url": base_url,
@@ -658,7 +658,7 @@ class SimplifiedPipelineRunner:
             
             # 02_genwiki
             print("\n📚 Module 02 - Wiki Generation:")
-            model_02 = input("Model [qwen3.5:35b]: ").strip() or "qwen3.5:35b"
+            model_02 = input("Model [qwen3.5:9b]: ").strip() or "qwen3.5:9b"
             api_configs["02_genwiki"] = {
                 "use_openai_api": True,
                 "openai_base_url": base_url,
@@ -669,7 +669,7 @@ class SimplifiedPipelineRunner:
             
             # 03_instructQA
             print("\n❓ Module 03 - Instruct QA:")
-            model_03 = input("Model [qwen3.5:35b]: ").strip() or "qwen3.5:35b"
+            model_03 = input("Model [qwen3.5:9b]: ").strip() or "qwen3.5:9b"
             api_configs["03_instructQA"] = {
                 "use_openai_api": True,
                 "openai_base_url": base_url,
@@ -680,7 +680,7 @@ class SimplifiedPipelineRunner:
             
             # 05_bmcreator
             print("\n📊 Module 05 - Benchmark Creation:")
-            model_05 = input("Model [qwen3.5:35b]: ").strip() or "qwen3.5:35b"
+            model_05 = input("Model [qwen3.5:9b]: ").strip() or "qwen3.5:9b"
             api_configs["05_bmcreator"] = {
                 "use_openai_api": True,
                 "openai_base_url": base_url,
@@ -699,7 +699,7 @@ class SimplifiedPipelineRunner:
             
             api_configs = {}
             for module_id in ["01_convert", "02_genwiki", "03_instructQA", "05_bmcreator"]:
-                model_name = input(f"Model for {module_id} [qwen3.5:35b]: ").strip() or "qwen3.5:35b"
+                model_name = input(f"Model for {module_id} [qwen3.5:9b]: ").strip() or "qwen3.5:9b"
                 api_configs[module_id] = {
                     "use_openai_api": False,
                     "ollama_server_url": ollama_url,
@@ -803,7 +803,7 @@ class SimplifiedPipelineRunner:
                 "type": "api", # api or local
                 "api_base_url": base_url if use_openai else "http://host.docker.internal:11434/v1",
                 "api_key": api_key if use_openai else "ollama",
-                "model": "qwen3.5:35b"
+                "model": "qwen3.5:9b"
             },
             "questions_file": "BENCHMARKFRAGEN/benchmark_fragen_complete.json",
             "max_new_tokens": 256,

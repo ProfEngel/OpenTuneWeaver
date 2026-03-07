@@ -20,7 +20,7 @@
     "avg_answer_length": 1738.720430107527,
     "markdown_formatted_answers": 185,
     "api_used": "OpenAI-API",
-    "model_used": "qwen3.5:35b",
+    "model_used": "qwen3.5:9b",
     "server_used": "http://host.docker.internal:11434/v1",
     "format": "instruct",
     "features": {

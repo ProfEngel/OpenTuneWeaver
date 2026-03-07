@@ -3,7 +3,7 @@
     "total_entries": 32,
     "total_qa_pairs": 87,
     "api_used": "OpenAI-API",
-    "model_used": "qwen3.5:35b",
+    "model_used": "qwen3.5:9b",
     "server_used": "http://host.docker.internal:11434/v1",
     "format": "instruct",
     "markdown_formatting": true

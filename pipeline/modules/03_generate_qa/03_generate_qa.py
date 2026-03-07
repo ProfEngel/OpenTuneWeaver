@@ -469,11 +469,11 @@ def generate_qa_for_entry(entry: Dict[str, Any], num_questions: Optional[int] = 
     if num_questions is None:
         content_length = len(lexikon_entry)
         if content_length < 500:
-            num_questions = random.randint(3, 5)
+            num_questions = random.randint(2, 3)
         elif content_length < 1500:
-            num_questions = random.randint(4, 7)
+            num_questions = random.randint(3, 4)
         else:
-            num_questions = random.randint(5, 8)
+            num_questions = random.randint(4, 5)
     
     print(f"🔄 Generating {num_questions} QA pairs for: {title}")
     

@@ -311,14 +311,16 @@ IMPORTANT REQUIREMENTS:
 4. Explain technical properties in the context of this specific product
 5. Describe concrete use cases for exactly this product
 6. Use the same language as the source document
+7. COMPLETELY PRESERVE all facts, numbers, technical details, and the full length of the source content. DO NOT summarize or shorten the information.
+8. NEVER omit any provided specification parameter.
 
 ENTRY FORMAT (adapt to source language):
 **{product_code} - {product_name}**
 
-[Detailed product description - what this specific product does]
+[Detailed product description - what this specific product does. Write a fully fleshed out text containing all details from the source.]
 
 **Technical Features:**
-[List of technical properties with explanations of their meaning]
+[Comprehensive list of technical properties with explanations of their meaning. Do not leave out any details.]
 
 **Application Areas:**
 [Concrete application areas for this specific product]
@@ -326,7 +328,7 @@ ENTRY FORMAT (adapt to source language):
 **Special Properties:**
 [What makes this product special]
 
-IMPORTANT: This is a product catalog entry for the concrete product {product_code}, NOT a general definition!
+IMPORTANT: This is a product catalog entry for the concrete product {product_code}, NOT a general definition! Must be highly detailed!
 """
     
     response = submit_to_api(prompt)
@@ -365,24 +367,25 @@ DATA CONTENT:
 
 TASK:
 1. Recognize the type of data (table, list, structure)
-2. Describe the data structure and its meaning
+2. Describe the data structure and its meaning in extreme detail
 3. Explain the practical use of this information
-4. Summarize important insights
+4. Summarize important insights while PRESERVING ALL numbers, facts, and actual data points.
+5. DO NOT shorten the data. Ensure all structural and factual information is represented.
 
 FORMAT (adapt headings to source language):
 **{clean_title}**
 
 **Data Type and Structure:**
-[Description of what kind of data this is]
+[Comprehensive description of what kind of data this is]
 
 **Content Meaning:**
-[What this data means in context]
+[Detailed explanation of what this data means in context, citing all important metrics/numbers]
 
 **Practical Use:**
 [What this data is used for]
 
 **Important Insights:**
-[Summary of key points]
+[Detailed summary of key points and ALL relevant data provided]
 """
     
     response = submit_to_api(prompt)
@@ -419,25 +422,25 @@ TECHNICAL CONTENT:
 {content}
 
 REQUIREMENTS:
-1. Explain technical concepts precisely and understandably
-2. Keep technical terminology but explain it
-3. Structure by: Definition, Functionality, Application
-4. Mention concrete technical parameters if available
+1. Explain technical concepts precisely and understandably, but DO NOT shorten the text.
+2. Keep all technical terminology and explain it.
+3. Structure by: Definition, Functionality, Application.
+4. Mention ALL concrete technical parameters, numbers, and specifications provided. Do not summarize them away.
 
 FORMAT (adapt headings to source language):
 **{clean_title}**
 
 **Technical Definition:**
-[Precise technical description]
+[Detailed and precise technical description preserving full source length]
 
 **Functionality:**
-[How it works technically]
+[Comprehensive explanation of how it works technically]
 
 **Technical Parameters:**
-[Important specifications and values]
+[Exhaustive inclusion of ALL specifications and values found in the text]
 
 **Practical Application:**
-[Where and how it is used]
+[Where and how it is used based on all provided details]
 """
     
     response = submit_to_api(prompt)
@@ -473,23 +476,27 @@ PROCESS: {clean_title}
 PROCESS CONTENT:
 {content}
 
+REQUIREMENTS:
+1. COMPLETELY PRESERVE all steps, preconditions, details, and warnings.
+2. DO NOT summarize or shorten the process. It must remain fully actionable and comprehensive.
+
 FORMAT (adapt headings to source language):
 **{clean_title}**
 
 **Process Overview:**
-[Brief summary of the process]
+[Detailed summary of the process context]
 
 **Process Steps:**
-[Structured presentation of steps]
+[Exhaustive and structured presentation of ALL steps without skipping any context]
 
 **Prerequisites:**
-[What is needed]
+[Everything that is needed]
 
 **Result:**
-[What is the goal/output]
+[Precise goal/output]
 
 **Important Notes:**
-[Specifics, best practices]
+[All specifics, best practices, and warnings from the text]
 """
     
     response = submit_to_api(prompt)
@@ -526,24 +533,25 @@ ORIGINAL CONTENT:
 {content}
 
 REQUIREMENTS:
-1. Start with a precise scientific definition
-2. Explain theoretical foundations
-3. Mention practical applications
-4. Use academic, neutral language
+1. Start with a precise, highly detailed scientific definition.
+2. Explain theoretical foundations extensively.
+3. Mention practical applications.
+4. Use academic, neutral language.
+5. DO NOT shorten or summarize the original content. Ensure ALL theoretical arguments, nuances, facts, and context from the original text are fully incorporated in your answer.
 
 FORMAT (adapt headings to source language):
 **{clean_title}**
 
-[Scientific definition]
+[Comprehensive scientific definition]
 
 **Theoretical Foundations:**
-[Explanation of theory]
+[Exhaustive explanation of theory preserving all original length and arguments]
 
 **Practical Significance:**
-[Application in practice]
+[Application in practice detailing all original points]
 
 **Related Concepts:**
-[If relevant]
+[If relevant, explain all mentioned related concepts]
 """
     
     response = submit_to_api(prompt)
@@ -634,20 +642,21 @@ Original content:
 
 REQUIREMENTS:
 1. The entry explains specifically "{optimal_title}" (not the broader topic)
-2. Start with a clear, concise definition
+2. Start with a clear, comprehensive definition
 3. Mention practical aspects and application
 4. Keep focus on the specific term
 5. Use professionally correct terminology
-6. Style: Neutral, encyclopedic, factual
+6. Style: Neutral, informative, factual
 7. Language: Same as the source document
+8. EXTREMELY IMPORTANT: DO NOT SUMMARIZE OR SHORTEN. You must preserve ALL details, facts, numbers, and the FULL semantic length of the original content. Your output must be exhaustive.
 
 STRUCTURE:
-- Clear definition/introduction of "{optimal_title}"
-- Main features/characteristics
-- Practical significance/application
-- Relevant details from the original content
+- Comprehensive definition/introduction of "{optimal_title}"
+- Exhaustive main features/characteristics
+- Detailed practical significance/application
+- ALL relevant details from the original content, leaving nothing out.
 
-IMPORTANT: Respond ONLY with the lexicon entry, without additional explanations or formatting.
+IMPORTANT: Respond ONLY with the highly detailed lexicon entry, without additional explanations or formatting.
 """
     return prompt
 
