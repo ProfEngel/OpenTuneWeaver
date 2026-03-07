@@ -3,8 +3,8 @@
     "total_entries": 32,
     "total_qa_pairs": 87,
     "api_used": "OpenAI-API",
-    "model_used": "gemma3:12b-it-qat",
-    "server_used": "http://localhost:11434/v1",
+    "model_used": "qwen3.5:35b",
+    "server_used": "http://host.docker.internal:11434/v1",
     "format": "instruct",
     "markdown_formatting": true
   },

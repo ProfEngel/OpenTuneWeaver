@@ -53,7 +53,7 @@ PRODUCT_CODE_PATTERN = r'\b[A-Z]{2,4}-\d{2,4}\b'
 # Technical specification keywords (language agnostic)
 TECH_SPEC_KEYWORDS = [
     'temperatur', 'temperature', 'messbereich', 'range', 'genauigkeit', 'accuracy', 
-    'betriebsspannung', 'voltage', 'schutzart', 'protection', 'ip\d{2}', 'durchfluss', 
+    'betriebsspannung', 'voltage', 'schutzart', 'protection', r'ip\d{2}', 'durchfluss', 
     'flow', 'frequenz', 'frequency', 'leistung', 'power', 'spannung', 'strom', 'current',
     'datenrate', 'data rate', 'auflösung', 'resolution', 'gewicht', 'weight', 
     'abmessungen', 'dimensions', 'specifications', 'specs'
@@ -163,29 +163,9 @@ def detect_content_type(title: str, content: str) -> Tuple[ContentType, Optional
     return ContentType.UNKNOWN, None
 
 def is_content_relevant(title: str, content: str) -> bool:
-    """Checks if content actually conveys knowledge."""
+    """Checks if content actually conveys knowledge.
+    User preferred to not skip anything automatically."""
     if not content.strip():
-        return False
-    
-    # Irrelevant title keywords (multilingual)
-    irrelevant_keywords = [
-        'inhaltsverzeichnis', 'table of contents', 'impressum', 'imprint', 
-        'literaturverzeichnis', 'bibliography', 'anhang', 'appendix', 'index', 
-        'glossar', 'glossary', 'danksagung', 'acknowledgments', 'vorwort', 'preface'
-    ]
-    
-    title_lower = title.lower()
-    if any(keyword in title_lower for keyword in irrelevant_keywords):
-        return False
-    
-    # Check for minimum content
-    word_count = len(content.split())
-    if word_count < 10:
-        return False
-    
-    # Check for pure reference content (multilingual)
-    reference_phrases = ['siehe kapitel', 'see chapter', 'see section', 'siehe abschnitt']
-    if any(phrase in content.lower() for phrase in reference_phrases) and word_count < 30:
         return False
     
     return True

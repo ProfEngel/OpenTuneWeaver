@@ -412,23 +412,23 @@ def load_existing_config():
         "api_configs": {
             "01_convert": {
                 "use_openai_api": True,
-                "openai_base_url": "http://localhost:11434/v1",
+                "openai_base_url": "http://host.docker.internal:11434/v1",
                 "openai_api_key": "ollama",
-                "openai_model_name": "gemma3:12b-it-qat",
+                "openai_model_name": "qwen3.5:35b",
                 "temperature": 0.1
             },
             "02_genwiki": {
                 "use_openai_api": True,
-                "openai_base_url": "http://localhost:11434/v1",
+                "openai_base_url": "http://host.docker.internal:11434/v1",
                 "openai_api_key": "ollama",
-                "openai_model_name": "gemma3:12b-it-qat",
+                "openai_model_name": "qwen3.5:35b",
                 "temperature": 0.3
             },
             "03_generate_qa": {
                 "use_openai_api": True,
-                "openai_base_url": "http://localhost:11434/v1",
+                "openai_base_url": "http://host.docker.internal:11434/v1",
                 "openai_api_key": "ollama",
-                "openai_model_name": "gemma3:12b-it-qat",
+                "openai_model_name": "qwen3.5:35b",
                 "temperature": 0.7
             }
         },
@@ -1141,8 +1141,8 @@ def create_main_interface():
                     with gr.Row():
                         api_base_url = gr.Textbox(
                             label="API Base URL",
-                            value="http://localhost:11434/v1",
-                            placeholder="http://localhost:11434/v1"
+                            value="http://host.docker.internal:11434/v1",
+                            placeholder="http://host.docker.internal:11434/v1"
                         )
                         api_key = gr.Textbox(
                             label="API Key",
@@ -1159,15 +1159,15 @@ def create_main_interface():
 
                     gr.Markdown("**Model configuration for each step:**")
                     with gr.Row():
-                        convert_model = gr.Textbox(label="📄 Convert Model", value="gemma3:12b-it-qat")
+                        convert_model = gr.Textbox(label="📄 Convert Model", value="qwen3.5:35b")
                         convert_temp = gr.Slider(label="Temperature", minimum=0.0, maximum=2.0, value=0.1, step=0.1)
 
                     with gr.Row():
-                        wiki_model = gr.Textbox(label="📚 Wiki Model", value="gemma3:12b-it-qat")
+                        wiki_model = gr.Textbox(label="📚 Wiki Model", value="qwen3.5:35b")
                         wiki_temp = gr.Slider(label="Temperature", minimum=0.0, maximum=2.0, value=0.3, step=0.1)
 
                     with gr.Row():
-                        qa_model = gr.Textbox(label="❓ QA Model", value="gemma3:12b-it-qat")
+                        qa_model = gr.Textbox(label="❓ QA Model", value="qwen3.5:35b")
                         qa_temp = gr.Slider(label="Temperature", minimum=0.0, maximum=2.0, value=0.7, step=0.1)
 
                 with gr.Accordion("⚙️ Pipeline Settings", open=False):

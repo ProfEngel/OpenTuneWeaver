@@ -476,30 +476,30 @@ class SimplifiedPipelineRunner:
             "api_configs": {
                 "01_convert": {
                     "use_openai_api": True,
-                    "openai_base_url": "http://localhost:11434/v1",
+                    "openai_base_url": "http://host.docker.internal:11434/v1",
                     "openai_api_key": "",
                     "openai_model_name": "llama3.2-vision:latest",
                     "temperature": 0.1
                 },
                 "02_genwiki": {
                     "use_openai_api": True,
-                    "openai_base_url": "http://localhost:11434/v1",
+                    "openai_base_url": "http://host.docker.internal:11434/v1",
                     "openai_api_key": "",
-                    "openai_model_name": "gemma2:27b",
+                    "openai_model_name": "qwen3.5:35b",
                     "temperature": 0.3
                 },
                 "03_instructQA": {
                     "use_openai_api": True,
-                    "openai_base_url": "http://localhost:11434/v1",
+                    "openai_base_url": "http://host.docker.internal:11434/v1",
                     "openai_api_key": "ollama",
-                    "openai_model_name": "gemma3:12b-it-qat",
+                    "openai_model_name": "qwen3.5:35b",
                     "temperature": 0.7
                 },
                 "05_bmcreator": {
                     "use_openai_api": True,
-                    "openai_base_url": "http://localhost:11434/v1",
+                    "openai_base_url": "http://host.docker.internal:11434/v1",
                     "openai_api_key": "ollama",
-                    "openai_model_name": "gemma3:12b-it-qat",
+                    "openai_model_name": "qwen3.5:35b",
                     "temperature": 0.5
                 }
             },
@@ -556,9 +556,9 @@ class SimplifiedPipelineRunner:
                 },
                 "evaluator": {
                     "type": "api",
-                    "api_base_url": "http://localhost:11434/v1",
+                    "api_base_url": "http://host.docker.internal:11434/v1",
                     "api_key": "ollama",
-                    "model": "gemma3:12b-it-qat"
+                    "model": "qwen3.5:35b"
                 },
                 "questions_file": "BENCHMARKFRAGEN/benchmark_fragen_complete.json",
                 "max_new_tokens": 256,
@@ -636,8 +636,8 @@ class SimplifiedPipelineRunner:
         use_openai = input("Use OpenAI-compatible API? (y/n) [y]: ").lower().strip() != 'n'
         
         if use_openai:
-            base_url = input("API Base URL [http://localhost:11434/v1]: ").strip()
-            base_url = base_url or "http://localhost:11434/v1"
+            base_url = input("API Base URL [http://host.docker.internal:11434/v1]: ").strip()
+            base_url = base_url or "http://host.docker.internal:11434/v1"
             api_key = input("API Key [ollama]: ").strip() or "ollama"
             
             print("\nModel configuration for each module:")
@@ -647,7 +647,7 @@ class SimplifiedPipelineRunner:
             
             # 01_convert
             print("\n📄 Module 01 - Document Conversion:")
-            model_01 = input("Model [gemma3:12b-it-qat]: ").strip() or "gemma3:12b-it-qat"
+            model_01 = input("Model [qwen3.5:35b]: ").strip() or "qwen3.5:35b"
             api_configs["01_convert"] = {
                 "use_openai_api": True,
                 "openai_base_url": base_url,
@@ -658,7 +658,7 @@ class SimplifiedPipelineRunner:
             
             # 02_genwiki
             print("\n📚 Module 02 - Wiki Generation:")
-            model_02 = input("Model [gemma3:12b-it-qat]: ").strip() or "gemma3:12b-it-qat"
+            model_02 = input("Model [qwen3.5:35b]: ").strip() or "qwen3.5:35b"
             api_configs["02_genwiki"] = {
                 "use_openai_api": True,
                 "openai_base_url": base_url,
@@ -669,7 +669,7 @@ class SimplifiedPipelineRunner:
             
             # 03_instructQA
             print("\n❓ Module 03 - Instruct QA:")
-            model_03 = input("Model [gemma3:12b-it-qat]: ").strip() or "gemma3:12b-it-qat"
+            model_03 = input("Model [qwen3.5:35b]: ").strip() or "qwen3.5:35b"
             api_configs["03_instructQA"] = {
                 "use_openai_api": True,
                 "openai_base_url": base_url,
@@ -680,7 +680,7 @@ class SimplifiedPipelineRunner:
             
             # 05_bmcreator
             print("\n📊 Module 05 - Benchmark Creation:")
-            model_05 = input("Model [gemma3:12b-it-qat]: ").strip() or "gemma3:12b-it-qat"
+            model_05 = input("Model [qwen3.5:35b]: ").strip() or "qwen3.5:35b"
             api_configs["05_bmcreator"] = {
                 "use_openai_api": True,
                 "openai_base_url": base_url,
@@ -694,12 +694,12 @@ class SimplifiedPipelineRunner:
         else:
             # Ollama configuration
             print("\n🦙 Ollama Configuration:")
-            ollama_url = input("Ollama Server URL [http://localhost:11434]: ").strip()
-            ollama_url = ollama_url or "http://localhost:11434"
+            ollama_url = input("Ollama Server URL [http://host.docker.internal:11434]: ").strip()
+            ollama_url = ollama_url or "http://host.docker.internal:11434"
             
             api_configs = {}
             for module_id in ["01_convert", "02_genwiki", "03_instructQA", "05_bmcreator"]:
-                model_name = input(f"Model for {module_id} [gemma3:12b-it-qat]: ").strip() or "gemma3:12b-it-qat"
+                model_name = input(f"Model for {module_id} [qwen3.5:35b]: ").strip() or "qwen3.5:35b"
                 api_configs[module_id] = {
                     "use_openai_api": False,
                     "ollama_server_url": ollama_url,
@@ -801,9 +801,9 @@ class SimplifiedPipelineRunner:
             },
             "evaluator": {
                 "type": "api", # api or local
-                "api_base_url": base_url if use_openai else "http://localhost:11434/v1",
+                "api_base_url": base_url if use_openai else "http://host.docker.internal:11434/v1",
                 "api_key": api_key if use_openai else "ollama",
-                "model": "gemma3:12b-it-qat"
+                "model": "qwen3.5:35b"
             },
             "questions_file": "BENCHMARKFRAGEN/benchmark_fragen_complete.json",
             "max_new_tokens": 256,
