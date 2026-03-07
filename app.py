@@ -594,13 +594,19 @@ def start_pipeline():
             log_message(f"🖥️ Command: {' '.join(cmd_args)}")
 
             # Start run_pipeline.py with parameters
+            # Ensure UTF-8 encoding for subprocess to handle emoji output on Windows
+            env = os.environ.copy()
+            env["PYTHONIOENCODING"] = "utf-8"
             current_process = subprocess.Popen(
                 cmd_args,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
                 bufsize=1,
-                universal_newlines=True
+                universal_newlines=True,
+                encoding='utf-8',
+                errors='replace',
+                env=env
             )
 
             # Read output and display in terminal
@@ -608,18 +614,18 @@ def start_pipeline():
                 for line in iter(current_process.stdout.readline, ''):
                     if not line:
                         break
-                
-                # Log all outputs
-                clean_line = line.strip()
-                if clean_line:
-                    if "🔴" in clean_line or "ERROR" in clean_line or "❌" in clean_line:
-                        log_message(clean_line, "ERROR")
-                    elif "⚠️" in clean_line or "WARNING" in clean_line:
-                        log_message(clean_line, "WARNING")
-                    elif "✅" in clean_line or "🎉" in clean_line:
-                        log_message(clean_line, "SUCCESS")
-                    else:
-                        log_message(clean_line, "INFO")
+                    
+                    # Log all outputs
+                    clean_line = line.strip()
+                    if clean_line:
+                        if "🔴" in clean_line or "ERROR" in clean_line or "❌" in clean_line:
+                            log_message(clean_line, "ERROR")
+                        elif "⚠️" in clean_line or "WARNING" in clean_line:
+                            log_message(clean_line, "WARNING")
+                        elif "✅" in clean_line or "🎉" in clean_line:
+                            log_message(clean_line, "SUCCESS")
+                        else:
+                            log_message(clean_line, "INFO")
 
             # Wait for pipeline to finish
             return_code = current_process.wait()

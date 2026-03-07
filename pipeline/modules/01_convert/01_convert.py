@@ -5,6 +5,14 @@ import logging
 import time
 import gc
 import sys
+
+# Fix Windows console encoding for emoji/unicode characters
+if sys.platform == "win32":
+    import io
+    if hasattr(sys.stdout, 'buffer'):
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    if hasattr(sys.stderr, 'buffer'):
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 from pathlib import Path
 from fpdf import FPDF
 from PIL import Image, ImageEnhance
@@ -254,7 +262,51 @@ def process_remaining_pdfs(pdf_files_to_process):
             md_filename = output_dir / f"{pdf_file.stem}.md"
             result.document.save_as_markdown(md_filename, image_mode=ImageRefMode.REFERENCED)
             
-            extracted_count = extract_images_from_result(result, pdf_file, output_dir)
+            # Fix docling path issue: save_as_markdown writes images relative to CWD,
+            # creating a nested OUTPUT/OUTPUT/<stem>_artifacts/ directory.
+            # We need to move them to the correct OUTPUT/<stem>_artifacts/ location.
+            nested_artifacts = output_dir / "OUTPUT" / f"{pdf_file.stem}_artifacts"
+            correct_artifacts = output_dir / f"{pdf_file.stem}_artifacts"
+            extracted_count = 0
+            
+            if nested_artifacts.exists():
+                correct_artifacts.mkdir(exist_ok=True)
+                for img_file in nested_artifacts.iterdir():
+                    if img_file.is_file():
+                        dest = correct_artifacts / img_file.name
+                        shutil.move(str(img_file), str(dest))
+                        extracted_count += 1
+                        print(f"   🖼️ Image moved: {img_file.name}")
+                # Clean up nested directories
+                try:
+                    shutil.rmtree(output_dir / "OUTPUT")
+                    print("   🗑️ Cleaned up nested OUTPUT directory")
+                except Exception:
+                    pass
+            else:
+                # Fallback: try extract_images_from_result if save_as_markdown didn't create artifacts
+                extracted_count = extract_images_from_result(result, pdf_file, output_dir)
+            
+            # Fix image paths in the markdown file: replace "OUTPUT\..." with relative paths
+            if md_filename.exists():
+                with open(md_filename, 'r', encoding='utf-8') as f:
+                    md_content = f.read()
+                # Fix backslash paths and remove the leading "OUTPUT\" or "OUTPUT/" prefix
+                import re
+                md_content = re.sub(
+                    r'!\[([^\]]*)\]\(OUTPUT[\\\/]([^)]+)\)',
+                    r'![\1](\2)',
+                    md_content
+                )
+                # Also normalize backslashes to forward slashes in image paths
+                md_content = re.sub(
+                    r'!\[([^\]]*)\]\(([^)]*\\[^)]*)\)',
+                    lambda m: f'![{m.group(1)}]({m.group(2).replace(chr(92), "/")})',
+                    md_content
+                )
+                with open(md_filename, 'w', encoding='utf-8') as f:
+                    f.write(md_content)
+                print("   ✅ Fixed image paths in markdown")
             
             elapsed = time.time() - start_time
             print(f"✅ Conversion successful: {md_filename}")
@@ -474,6 +526,10 @@ def query_image_with_api(image_path, retries=None):
         'Content-Type': 'application/json'
     }
     
+    # Detect MIME type from file extension
+    ext = os.path.splitext(image_path)[1].lower()
+    mime_type = "image/png" if ext == ".png" else "image/jpeg"
+    
     # LANGUAGE AGNOSTIC: Let the model respond in the same language as the document
     payload = {
         "model": MODEL_NAME,
@@ -488,7 +544,7 @@ def query_image_with_api(image_path, retries=None):
                     {
                         "type": "image_url",
                         "image_url": {
-                            "url": f"data:image/jpeg;base64,{image_base64}"
+                            "url": f"data:{mime_type};base64,{image_base64}"
                         }
                     }
                 ]
@@ -497,6 +553,7 @@ def query_image_with_api(image_path, retries=None):
         "max_tokens": 500
     }
     
+    # --- TRY OPENAI FORMAT FIRST ---
     for attempt in range(retries):
         try:
             response = requests.post(
@@ -512,15 +569,56 @@ def query_image_with_api(image_path, retries=None):
                 
                 if content:
                     return content
+                else:
+                    print(f"   ⚠️ OpenAI format returned empty content, trying native...")
+                    break # Try native below
                     
             elif response.status_code == 401:
                 print(f"   ❌ Authentication failed")
                 break
             else:
-                print(f"   ❌ API error {response.status_code}")
+                print(f"   ❌ API error {response.status_code} (OpenAI format)")
                 
         except requests.RequestException as e:
-            print(f"   ❌ Network error (attempt {attempt + 1}): {e}")
+            print(f"   ❌ Network error (OpenAI format attempt {attempt + 1}): {e}")
+            if attempt < retries - 1:
+                time.sleep(2)
+
+    # --- FALLBACK: TRY NATIVE OLLAMA FORMAT ---
+    NATIVE_URL = API_BASE_URL.replace("/v1", "")
+    print(f"   🔄 Falling back to native Ollama API: {NATIVE_URL}/api/chat")
+    
+    native_payload = {
+        "model": MODEL_NAME,
+        "messages": [
+            {
+                "role": "user",
+                "content": "Please describe the content of this image in great detail in the same language as the document being processed. If you detect German text or context, respond in German. If you detect English text or context, respond in English. If the language is unclear, use the language that best matches the content.",
+                "images": [image_base64]
+            }
+        ],
+        "stream": False
+    }
+
+    for attempt in range(retries):
+        try:
+            response = requests.post(
+                f"{NATIVE_URL}/api/chat", 
+                json=native_payload, 
+                timeout=IMAGE_DESCRIPTION_TIMEOUT
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                content = result.get("message", {}).get("content", "").strip()
+                if content:
+                    print(f"   ✅ Native format success!")
+                    return content
+            else:
+                print(f"   ❌ API error {response.status_code} (Native format)")
+                
+        except requests.RequestException as e:
+            print(f"   ❌ Network error (Native format attempt {attempt + 1}): {e}")
             if attempt < retries - 1:
                 time.sleep(2)
     
@@ -569,7 +667,7 @@ def describe_images_with_api():
     for artifacts_dir in artifacts_dirs:
         for file_path in artifacts_dir.rglob("*"):
             if file_path.suffix.lower() in ['.png', '.jpg', '.jpeg', '.bmp', '.gif']:
-                relative_path = str(file_path.relative_to(output_dir))
+                relative_path = str(file_path.relative_to(output_dir)).replace("\\", "/")
                 image_files.append((file_path, relative_path))
                 total_images += 1
     
@@ -673,58 +771,52 @@ def integrate_image_descriptions():
             content = f.read()
         
         original_content = content
-        changes_made = False
+        changes_found = False
         
+        # Improved regex to handle various markdown image styles
         image_pattern = r'!\[([^\]]*)\]\(([^)]+)\)'
-        matches = re.findall(image_pattern, content)
         
-        # Filter descriptions for this specific file to allow sequential fallback
-        file_descriptions = [d for d in descriptions if f"{md_file.stem}_artifacts" in d["image_name"]]
-        file_descriptions.sort(key=lambda x: x["image_name"])  # Ensure chronological order
-        
-        desc_index = 0
-        
-        for alt_text, image_path in matches:
-            description = None
+        def replace_with_description(match):
+            nonlocal changes_found
+            alt_text = match.group(1)
+            image_path = match.group(2)
             
+            description = None
+            # Matching logic
             for key in [image_path, os.path.basename(image_path)]:
                 if key in description_dict:
                     description = description_dict[key]
                     break
             
             if not description:
-                for desc_path in description_dict.keys():
+                for desc_path, desc_text in description_dict.items():
                     if image_path in desc_path or desc_path in image_path:
-                        description = description_dict[desc_path]
+                        description = desc_text
                         break
-                        
-            # Fallback to sequential index if name matching failed
-            if not description and desc_index < len(file_descriptions):
-                description = file_descriptions[desc_index]["description"]
-            
-            desc_index += 1
             
             if description:
-                # Language-agnostic header - detect language from description
-                if any(german_word in description.lower() for german_word in ['das', 'die', 'der', 'ist', 'sind', 'zeigt', 'abbildung']):
+                if any(word in description.lower() for word in ['das', 'die', 'der', 'ist', 'sind', 'zeigt', 'abbildung']):
                     header = "**Bildbeschreibung:**"
                 else:
                     header = "**Image Description:**"
                 
-                if f"{header} {description}" not in content:
-                    old_ref = f"![{alt_text}]({image_path})"
-                    new_ref = f"{old_ref}\n\n{header} {description}\n"
-                    content = content.replace(old_ref, new_ref)
-                    integrated_count += 1
-                    changes_made = True
-                    print(f"   ✅ Description integrated for: {image_path}")
+                if f"{header}" in content and description[:50] in content:
+                    return match.group(0)
+                    
+                changes_found = True
+                return f"{match.group(0)}\n\n{header} {description}\n"
+            
+            return match.group(0)
+
+        new_content = re.sub(image_pattern, replace_with_description, content)
         
-        if changes_made:
+        if changes_found:
             with open(md_file, 'w', encoding='utf-8') as f:
-                f.write(content)
-            print(f"   💾 File updated")
+                f.write(new_content)
+            integrated_count += 1
+            print(f"   ✅ Integration successful")
         else:
-            print(f"   ⚠️ No new descriptions added")
+            print(f"   ⚠️ No matching descriptions found or already integrated")
     
     print(f"📊 Image descriptions integrated: {integrated_count}")
 

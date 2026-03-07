@@ -12,6 +12,15 @@ Version: 5.3 - With archiving functionality, viewer integration and metrics coll
 
 import os
 import sys
+
+# Fix Windows console encoding for emoji/unicode characters
+if sys.platform == "win32":
+    import io
+    if hasattr(sys.stdout, 'buffer'):
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    if hasattr(sys.stderr, 'buffer'):
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+    os.environ.setdefault("PYTHONIOENCODING", "utf-8")
 import json
 import time
 import subprocess

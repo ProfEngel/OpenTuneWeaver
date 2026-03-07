@@ -17,6 +17,12 @@ venv.bak/
 data/
 *.db
 .DS_Store
+INPUT/
+OUTPUT/
+UPLOAD/
+pipeline_config.json
+pipeline_status.json
+pipeline_metrics.json
 
 # IDE and Editor files
 .vscode/

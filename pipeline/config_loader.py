@@ -106,9 +106,7 @@ class PipelineConfigLoader:
         """Returns a merged config for a specific module.
         
         Starts from the global vision/llm config and overlays any
-        per-module overrides from api_configs. This allows e.g. 
-        03_generate_qa to use a different model_name than 02_genwiki
-        while sharing the same API base URL and key.
+        per-module overrides from api_configs.
         """
         # Pick base: 01_convert uses vision, everything else uses llm
         if module_name == "01_convert":
@@ -116,8 +114,19 @@ class PipelineConfigLoader:
         else:
             base = dict(self.llm_config)
         
-        # Overlay per-module overrides
-        module_overrides = self.config.get("api_configs", {}).get(module_name, {})
+        # Check backward compatible names
+        alt_names = [module_name]
+        if module_name == "03_generate_qa":
+            alt_names.append("03_instructQA")
+        elif module_name == "03_instructQA":
+            alt_names.append("03_generate_qa")
+            
+        module_overrides = {}
+        for name in alt_names:
+            if name in self.config.get("api_configs", {}):
+                module_overrides = self.config.get("api_configs", {}).get(name, {})
+                break
+                
         if isinstance(module_overrides, dict):
             # Map the openai_* keys to the canonical names
             key_map = {

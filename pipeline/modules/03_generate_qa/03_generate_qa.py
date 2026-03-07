@@ -3,6 +3,14 @@ import requests
 import random
 import os
 import sys
+
+# Fix Windows console encoding for emoji/unicode characters
+if sys.platform == "win32":
+    import io
+    if hasattr(sys.stdout, 'buffer'):
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    if hasattr(sys.stderr, 'buffer'):
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 import glob
 from pathlib import Path
 from typing import Dict, List, Optional, Any
@@ -15,7 +23,7 @@ from config_loader import PipelineConfigLoader
 
 # Load configuration for this module
 config_loader = PipelineConfigLoader()
-module_config = config_loader.get_module_config("03_generate_qa")
+module_config = config_loader.get_module_config("03_instructQA")
 pipeline_config = config_loader.get_pipeline_config()
 
 # Extract configuration values
