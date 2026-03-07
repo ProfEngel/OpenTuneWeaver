@@ -485,14 +485,14 @@ class SimplifiedPipelineRunner:
                     "use_openai_api": True,
                     "openai_base_url": "http://host.docker.internal:11434/v1",
                     "openai_api_key": "",
-                    "openai_model_name": "qwen3.5:9b",
+                    "openai_model_name": "gpt-oss:20b",
                     "temperature": 0.3
                 },
                 "03_instructQA": {
                     "use_openai_api": True,
                     "openai_base_url": "http://host.docker.internal:11434/v1",
                     "openai_api_key": "ollama",
-                    "openai_model_name": "qwen3.5:9b",
+                    "openai_model_name": "gpt-oss:20b",
                     "temperature": 0.7
                 },
                 "05_bmcreator": {
@@ -658,7 +658,7 @@ class SimplifiedPipelineRunner:
             
             # 02_genwiki
             print("\n📚 Module 02 - Wiki Generation:")
-            model_02 = input("Model [qwen3.5:9b]: ").strip() or "qwen3.5:9b"
+            model_02 = input("Model [gpt-oss:20b]: ").strip() or "gpt-oss:20b"
             api_configs["02_genwiki"] = {
                 "use_openai_api": True,
                 "openai_base_url": base_url,
@@ -669,7 +669,7 @@ class SimplifiedPipelineRunner:
             
             # 03_instructQA
             print("\n❓ Module 03 - Instruct QA:")
-            model_03 = input("Model [qwen3.5:9b]: ").strip() or "qwen3.5:9b"
+            model_03 = input("Model [gpt-oss:20b]: ").strip() or "gpt-oss:20b"
             api_configs["03_instructQA"] = {
                 "use_openai_api": True,
                 "openai_base_url": base_url,

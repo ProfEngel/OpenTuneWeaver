@@ -15,14 +15,14 @@
       "use_openai_api": true,
       "openai_base_url": "http://host.docker.internal:11434/v1",
       "openai_api_key": "ollama",
-      "openai_model_name": "qwen3.5:9b",
+      "openai_model_name": "gpt-oss:20b",
       "temperature": 0.3
     },
     "03_instructQA": {
       "use_openai_api": true,
       "openai_base_url": "http://host.docker.internal:11434/v1",
       "openai_api_key": "ollama",
-      "openai_model_name": "qwen3.5:9b",
+      "openai_model_name": "gpt-oss:20b",
       "temperature": 0.7
     },
     "05_bmcreator": {
