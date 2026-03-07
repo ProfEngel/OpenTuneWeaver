@@ -424,23 +424,51 @@ def submit_to_api(prompt: str, retries: int = 3) -> Optional[str]:
 def extract_qa_from_response(response: str) -> Optional[Dict[str, str]]:
     """Extracts QA pair from the API response."""
     try:
+        import re
         # Clean the response
         response = response.strip()
         
-        # Remove code block markers if present
-        if response.startswith("```json") and response.endswith("```"):
-            response = response[7:-3].strip()
-        elif response.startswith("```") and response.endswith("```"):
-            response = response[3:-3].strip()
+        qa_data = None
         
-        # Parse JSON
-        qa_data = json.loads(response)
+        # Method 1: Try finding a markdown JSON block
+        json_match = re.search(r'```(?:json)?\s*({[\s\S]*?})\s*```', response)
+        if json_match:
+            try:
+                qa_data = json.loads(json_match.group(1))
+            except json.JSONDecodeError:
+                pass
+                
+        # Method 2: Try finding any JSON object containing "question" and "answer"
+        if not qa_data:
+            json_match = re.search(r'({[\s\S]*?"question"[\s\S]*?"answer"[\s\S]*?})', response)
+            if json_match:
+                try:
+                    qa_data = json.loads(json_match.group(1))
+                except json.JSONDecodeError:
+                    pass
+        
+        # Method 3: Direct parse as last resort
+        if not qa_data:
+            try:
+                # Remove code block markers if present manually
+                clean_resp = response
+                if clean_resp.startswith("```json") and clean_resp.endswith("```"):
+                    clean_resp = clean_resp[7:-3].strip()
+                elif clean_resp.startswith("```") and clean_resp.endswith("```"):
+                    clean_resp = clean_resp[3:-3].strip()
+                qa_data = json.loads(clean_resp)
+            except json.JSONDecodeError:
+                pass
+
+        if not qa_data:
+            print(f"❌ Invalid QA format: Could not extract valid JSON")
+            return None
         
         # Validate structure
         if "question" in qa_data and "answer" in qa_data:
             return {
-                "question": qa_data["question"].strip(),
-                "answer": qa_data["answer"].strip()
+                "question": str(qa_data["question"]).strip(),
+                "answer": str(qa_data["answer"]).strip()
             }
         else:
             print(f"❌ Invalid QA format: Missing fields")

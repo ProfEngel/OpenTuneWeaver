@@ -165,9 +165,7 @@ def detect_content_type(title: str, content: str) -> Tuple[ContentType, Optional
 def is_content_relevant(title: str, content: str) -> bool:
     """Checks if content actually conveys knowledge.
     User preferred to not skip anything automatically."""
-    if not content.strip():
-        return False
-    
+    # User requested to NEVER skip anything, even if content is empty
     return True
 
 # ========================================
