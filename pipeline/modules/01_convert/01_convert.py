@@ -678,6 +678,12 @@ def integrate_image_descriptions():
         image_pattern = r'!\[([^\]]*)\]\(([^)]+)\)'
         matches = re.findall(image_pattern, content)
         
+        # Filter descriptions for this specific file to allow sequential fallback
+        file_descriptions = [d for d in descriptions if f"{md_file.stem}_artifacts" in d["image_name"]]
+        file_descriptions.sort(key=lambda x: x["image_name"])  # Ensure chronological order
+        
+        desc_index = 0
+        
         for alt_text, image_path in matches:
             description = None
             
@@ -691,6 +697,12 @@ def integrate_image_descriptions():
                     if image_path in desc_path or desc_path in image_path:
                         description = description_dict[desc_path]
                         break
+                        
+            # Fallback to sequential index if name matching failed
+            if not description and desc_index < len(file_descriptions):
+                description = file_descriptions[desc_index]["description"]
+            
+            desc_index += 1
             
             if description:
                 # Language-agnostic header - detect language from description

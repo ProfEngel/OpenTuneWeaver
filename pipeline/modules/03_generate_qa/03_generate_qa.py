@@ -368,7 +368,7 @@ OUTPUT FORMAT:
     "answer": "The complete, detailed, fact-rich answer with all details from the lexicon entry"
 }}
 
-IMPORTANT: Respond ONLY with the JSON object, no additional explanations!
+IMPORTANT: Respond ONLY with the JSON object, no additional explanations! DO NOT translate the JSON keys "question" and "answer". The keys MUST remain in exactly those English words.
 """
     return prompt
 
@@ -430,23 +430,14 @@ def extract_qa_from_response(response: str) -> Optional[Dict[str, str]]:
         
         qa_data = None
         
-        # Method 1: Try finding a markdown JSON block
-        json_match = re.search(r'```(?:json)?\s*({[\s\S]*?})\s*```', response)
+        # Try finding any JSON object with question/answer variations
+        json_match = re.search(r'({[\s\S]*?"(?:question|frage|q)"[\s\S]*?"(?:answer|antwort|a)"[\s\S]*?})', response, re.IGNORECASE)
         if json_match:
             try:
                 qa_data = json.loads(json_match.group(1))
             except json.JSONDecodeError:
                 pass
                 
-        # Method 2: Try finding any JSON object containing "question" and "answer"
-        if not qa_data:
-            json_match = re.search(r'({[\s\S]*?"question"[\s\S]*?"answer"[\s\S]*?})', response)
-            if json_match:
-                try:
-                    qa_data = json.loads(json_match.group(1))
-                except json.JSONDecodeError:
-                    pass
-        
         # Method 3: Direct parse as last resort
         if not qa_data:
             try:
@@ -456,19 +447,27 @@ def extract_qa_from_response(response: str) -> Optional[Dict[str, str]]:
                     clean_resp = clean_resp[7:-3].strip()
                 elif clean_resp.startswith("```") and clean_resp.endswith("```"):
                     clean_resp = clean_resp[3:-3].strip()
-                qa_data = json.loads(clean_resp)
+                parsed = json.loads(clean_resp)
+                # If it's a list, take the first element
+                if isinstance(parsed, list) and len(parsed) > 0:
+                    qa_data = parsed[0]
+                elif isinstance(parsed, dict):
+                    qa_data = parsed
             except json.JSONDecodeError:
                 pass
 
-        if not qa_data:
+        if not qa_data or not isinstance(qa_data, dict):
             print(f"❌ Invalid QA format: Could not extract valid JSON")
             return None
         
-        # Validate structure
-        if "question" in qa_data and "answer" in qa_data:
+        # Normalize keys if translated
+        question = qa_data.get("question") or qa_data.get("frage") or qa_data.get("Frage") or qa_data.get("Question") or qa_data.get("q")
+        answer = qa_data.get("answer") or qa_data.get("antwort") or qa_data.get("Antwort") or qa_data.get("Answer") or qa_data.get("a")
+        
+        if question and answer:
             return {
-                "question": str(qa_data["question"]).strip(),
-                "answer": str(qa_data["answer"]).strip()
+                "question": str(question).strip(),
+                "answer": str(answer).strip()
             }
         else:
             print(f"❌ Invalid QA format: Missing fields")
@@ -643,11 +642,11 @@ OUTPUT FORMAT (JSON array):
 [
   {{
     "question": "The reversed/inverse question",
-    "answer": "The complete answer from the reversed perspective"
+    "answer": "The reversed/inverse answer"
   }}
 ]
 
-IMPORTANT: Respond ONLY with the JSON array, no additional explanations!
+IMPORTANT: Respond ONLY with the JSON array, no additional explanations! DO NOT translate the JSON keys "question" and "answer". The keys MUST remain exactly "question" and "answer".
 If the Q&A pair does not contain reversible relationships (e.g., purely abstract concepts),
 return an empty array: []
 """
@@ -687,22 +686,37 @@ def generate_inverse_qa(qa_pairs: List[Dict[str, Any]], max_inverse_per_pair: in
         try:
             # Clean response
             response = response.strip()
-            if response.startswith("```json") and response.endswith("```"):
-                response = response[7:-3].strip()
-            elif response.startswith("```") and response.endswith("```"):
-                response = response[3:-3].strip()
+            
+            # Extract JSON block using regex if it's wrapped in text
+            import re
+            json_match = re.search(r'(\[[\s\S]*\])', response)
+            if json_match:
+                response = json_match.group(1)
+            else:
+                if response.startswith("```json") and response.endswith("```"):
+                    response = response[7:-3].strip()
+                elif response.startswith("```") and response.endswith("```"):
+                    response = response[3:-3].strip()
             
             inverse_data = json.loads(response)
             
             if not isinstance(inverse_data, list):
-                continue
+                # Try wrapping in list if it's a single dict
+                if isinstance(inverse_data, dict):
+                    inverse_data = [inverse_data]
+                else:
+                    continue
             
             # Limit inverse pairs per original
             for inv_idx, inv_pair in enumerate(inverse_data[:max_inverse_per_pair]):
-                if 'question' in inv_pair and 'answer' in inv_pair:
+                # Normalize keys just in case
+                q_key = inv_pair.get("question") or inv_pair.get("frage") or inv_pair.get("Frage") or inv_pair.get("q")
+                a_key = inv_pair.get("answer") or inv_pair.get("antwort") or inv_pair.get("Antwort") or inv_pair.get("a")
+                
+                if q_key and a_key:
                     inv_qa = {
-                        'question': inv_pair['question'].strip(),
-                        'answer': inv_pair['answer'].strip(),
+                        'question': str(q_key).strip(),
+                        'answer': str(a_key).strip(),
                         'source': qa.get('source', ''),
                         'title': qa.get('title', ''),
                         'question_type': 'inverse_bidirectional',
