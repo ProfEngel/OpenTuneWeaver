@@ -128,7 +128,7 @@ docker run -d -p 3030:8080 \
   `docker build --network host -t opentuneweaver .`
 - **Port Conflict:** Ensure port 3030 (for bridge) or 8080 (for host mode) is not already in use.
 
-### Option 2: Ubuntu Server / venv / systemd (Persistent, no Docker)
+### Option 2: Ubuntu Server / venv / systemd (Persistent, no Docker) (Highly recommended for Real-Time Terminal Progress in the UI)
 
 This is the recommended path for running OpenTuneWeaver directly on an Ubuntu server in a Python virtual environment for persistent operation.
 
