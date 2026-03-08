@@ -221,8 +221,8 @@ sudo systemctl status opentuneweaver
 ## What's Next? 🌟
 
 **Short to medium-term roadmap:**
-- 📁 **Multi-Datensätze**: Anlegen und Wiederverwenden mehrerer Datensätze getrennt voneinander (inkl. Wikis, QAs etc. je Datensatzordner).
-- 🔄 **Datensatz-Konvertierung**: Zusätzliche Konvertierung des QA-Datensatzes in alle relevanten Datensatztypen (Alpaca, Chat, etc.) für LlamaFactory, Unsloth etc.
+- 📁 **Multi-Dataset Management**: Create and reuse multiple datasets independently (including Wikis, QAs, etc., stored per dataset folder).
+- 🔄 **Dataset Conversion**: Additional conversion of QA datasets into all relevant formats (Alpaca, Chat, ShareGPT, etc.) for direct use in LlamaFactory, Unsloth, and other training frameworks.
 - 🌍 **Multilingual Support**: German, Spanish, French, additional languages
 - 🔬 **ArXiv Publication**: Publishing the foundational research paper for OpenTuneWeaver's methodology on ArXiv
 - 📟 **Real LiveView**: Building a genuine, Container-aware Live Terminal directly into the UI for full transparency on background processes
@@ -236,8 +236,8 @@ sudo systemctl status opentuneweaver
 
 ## Who is this for? 👥
 
-1. **Entwickler neuer LLMs**: Im Basistraining von LLM relevant um z.B. auf Instruct oder Reasoning etc. zu trainieren.
-2. **Unternehmen**: Um Frontiermodelle oder eigen gehostete Modelle mit einem trainierten Lora-Adapter zu versorgen, der die eigene Sprache spricht (dank eigenem LLM-Finetuning-Datensatz).
+1. **LLM Developers**: Essential for base model training (e.g., Instruct or Reasoning tuning) by providing high-quality, structured synthetic data.
+2. **Enterprises**: To equip frontier or self-hosted models with custom LoRA adapters that speak the organization's specific language and domain knowledge, powered by proprietary fine-tuning datasets.
 
 ***
 
