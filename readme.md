@@ -74,22 +74,22 @@ You are never isolated from your data. Instead of digging through raw `.jsonl` f
 ## How to Install 🚀
 
 ### Option 1: Docker (Highly Recommended)
-We provide a highly optimized Docker image that handles all PyTorch and `docling` dependencies for you cleanly.
 
-1. **Clone the repository:**
+We provide a highly optimized Docker image that handles all PyTorch and `docling` dependencies cleanly. For persistent operation on an Ubuntu/Linux server, follow these steps.
+
+#### 1. Clone & Build
 ```bash
 git clone https://github.com/profengel/opentuneweaver.git
 cd opentuneweaver
-```
-
-2. **Build the container locally:**
-```bash
 docker build -t opentuneweaver .
 ```
 
-3. **Run the container (Requires port 3030):**
+#### 2. Run OpenTuneWeaver
+The container runs internally on port `8080`. We map this to `3030` on your host. **Crucial:** You must provide a reachable HTTP API URL in the UI. **Do not use `localhost`** in the UI settings, as it refers to the container itself.
+
+##### Standard Linux Setup (Bridge Mode)
+Recommended for most users. Use `host-gateway` to allow the container to reach Ollama/LM Studio running on your host machine.
 ```bash
-# Uses host-gateway to correctly bridge API requests to your local Ollama/LM Studio or APIs like OpenRouter/OpenAI
 docker run -d -p 3030:8080 \
   --add-host=host.docker.internal:host-gateway \
   -v opentuneweaver_data:/app/pipeline/OUTPUT \
@@ -97,34 +97,124 @@ docker run -d -p 3030:8080 \
   --restart always \
   opentuneweaver:latest
 ```
-Access the application on your browser at `http://localhost:3030`.
+*In the OpenTuneWeaver UI, set your API URL to `http://host.docker.internal:11434/v1` (for Ollama).*
 
-#### Troubleshooting Docker Build on Linux/Ubuntu/WSL2
-If the `docker build` fails during the `apt-get update` step with errors like `Temporary failure resolving 'deb.debian.org'`, it is usually a DNS issue inside the Docker build container. You can fix this by using your host's network during the build:
+##### Host Network Mode (Advanced)
+Shares the host's network namespace directly. No port mapping needed.
 ```bash
-docker build --network host -t opentuneweaver .
+docker run -d \
+  --network host \
+  -v opentuneweaver_data:/app/pipeline/OUTPUT \
+  --name opentuneweaver \
+  --restart always \
+  opentuneweaver:latest
 ```
-*(Alternatively, configure your `/etc/docker/daemon.json` to use public DNS servers like `8.8.8.8`.)*
+*Note: In this mode, `localhost` in the UI points to your host. Access the UI at `http://your-ip:8080`.*
 
-### Option 2: Local Installation (Linux/Windows/Mac)
+##### Remote API (LAN / Tailscale)
+If your API runs on another server or via Tailscale, use its real IP.
+```bash
+docker run -d -p 3030:8080 \
+  -v opentuneweaver_data:/app/pipeline/OUTPUT \
+  --name opentuneweaver \
+  --restart always \
+  opentuneweaver:latest
+```
+*Example UI API URL: `http://100.x.y.z:11434/v1` (Tailscale) or `http://192.168.1.50:11434/v1` (LAN).*
 
-1. Clone the repository
+#### Troubleshooting Docker
+- **Persistence:** All generated data is stored in the Docker volume `opentuneweaver_data`.
+- **DNS Issues:** If `docker build` fails to resolve packages, use:
+  `docker build --network host -t opentuneweaver .`
+- **Port Conflict:** Ensure port 3030 (for bridge) or 8080 (for host mode) is not already in use.
+
+### Option 2: Ubuntu Server / venv / systemd (Persistent, no Docker)
+
+This is the recommended path for running OpenTuneWeaver directly on an Ubuntu server in a Python virtual environment for persistent operation.
+
+#### 1. Install system packages
+
+```bash
+sudo apt update
+sudo apt install -y git python3 python3-venv python3-pip \
+  poppler-utils tesseract-ocr tesseract-ocr-deu tesseract-ocr-eng
+```
+
+#### 2. Clone the repository
+
 ```bash
 git clone https://github.com/ProfEngel/OpenTuneWeaver.git
 cd OpenTuneWeaver
 ```
 
-2. Create a Virtual Environment & Install Requirements
+#### 3. Create and fill the virtual environment
+
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+python3 -m venv venv
+source venv/bin/activate
+pip install --upgrade pip setuptools wheel
 pip install -r requirements.txt
 ```
 
-3. Start OpenTuneWeaver
+#### 4. Test locally (with custom port)
+
+OpenTuneWeaver binds to `0.0.0.0`. By default, it uses port `8080`. You can change this using the `OTW_PORT` environment variable (e.g., to `3030` for Tailscale):
+
 ```bash
+# Default (8080)
+source venv/bin/activate
 python app.py
+
+# Custom port (e.g., 3030)
+OTW_PORT=3030 python app.py
 ```
+
+#### 5. Run permanently with systemd
+
+Create a service file:
+
+```bash
+sudo nano /etc/systemd/system/opentuneweaver.service
+```
+
+Paste the following and replace `YOUR_USER` and the paths with your real values:
+
+```ini
+[Unit]
+Description=OpenTuneWeaver
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=YOUR_USER
+WorkingDirectory=/home/YOUR_USER/OpenTuneWeaver
+Environment=PYTHONUNBUFFERED=1
+# Optional: Set a custom port (default is 8080)
+Environment=OTW_PORT=3030
+ExecStart=/home/YOUR_USER/OpenTuneWeaver/venv/bin/python /home/YOUR_USER/OpenTuneWeaver/app.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Then enable and start the service:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now opentuneweaver
+sudo systemctl status opentuneweaver
+```
+
+#### Troubleshooting
+
+- **217/USER**: Your `User=` entry in the service file is wrong or not resolvable.
+- **203/EXEC**: Your `ExecStart=` path is wrong or the Python executable is missing.
+- **Port Conflict**: Ensure the port is not already in use. Reach the UI at `http://SERVER-IP:PORT`.
+- **Ollama**: If using a local Ollama instance, set the API URL in the UI to `http://127.0.0.1:11434/v1`.
+
 
 ***
 
