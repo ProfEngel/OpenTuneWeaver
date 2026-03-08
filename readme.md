@@ -241,6 +241,31 @@ sudo systemctl status opentuneweaver
 
 ***
 
+## ⚠️ Warning & Performance Benchmarks
+
+> [!IMPORTANT]
+> **Use Local LLMs!** We strongly recommend using local LLM providers like **Ollama** or **LM Studio**. OpenTuneWeaver generates an immense amount of tokens. Using paid cloud-based APIs (like OpenAI or Anthropic) for the full pipeline can lead to **very high costs** and potential **account bans**, as massive automated synthetic data generation may violate some providers' terms of service.
+
+### Real-World Performance Case Study
+To give you an idea of processing times, here is a benchmark from our tests:
+
+- **Target Document**: [OpenClaw Guide by Matthew Bearman](https://forwardfuture.ai/p/what-people-are-actually-doing-with-openclaw-25-use-cases) (41 pages, 3 images).
+- **Hardware**: RTX 5000 Ada
+- **Backend**: Ollama
+- **Model**: GPT-OSS 20B
+- **Total Duration**: ~4.5 hours (`04:24:56`)
+    - **Wiki Generation**: 36 minutes
+    - **QA Dataset Generation**: 229 minutes
+
+#### 📊 Extraction Results:
+- **Lexicon Entries**: 118 (117 successful)
+- **Total QA Pairs**: **1,380**
+    - **Bidirectional QA**: 918 pairs
+    - **Avg. Answer Length**: 1,174 characters
+- **Final Output Size**: 2.1 MB (`dataset.jsonl`)
+
+***
+
 ## Media Coverage & Interviews 📰
 
 OpenTuneWeaver and our research on AI in education have gained significant media attention. Here are recent interviews and articles featuring Prof. Dr. Mathias Engel and the project:
