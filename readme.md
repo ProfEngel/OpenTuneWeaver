@@ -73,7 +73,7 @@ You are never isolated from your data. Instead of digging through raw `.jsonl` f
 
 ## How to Install 🚀
 
-### Option 1: Docker (Highly Recommended)
+### Option 1: Docker
 
 We provide a highly optimized Docker image that handles all PyTorch and `docling` dependencies cleanly. For persistent operation on an Ubuntu/Linux server, follow these steps.
 
