@@ -221,6 +221,8 @@ sudo systemctl status opentuneweaver
 ## What's Next? 🌟
 
 **Short to medium-term roadmap:**
+- 📁 **Multi-Datensätze**: Anlegen und Wiederverwenden mehrerer Datensätze getrennt voneinander (inkl. Wikis, QAs etc. je Datensatzordner).
+- 🔄 **Datensatz-Konvertierung**: Zusätzliche Konvertierung des QA-Datensatzes in alle relevanten Datensatztypen (Alpaca, Chat, etc.) für LlamaFactory, Unsloth etc.
 - 🌍 **Multilingual Support**: German, Spanish, French, additional languages
 - 🔬 **ArXiv Publication**: Publishing the foundational research paper for OpenTuneWeaver's methodology on ArXiv
 - 📟 **Real LiveView**: Building a genuine, Container-aware Live Terminal directly into the UI for full transparency on background processes
@@ -229,6 +231,13 @@ sudo systemctl status opentuneweaver
 - 🤖 **Agentic QA Evaluation**: Implementing an "LLM-as-a-Judge" pipeline to automatically score and filter generated QA pairs for maximum quality
 - 🔗 **MCP-Server Integration**: OpenTuneWeaver as MCP-Server for direct chat integration and automation pipelines
 - 🎥 **YouTube Tutorials**: Comprehensive video tutorials on [MatMaxEngel YouTube Channel](https://www.youtube.com/user/MatMaxEngel) covering usage guides
+
+***
+
+## Who is this for? 👥
+
+1. **Entwickler neuer LLMs**: Im Basistraining von LLM relevant um z.B. auf Instruct oder Reasoning etc. zu trainieren.
+2. **Unternehmen**: Um Frontiermodelle oder eigen gehostete Modelle mit einem trainierten Lora-Adapter zu versorgen, der die eigene Sprache spricht (dank eigenem LLM-Finetuning-Datensatz).
 
 ***
 
