@@ -1564,10 +1564,11 @@ def main():
     interface = create_main_interface()
 
     # Start server
-    log_message("🌐 Starting web server...")
+    port = int(os.getenv("OTW_PORT", "8080"))
+    log_message(f"🌐 Starting web server on port {port}...")
     print("\n🌐 UI available at:")
-    print(" - Local: http://localhost:8080")
-    print(" - Network: http://YOUR_IP:8080")
+    print(f" - Local: http://localhost:{port}")
+    print(f" - Network: http://YOUR_IP:{port}")
     print("\n🎯 Features:")
     print(" - 📁 Direct access to pipeline and ui folders")
     print(" - 🔬 Expert Settings for advanced configuration")
@@ -1579,7 +1580,7 @@ def main():
     try:
         interface.launch(
             server_name="0.0.0.0",
-            server_port=8080,
+            server_port=port,
             share=False,
             debug=False,
             show_error=True,
